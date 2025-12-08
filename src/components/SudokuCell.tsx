@@ -45,18 +45,18 @@ const SudokuCell = ({
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({
     id: `cell-${row}-${col}`,
     data: { cell: { row, col } },
-    disabled: isImmutable
+    disabled: isImmutable,
   });
 
   const classNames = clsx('sudoku__cell', {
     'sudoku__cell--ok': isSelected,
     'sudoku__cell--disabled': isDisabled,
-    'sudoku__cell--pre-filled': isFixed,
+    'sudoku__cell--pre-filled': isFixed && !isRelated,
     'sudoku__cell--empty': !isRelated && value == null,
     'sudoku__cell--warning': !isSelected && isHint,
     'sudoku__cell--danger': !isSelected && isConflicting,
     'sudoku__cell--highlight': !isConflicting && !isSelected && (isRelated || isOver),
-    'sudoku__cell--no-outline': isRelated && value == null
+    'sudoku__cell--no-outline': isRelated && !isSelected
   });
 
   return (

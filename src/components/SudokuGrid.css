@@ -2,6 +2,12 @@
   display: grid;
   grid-template-columns: repeat(3, auto);
   grid-template-rows: repeat(3, auto);
+  padding: 0.75rem;
+
+  background-color: white;
+
+  border: 0.125rem solid var(--pink);
+  border-radius: 0.75rem;
 
   > .sudoku__block:nth-child(3n) {
     border-right: none;
@@ -20,7 +26,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 0.25em;
+  gap: 0.5rem;
   padding: 0.75rem;
 
   border-bottom: 2px dashed var(--pink);
