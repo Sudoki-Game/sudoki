@@ -33,7 +33,8 @@ import {
   isGameWon,
   createEmptyBoard,
   computeHighlights
-} from '../util';
+} from '../util/util';
+import { MAX_LIVES } from '@/util/constants';
 
 type SudokuProviderProps = {
   children: React.ReactNode;
@@ -133,7 +134,7 @@ function reducer(state: GameState, action: GameAction): GameState {
         originalBoard: action.payload.board,
         solution: action.payload.solution,
         score: 0,
-        lives: 6,
+        lives: MAX_LIVES,
         status: 'playing',
         selected: { row: null, col: null },
         conflicts: new Map(),

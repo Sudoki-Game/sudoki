@@ -10,6 +10,10 @@ import SudokuGrid from './SudokuGrid';
 import { useSudoku } from '@/context/SudokuContext';
 import './Sudoku.css';
 import { Dynascale } from 'dynascale';
+import Image from 'next/image';
+import HeartIcon from '../../public/game/heart.svg';
+import EmptyHeartIcon from '../../public/game/heart-empty.svg';
+import { MAX_LIVES } from '@/util/constants';
 
 /**
  * Main Sudoku UI component
@@ -40,10 +44,22 @@ const Sudoku = () => {
         </DragOverlay>
 
         <div className='sudoku__game'>
-          <p className='sudoku__stat'>
-            {'Score '}
-            <span>{game.score}</span>
-          </p>
+          <div className='sudoku__stats'>
+            <div className='sudoku__stat-container'>
+              <span className='sudoku__stat'>Score</span>
+              <span className='sudoku__stat sudoku__stat--numerical'>{game.score}</span>
+            </div>
+
+            <div className='sudoku__lives-container'>
+              {Array.from({ length: MAX_LIVES }).map((_, i) =>
+                i < game.lives ? (
+                  <Image key={`heart-${i}`} src={HeartIcon} alt={'Heart'} height={24} />
+                ) : (
+                  <Image key={`heart-${i}`} src={EmptyHeartIcon} alt={'Empty Heart'} height={24} />
+                )
+              )}
+            </div>
+          </div>
 
           {/* Game Board */}
           {isReady && (
@@ -51,11 +67,6 @@ const Sudoku = () => {
               <SudokuGrid ref={boardRef} showSolution={false} />
             </Dynascale>
           )}
-
-          <p className='sudoku__stat'>
-            <span data-testid='lives-count'>{game.lives}</span>
-            {' Lives Remaining'}
-          </p>
 
           {/* Draggable numbers */}
           <div className={`sudoku__controls ${!isPlaying ? 'sudoku__controls--game-over' : ''}`}>
@@ -76,8 +87,8 @@ const Sudoku = () => {
                 ))}
             </div>
 
-            <button disabled={!isPlaying} className='button button--warning' onClick={addHint}>
-              Hint
+            <button disabled={!isPlaying} className='button button--lg button--warning' onClick={addHint}>
+              HTNT
             </button>
           </div>
         </div>

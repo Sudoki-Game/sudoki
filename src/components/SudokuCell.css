@@ -23,11 +23,10 @@
 
   padding-bottom: 0.25rem;
 
-  border: none;
+  border: 0.15rem solid var(--text);
   border-radius: 0.75rem;
 
-  box-shadow: inset 0 -0.375rem 0 var(--shadow);
-  outline: 0.175rem solid var(--text);
+  box-shadow: inset 0 -0.35rem 0 var(--shadow);
 
   &.sudoku__cell--disabled {
     transition: all 1s ease;
@@ -55,16 +54,16 @@
     opacity: 50%;
     background: none;
     box-shadow: none;
-    outline: none;
-    padding: none;
+    border: none;
+    padding: 0;
   }
 
   &.sudoku__cell--empty {
     opacity: 30%;
     background: var(--shadow);
-    box-shadow: inset 0 0.375rem 0 var(--shadow);
-    outline: none;
-    padding: none;
+    box-shadow: inset 0 0.35rem 0 var(--shadow);
+    border: none;
+    padding: 0;
   }
 
   &.sudoku__cell--danger {
@@ -88,8 +87,8 @@
   }
 
   &.sudoku__cell--no-outline {
-    outline: none;
+    border: none;
     box-shadow: none;
-    padding: none;
+    padding: 0;
   }
 }
