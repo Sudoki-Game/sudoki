@@ -1,0 +1,113 @@
+.sudoku {
+  display: grid;
+  grid-template-rows: 100% 1fr;
+  grid-template-columns: 100%;
+  width: 100%;
+  height: 100%;
+
+  padding-bottom: 1rem;
+  overflow: hidden;
+
+  &.sudoku--game-over {
+    transition: grid-template-rows 2s ease;
+    height: 100%;
+    grid-template-rows: 45% 1fr;
+    overflow-y: auto;
+  }
+}
+
+.sudoku__game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0 2rem;
+  gap: 1.5rem;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+
+.sudoku__stat {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+
+  > span {
+    font-weight: 700;
+    color: var(--text);
+  }
+}
+
+.sudoku__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  /* overflow: hidden; */
+  transition: max-height 1s ease;
+
+  &.sudoku__controls--game-over {
+    max-height: 0px;
+  }
+}
+
+.sudoku__controls-numlist {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 0.5rem;
+
+  @media (orientation: portrait) {
+    grid-template-columns: repeat(3, 4rem);
+    grid-template-rows: repeat(3, 4rem);
+
+    gap: 1rem;
+
+    .sudoku__cell {
+      font-size: 1.75rem;
+      width: 4rem;
+      height: 4rem;
+    }
+  }
+}
+
+.sudoku__game-over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  opacity: 100%;
+
+  gap: 2rem;
+
+  transition: opacity 0.5s ease-in-out;
+
+  @starting-style {
+    opacity: 0%;
+  }
+}
+
+.sudoku__game-over-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-tone-5);
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 1.5rem;
+  gap: 0.75rem;
+
+  h1 {
+    text-transform: uppercase;
+  }
+
+  p {
+    font-size: 1.25rem;
+  }
+}
+
+:root[data-theme='dark'] .sudoku__game-over-banner {
+  background-color: black;
+}

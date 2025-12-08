@@ -1,0 +1,24 @@
+.draggable {
+  position: relative;
+  min-width: 3.25rem;
+  min-height: 3.25rem;
+  touch-action: none;
+}
+
+.draggable__wrapper {
+  height: 100%;
+  width: 100%;
+  opacity: 100%;
+}
+
+.draggable__placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+
+  border-radius: 0.25rem;
+  border: 2px solid var(--color-tone-5);
+  box-sizing: border-box;
+}

@@ -1,0 +1,28 @@
+.sudoku__grid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  grid-template-rows: repeat(3, auto);
+
+  > .sudoku__block:nth-child(3n) {
+    border-right: none;
+  }
+
+  > .sudoku__block:nth-child(n + 7) {
+    border-bottom: none;
+  }
+
+  &.sudoku__grid--show-solution {
+    pointer-events: none;
+  }
+}
+
+.sudoku__block {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 0.25em;
+  padding: 0.25em;
+
+  border-bottom: 2px solid var(--color-tone-3);
+  border-right: 2px solid var(--color-tone-3);
+}
