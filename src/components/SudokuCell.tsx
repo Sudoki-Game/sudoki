@@ -49,13 +49,13 @@ const SudokuCell = ({
   });
 
   const classNames = clsx('sudoku__cell', {
-    'sudoku__cell--green': isSelected,
+    'sudoku__cell--ok': isSelected,
     'sudoku__cell--disabled': isDisabled,
-    'sudoku__cell--transparent': isFixed,
-    'sudoku__cell--outline': !isRelated && value == null,
-    'sudoku__cell--yellow': !isSelected && isHint,
-    'sudoku__cell--red': !isSelected && isConflicting,
-    'sudoku__cell--blue': !isConflicting && !isSelected && (isRelated || isOver),
+    'sudoku__cell--pre-filled': isFixed,
+    'sudoku__cell--empty': !isRelated && value == null,
+    'sudoku__cell--warning': !isSelected && isHint,
+    'sudoku__cell--danger': !isSelected && isConflicting,
+    'sudoku__cell--highlight': !isConflicting && !isSelected && (isRelated || isOver),
     'sudoku__cell--no-outline': isRelated && value == null
   });
 

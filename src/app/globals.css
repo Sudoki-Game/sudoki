@@ -1,43 +1,42 @@
-:root {
-  --color-tone-1: #1a1a1b;
-  --color-tone-2: #454747;
-  --color-tone-3: #a9abad;
-  --color-tone-4: #d3d6da;
-  --color-tone-5: #edeff1;
-  --color-tone-6: #f6f7f8;
-  --color-tone-7: #fff;
+@font-face {
+  font-family: 'Yang Bagus';
+  src: url(/font/YangBagus.woff);
+}
 
-  --blue: #509ce5;
-  --red: #fd8484;
-  --green: #6fb05c;
-  --yellow: #e9ba3a;
-  --grey: #edeff1;
-  --text: #1a1a1b;
-  --text-secondary: #a9abad;
+@font-face {
+  font-family: 'Bear Days';
+  src: url(/font/BearDays.woff);
+}
+
+:root {
+  --cyan: #effdff;
+  --blue: #4fa8fc;
+  --red: #fc4f6a;
+  --green: #8acc37;
+  --green: #679929;
+  --yellow: #ffe18e;
+  --bronze: #db4500;
+  --pink: #ff91a8;
+  --hot-pink: #f8315a;
+  --grey: #fff2ec;
+  --silver: #cecece;
+  --text: #531b26;
+  --label: #aa4056;
+  --background: #fef4ea;
+
   --shadow: rgba(0, 0, 0, 0.25);
 
-  &[data-theme='dark'] {
-    --color-tone-7: #1a1a1b;
-    --color-tone-6: #292b2b;
-    --color-tone-5: #323434;
-    --color-tone-4: #454747;
-    --color-tone-3: #666;
-    --color-tone-2: #f6f7f8;
-    --color-tone-1: #f6f7f8;
-
-    --red: #bf5a5a;
-    --green: #3a8b38;
-    --yellow: #b59626;
-    --grey: #616161;
-    --text: #ffffff;
-    --text-secondary: #a9abad;
-    --shadow: rgba(0, 0, 0, 0.25);
-  }
+  /* Gradients */
+  --grey-gradient: linear-gradient(180deg, #ffffff 0%, #fff2ec 100%);
+  --red-gradient: linear-gradient(180deg, #fc4f6a 0%, #f8315a 100%);
+  --blue-gradient: linear-gradient(180deg, #6eb9ff 0%, #4fa8fc 100%);
+  --yellow-gradient: linear-gradient(180deg, #fff1cb 0%, #ffe18e 100%);
+  --green-gradient: linear-gradient(180deg, #91d877 0%, #8acc37 100%);
 }
 
 * {
   color: var(--text);
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Yang Bagus', sans-serif;
   font-optical-sizing: auto;
   margin: 0;
 }
@@ -51,18 +50,17 @@ html {
 }
 
 body {
-  background-color: var(--color-tone-5);
+  background-color: var(--background);
   margin: 0;
 }
 
 header {
   display: flex;
   position: relative;
-  justify-content: space-between;
+  justify-content: center;
   box-sizing: border-box;
-  padding: 0 1rem;
+  margin-top: 2.5rem;
   align-items: center;
-  height: 5rem;
   width: 100%;
 
   > h1 {
