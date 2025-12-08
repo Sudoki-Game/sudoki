@@ -87,9 +87,15 @@ const Sudoku = () => {
                 ))}
             </div>
 
-            <button disabled={!isPlaying} className='button button--lg button--warning' onClick={addHint}>
-              HTNT
-            </button>
+            {isReady && (
+              <button
+                disabled={!isPlaying}
+                className='button button--lg button--warning'
+                onClick={addHint}
+              >
+                HTNT
+              </button>
+            )}
           </div>
         </div>
       </DndContext>
