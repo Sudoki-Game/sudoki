@@ -184,7 +184,15 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
   const boardRef = useRef<HTMLDivElement>(null);
 
   // Drag and drop
-  const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 100,
+        tolerance: 150
+      }
+    }),
+    useSensor(KeyboardSensor)
+  );
 
   /**
    * Grid of all fixed cells
@@ -210,7 +218,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    * Generates board and resets state.
    */
   const newGame = useCallback(() => {
-    const { puzzle, solution } = generatePuzzledifficulty('easy');
+    const { puzzle, solution } = generatePuzzledifficulty('medium');
     // console.log('Solution:', solution);
 
     containerRef.current?.scrollTo(0, 0);
