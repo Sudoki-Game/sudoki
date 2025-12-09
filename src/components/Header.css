@@ -1,0 +1,23 @@
+.header {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  padding-top: 2.5rem;
+  align-items: center;
+  width: 100%;
+  transition: all 0.3s ease-in-out;
+
+  height: 5.25rem;
+
+  @media screen and (max-width: 768px) {
+    padding-top: 2rem;
+    height: 4rem;
+  }
+}
+
+.header__logo {
+  transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1);
+  @media screen and (max-width: 768px) {
+    height: 4rem;
+  }
+}
