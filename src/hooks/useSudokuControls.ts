@@ -61,24 +61,59 @@ const useSudokuControls = (): SudokuControls => {
   /**
    * Handle keyboard input for editing Sudoku cells.
    */
+  /**
+   * Handle keyboard input for editing Sudoku cells and moving selection.
+   */
   useEffect(() => {
     if (game.status !== 'playing' || !boardRef.current) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (game.selected.row !== null && game.selected.col !== null) {
+      const { row, col } = game.selected;
+
+      const isArrow =
+        e.key === 'ArrowUp' ||
+        e.key === 'ArrowDown' ||
+        e.key === 'ArrowLeft' ||
+        e.key === 'ArrowRight';
+
+      // Handle arrow-key navigation
+      if (isArrow) {
+        e.preventDefault(); // prevent scrolling
+
+        const newRow = (() => {
+          if (row === null) return 0;
+          if (e.key === 'ArrowUp') return Math.max(row - 1, 0);
+          if (e.key === 'ArrowDown') return Math.min(row + 1, 8);
+          return row;
+        })();
+
+        const newCol = (() => {
+          if (col === null) return 0;
+          if (e.key === 'ArrowLeft') return Math.max(col - 1, 0);
+          if (e.key === 'ArrowRight') return Math.min(col + 1, 8);
+          return col;
+        })();
+
+        dispatch({ type: 'SELECT_CELL', row: newRow, col: newCol });
+        return;
+      }
+
+      // Handle number input + deletion
+      if (row !== null && col !== null) {
         const isNumber = /^[1-9]$/.test(e.key);
         const isDeleteOrBackspace = e.key === '0' || e.key === 'Delete' || e.key === 'Backspace';
 
         if (isNumber) {
-          updateCell(game.selected.row, game.selected.col, Number(e.key));
+          updateCell(row, col, Number(e.key));
         } else if (isDeleteOrBackspace) {
-          updateCell(game.selected.row, game.selected.col, null);
+          updateCell(row, col, null);
         }
       }
     };
+
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [boardRef, game.selected, game.showSolution, game.status, updateCell]);
+  }, [boardRef, game.selected, game.status, updateCell, dispatch]);
 
   /**
    * Deselect the active cell when clicking outside the board area.
