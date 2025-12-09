@@ -33,7 +33,7 @@ const SudokuGrid = ({ showSolution, ref }: SudokuGridProps) => {
   const isPlaying = game.status === 'playing';
 
   return (
-    <div className={`sudoku__grid ${showSolution ? 'sudoku__grid--show-solution' : ''}`} ref={ref}>
+    <div ref={ref} className={`sudoku__grid ${showSolution ? 'sudoku__grid--show-solution' : ''}`}>
       {Array.from({ length: 9 }).map((_, blockIdx) => {
         const blockRow = Math.floor(blockIdx / 3);
         const blockCol = blockIdx % 3;

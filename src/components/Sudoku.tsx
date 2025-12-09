@@ -5,7 +5,14 @@
 'use client';
 
 import Draggable from './Draggable';
-import { DndContext, DragOverlay } from '@dnd-kit/core';
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core';
 import SudokuGrid from './SudokuGrid';
 import { useSudoku } from '@/context/SudokuContext';
 import './Sudoku.css';
@@ -14,28 +21,72 @@ import Image from 'next/image';
 import HeartIcon from '../../public/game/heart.svg';
 import EmptyHeartIcon from '../../public/game/heart-empty.svg';
 import { MAX_LIVES } from '@/util/constants';
+import { useRef, useEffect } from 'react';
 
 /**
  * Main Sudoku UI component
  * @returns
  */
 const Sudoku = () => {
-  const {
-    game,
-    sensors,
-    containerRef,
-    boardRef,
-    isReady,
-    addHint,
-    handleDragStart,
-    handleDrop,
-    newGame,
-    dispatch
-  } = useSudoku();
+  const { game, isReady, addHint, handleDragStart, handleDrop, newGame, updateCell, dispatch } =
+    useSudoku();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 100,
+        tolerance: 150
+      }
+    }),
+    useSensor(KeyboardSensor)
+  );
+
+  const boardRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Handle keyboard input
+   */
+  useEffect(() => {
+    if (game.status !== 'playing' || !boardRef.current) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (game.selected.row !== null && game.selected.col !== null) {
+        const isNumber = /^[1-9]$/.test(e.key);
+        const isDeleteOrBackspace = e.key === '0' || e.key === 'Delete' || e.key === 'Backspace';
+
+        if (isNumber) {
+          updateCell(game.selected.row, game.selected.col, Number(e.key));
+        } else if (isDeleteOrBackspace) {
+          updateCell(game.selected.row, game.selected.col, null);
+        }
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [boardRef, game.selected, game.showSolution, game.status, updateCell]);
+
+  /**
+   * Deselect when clicking outside the grid
+   */
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (!boardRef.current?.contains(e.target as Node)) {
+        dispatch({ type: 'RESET_SELECTION' });
+      }
+    };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, [boardRef, dispatch]);
+
+  /**
+   * Start new game on mount
+   */
+  useEffect(newGame, [newGame]);
+
   const isPlaying = game.status === 'playing';
 
   return (
-    <div ref={containerRef} className={`sudoku ${isPlaying ? '' : 'sudoku--game-over'}`}>
+    <div className={`sudoku ${isPlaying ? '' : 'sudoku--game-over'}`}>
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDrop}>
         <DragOverlay dropAnimation={null}>
           {game.dragValue ? (

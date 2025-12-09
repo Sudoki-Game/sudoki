@@ -12,20 +12,10 @@ import {
   useEffect,
   useMemo,
   useReducer,
-  useRef,
   useState
 } from 'react';
 import type { GameAction, GameState } from '../types';
-import {
-  type DragStartEvent,
-  type DragEndEvent,
-  useSensors,
-  useSensor,
-  PointerSensor,
-  type SensorDescriptor,
-  type SensorOptions,
-  KeyboardSensor
-} from '@dnd-kit/core';
+import { type DragStartEvent, type DragEndEvent } from '@dnd-kit/core';
 import {
   generatePuzzledifficulty,
   removeConflictsForCell,
@@ -45,21 +35,6 @@ export type SudokuProviderState = {
    * Core game state
    */
   game: GameState;
-
-  /**
-   * Drag and drop sensors (DnD Kit)
-   */
-  sensors: SensorDescriptor<SensorOptions>[];
-
-  /**
-   * Game container ref
-   */
-  containerRef: React.RefObject<HTMLDivElement | null>;
-
-  /**
-   * Main game board ref
-   */
-  boardRef: React.RefObject<HTMLDivElement | null>;
 
   /**
    * Set of all highlighted cells
@@ -181,19 +156,6 @@ const SudokuContext = createContext<SudokuProviderState | undefined>(undefined);
 export function SudokuProvider({ children }: SudokuProviderProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isReady, setIsReady] = useState<boolean>(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const boardRef = useRef<HTMLDivElement>(null);
-
-  // Drag and drop
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        delay: 100,
-        tolerance: 150
-      }
-    }),
-    useSensor(KeyboardSensor)
-  );
 
   /**
    * Grid of all fixed cells
@@ -222,7 +184,6 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     const { puzzle, solution } = generatePuzzledifficulty('medium');
     // console.log('Solution:', solution);
 
-    containerRef.current?.scrollTo(0, 0);
     dispatch({ type: 'NEW_GAME', payload: { board: puzzle, solution } });
     setIsReady(true);
   }, []);
@@ -515,37 +476,6 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     dispatch({ type: 'ADD_HINT', row: r, col: c });
   }, [fixedCells, state.board, state.solution, state.conflicts, dispatch]);
 
-  // Handle keyboard input
-  useEffect(() => {
-    if (state.status !== 'playing' || !boardRef.current) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (state.selected.row !== null && state.selected.col !== null) {
-        const isNumber = /^[1-9]$/.test(e.key);
-        const isDeleteOrBackspace = e.key === '0' || e.key === 'Delete' || e.key === 'Backspace';
-
-        if (isNumber) {
-          updateCell(state.selected.row, state.selected.col, Number(e.key));
-        } else if (isDeleteOrBackspace) {
-          updateCell(state.selected.row, state.selected.col, null);
-        }
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [state.selected, state.showSolution, state.status, updateCell]);
-
-  // Deselect when clicking outside the grid
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (!boardRef.current?.contains(e.target as Node)) {
-        dispatch({ type: 'RESET_SELECTION' });
-      }
-    };
-    document.addEventListener('mousedown', onClick);
-    return () => document.removeEventListener('mousedown', onClick);
-  }, []);
-
   // Check win/lose conditions
   useEffect(() => {
     if (state.status !== 'playing') return;
@@ -563,17 +493,10 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     }
   }, [state.board, state.conflicts, state.lives, state.status]);
 
-  // Start new game on mount
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(newGame, [newGame]);
-
   return (
     <SudokuContext.Provider
       value={{
         game: state,
-        sensors,
-        containerRef,
-        boardRef,
         highlights,
         isReady,
         updateCell,
