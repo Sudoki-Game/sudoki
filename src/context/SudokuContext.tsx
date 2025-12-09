@@ -170,10 +170,10 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    */
   const highlights: Set<string> = useMemo(
     () =>
-      state.selected.row != null && state.selected.col != null
+      !state.dragValue && state.selected.row != null && state.selected.col != null
         ? computeHighlights(state.selected.row, state.selected.col, state.board)
         : new Set(),
-    [state.board, state.selected.col, state.selected.row]
+    [state.dragValue, state.board, state.selected.col, state.selected.row]
   );
 
   /**
