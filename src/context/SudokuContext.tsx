@@ -391,14 +391,18 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
       // Make sure cell is editable
       if (state.originalBoard[row][col]) return;
 
+      // Ignore if the target cell contains the same value
+      if (state.board[row][col] === value) return;
+
       // We're updating a valid cell
       let deltaScore = 0;
       let newLives = state.lives;
       const newBoard = state.board.map((r) => [...r]);
       let newConflicts = new Map(state.conflicts);
 
-      // Remove the current target cell
       const currentTargetValue = state.board[row][col];
+
+      // Remove the current target cell
       newBoard[row][col] = null;
 
       // Remove current target conflcits
