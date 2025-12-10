@@ -6,7 +6,7 @@
 
   background-color: white;
 
-  border: 0.125rem solid var(--pink);
+  border: 2px solid var(--pink);
   border-radius: 0.75rem;
 
   > .sudoku__block:nth-child(3n) {
