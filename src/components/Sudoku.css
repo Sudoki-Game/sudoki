@@ -27,9 +27,13 @@
   width: 100%;
   height: 100%;
 
-  @media (orientation: portrait) and (max-width: 768px) {
-    padding-left: 0;
-    padding-right: 0;
+  > .dynascale {
+    aspect-ratio: 1/1;
+  }
+
+  @media (orientation: portrait) and (max-width: 640px) {
+    justify-content: space-evenly;
+    padding: 1.25rem 1rem;
     gap: 1rem;
   }
 }
