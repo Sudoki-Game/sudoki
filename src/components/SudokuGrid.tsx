@@ -2,7 +2,6 @@
  * Sudoku Game — Copyright (c) 2025 Dylan Almond
  * @license GNU General Public License v3.0
  */
-'use client';
 
 import { memo } from 'react';
 import SudokuCell from './SudokuCell';

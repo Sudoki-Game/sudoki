@@ -2,7 +2,6 @@
  * Sudoku Game — Copyright (c) 2025 Dylan Almond
  * @license GNU General Public License v3.0
  */
-'use client';
 
 import { useDraggable } from '@dnd-kit/core';
 import './Draggable.css';
