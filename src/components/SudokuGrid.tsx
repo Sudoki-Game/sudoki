@@ -21,7 +21,7 @@ type SudokuGridProps = {
  * @returns The rendered Sudoku grid as a set of blocks and cells.
  */
 const SudokuGrid = ({ showSolution, ref }: SudokuGridProps) => {
-  const { game, highlights, handleClick } = useSudoku();
+  const { game, isReady, highlights, handleClick } = useSudoku();
 
   /**
    * Check if a given cell is selected.
@@ -30,6 +30,9 @@ const SudokuGrid = ({ showSolution, ref }: SudokuGridProps) => {
     game.selected.row === row && game.selected.col === col;
 
   const isPlaying = game.status === 'playing';
+
+  // Will scale into view when ready
+  if (!isReady) return null;
 
   return (
     <div ref={ref} className={`sudoku__grid ${showSolution ? 'sudoku__grid--show-solution' : ''}`}>
