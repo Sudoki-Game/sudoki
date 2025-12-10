@@ -1,0 +1,35 @@
+.sudoku__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  /* overflow: hidden; */
+  transition: max-height 1s ease;
+
+  &.sudoku__controls--game-over {
+    max-height: 0px;
+  }
+}
+
+.sudoku__controls-numlist {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0.5rem;
+
+  padding: 1rem;
+
+  background-color: white;
+
+  border: 2px solid var(--pink);
+  border-radius: 0.75rem;
+
+  margin: 0 1.5rem;
+
+  .sudoku__cell {
+    margin: auto;
+  }
+
+  @media (orientation: portrait) and (max-width: 640px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}

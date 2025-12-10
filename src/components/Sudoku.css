@@ -78,46 +78,6 @@
   }
 }
 
-.sudoku__controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  /* overflow: hidden; */
-  transition: max-height 1s ease;
-
-  &.sudoku__controls--game-over {
-    max-height: 0px;
-  }
-}
-
-.sudoku__controls-numlist {
-  display: flex;
-  /* grid-template-columns: repeat(9, 1fr); */
-  justify-content: center;
-  gap: 0.5rem;
-
-  padding: 1rem;
-
-  background-color: white;
-
-  border: 0.125rem solid var(--pink);
-  border-radius: 0.75rem;
-
-  @media (orientation: portrait) and (max-width: 640px) {
-    flex-wrap: wrap;
-    justify-content: center;
-
-    gap: 1rem;
-
-    .sudoku__cell {
-      /* font-size: 1.75rem; */
-      width: 100%;
-      height: 100%;
-    }
-  }
-}
-
 .sudoku__game-over {
   display: flex;
   flex-direction: column;
