@@ -4,7 +4,6 @@
  */
 'use client';
 
-import Draggable from './Draggable';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import SudokuGrid from './SudokuGrid';
 import { useSudoku } from '@/context/SudokuContext';
@@ -14,15 +13,16 @@ import Image from 'next/image';
 import HeartIcon from '../../public/game/heart.svg';
 import EmptyHeartIcon from '../../public/game/heart-empty.svg';
 import { MAX_LIVES } from '@/util/constants';
-import { useEffect } from 'react';
 import useSudokuControls from '@/hooks/useSudokuControls';
+import SudokuControls from './SudokuControls';
+import { useEffect } from 'react';
 
 /**
  * Main Sudoku UI component
  * @returns
  */
 const Sudoku = () => {
-  const { game, isReady, addHint, handleDragStart, handleDrop, newGame, dispatch } = useSudoku();
+  const { game, handleDragStart, handleDrop, newGame, dispatch } = useSudoku();
   const { dndSensors, boardRef } = useSudokuControls();
 
   /**
@@ -60,41 +60,11 @@ const Sudoku = () => {
           </div>
 
           {/* Game Board */}
-          {isReady && (
-            <Dynascale defaultScale={0} margin={0}>
-              <SudokuGrid ref={boardRef} showSolution={false} />
-            </Dynascale>
-          )}
+          <Dynascale defaultScale={0} margin={0}>
+            <SudokuGrid ref={boardRef} showSolution={false} />
+          </Dynascale>
 
-          {/* Draggable numbers */}
-          <div className={`sudoku__controls ${!isPlaying ? 'sudoku__controls--game-over' : ''}`}>
-            <div className='sudoku__controls-numlist'>
-              {isReady &&
-                Array.from({ length: 9 }).map((_, i) => (
-                  <Draggable
-                    key={i}
-                    id={`draggable-${i + 1}`}
-                    isDisabled={!isPlaying}
-                    className={`sudoku__cell ${!isPlaying ? 'sudoku__cell--disabled' : ''}`}
-                    data={{ cell: { value: i + 1 } }}
-                    tabIndex={isPlaying ? 0 : -1}
-                    data-testid={`draggable-${i + 1}`}
-                  >
-                    {i + 1}
-                  </Draggable>
-                ))}
-            </div>
-
-            {isReady && (
-              <button
-                disabled={!isPlaying}
-                className='button button--lg button--warning'
-                onClick={addHint}
-              >
-                HTNT
-              </button>
-            )}
-          </div>
+          <SudokuControls />
         </div>
       </DndContext>
 
