@@ -41,7 +41,7 @@ const Sudoku = () => {
         </DragOverlay>
 
         <div className='sudoku__game'>
-          <SudokuStats />
+          <SudokuStats score={game.score} lives={game.lives} />
 
           {/* Game Board */}
           <Dynascale defaultScale={0} margin={0}>
