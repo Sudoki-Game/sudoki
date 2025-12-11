@@ -20,7 +20,8 @@ import SudokuStats from './SudokuStats';
  * @returns
  */
 const Sudoku = () => {
-  const { game, handleDragStart, handleDrop, newGame } = useSudoku();
+  const { game, isReady, highlights, handleClick, handleDragStart, handleDrop, newGame } =
+    useSudoku();
   const { dndSensors, boardRef } = useSudokuControls();
 
   /**
@@ -44,7 +45,14 @@ const Sudoku = () => {
 
           {/* Game Board */}
           <Dynascale defaultScale={0} margin={0}>
-            <SudokuGrid ref={boardRef} showSolution={false} />
+            <SudokuGrid
+              ref={boardRef}
+              game={game}
+              isReady={isReady}
+              handleClick={handleClick}
+              highlights={highlights}
+              showSolution={false}
+            />
           </Dynascale>
 
           <SudokuControls />

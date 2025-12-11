@@ -3,7 +3,6 @@
  * @license GNU General Public License v3.0
  */
 
-import { memo } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import Draggable from './Draggable';
 import clsx from 'clsx';
@@ -44,7 +43,7 @@ const SudokuCell = ({
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({
     id: `cell-${row}-${col}`,
     data: { cell: { row, col } },
-    disabled: isImmutable,
+    disabled: isImmutable
   });
 
   const classNames = clsx('sudoku__cell', {
@@ -75,14 +74,4 @@ const SudokuCell = ({
   );
 };
 
-export default memo(
-  SudokuCell,
-  (prev, next) =>
-    prev.value === next.value &&
-    prev.isDisabled === next.isDisabled &&
-    prev.isFixed === next.isFixed &&
-    prev.isConflicting === next.isConflicting &&
-    prev.isSelected === next.isSelected &&
-    prev.isRelated === next.isRelated &&
-    prev.isHint === next.isHint
-);
+export default SudokuCell;

@@ -3,13 +3,16 @@
  * @license GNU General Public License v3.0
  */
 
-import { memo } from 'react';
 import SudokuCell from './SudokuCell';
-import { useSudoku } from '@/context/SudokuContext';
 import './SudokuGrid.css';
+import { GameState } from '@/types';
 
 type SudokuGridProps = {
+  game: GameState;
+  isReady: boolean;
+  highlights: Set<string>;
   showSolution: boolean;
+  handleClick: (row: number, col: number) => void;
 } & React.ComponentProps<'div'>;
 
 /**
@@ -20,9 +23,14 @@ type SudokuGridProps = {
  * @param showSolution - If true, displays the solution grid; otherwise, displays the current game board.
  * @returns The rendered Sudoku grid as a set of blocks and cells.
  */
-const SudokuGrid = ({ showSolution, ref }: SudokuGridProps) => {
-  const { game, isReady, highlights, handleClick } = useSudoku();
-
+const SudokuGrid = ({
+  game,
+  isReady,
+  highlights,
+  showSolution,
+  handleClick,
+  ref
+}: SudokuGridProps) => {
   /**
    * Check if a given cell is selected.
    */
@@ -95,4 +103,4 @@ const SudokuGrid = ({ showSolution, ref }: SudokuGridProps) => {
   );
 };
 
-export default memo(SudokuGrid);
+export default SudokuGrid;

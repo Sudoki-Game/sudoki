@@ -5,15 +5,7 @@
 
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useState
-} from 'react';
+import { createContext, useContext, useEffect, useReducer, useState } from 'react';
 import type { GameAction, GameState } from '../types';
 import { type DragStartEvent, type DragEndEvent } from '@dnd-kit/core';
 import {
@@ -160,178 +152,252 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
   /**
    * Grid of all fixed cells
    */
-  const fixedCells = useMemo(
-    () => state.originalBoard.map((row) => row.map((val) => val !== null)),
-    [state.originalBoard]
-  );
+  const fixedCells = state.originalBoard.map((row) => row.map((val) => val !== null));
 
   /**
    * Set of all highlighted cells
    */
-  const highlights: Set<string> = useMemo(
-    () =>
-      !state.dragValue && state.selected.row != null && state.selected.col != null
-        ? computeHighlights(state.selected.row, state.selected.col, state.board)
-        : new Set(),
-    [state.dragValue, state.board, state.selected.col, state.selected.row]
-  );
+  const highlights: Set<string> =
+    !state.dragValue && state.selected.row != null && state.selected.col != null
+      ? computeHighlights(state.selected.row, state.selected.col, state.board)
+      : new Set();
 
   /**
    * Starts a new game.
    * Generates board and resets state.
    */
-  const newGame = useCallback(() => {
+  const newGame = () => {
     const { puzzle, solution } = generatePuzzledifficulty('medium');
     // console.log('Solution:', solution);
 
     dispatch({ type: 'NEW_GAME', payload: { board: puzzle, solution } });
     setIsReady(true);
-  }, []);
+  };
 
   /**
    * Handle cell selection.
    */
-  const handleClick = useCallback((row: number, col: number) => {
+  const handleClick = (row: number, col: number) => {
     dispatch({ type: 'SELECT_CELL', row, col });
-  }, []);
+  };
 
   /**
    * Handle dragging start.
    * Capture value and select source cell.
    */
-  const handleDragStart = useCallback((e: DragStartEvent) => {
+  const handleDragStart = (e: DragStartEvent) => {
     const cell = e.active.data.current?.cell;
     if (!cell) return;
     dispatch({ type: 'SET_DRAG_VALUE', value: cell.value });
     dispatch({ type: 'SELECT_CELL', row: cell.row, col: cell.col });
-  }, []);
+  };
 
   /**
    * Determines if a drop is invalid (no move or fixed cell.)
    */
-  const isInvalidDrop = useCallback(
-    (
-      sourceRow: number | undefined,
-      sourceCol: number | undefined,
-      targetRow: number,
-      targetCol: number
-    ) =>
-      !state.dragValue ||
-      fixedCells[targetRow][targetCol] ||
-      (sourceRow === targetRow && sourceCol === targetCol),
-    [state.dragValue, fixedCells]
-  );
+  const isInvalidDrop = (
+    sourceRow: number | undefined,
+    sourceCol: number | undefined,
+    targetRow: number,
+    targetCol: number
+  ) =>
+    !state.dragValue ||
+    fixedCells[targetRow][targetCol] ||
+    (sourceRow === targetRow && sourceCol === targetCol);
 
   /**
    * Clears a source cell when dropped out of bounds.
    */
-  const handleOutOfBounds = useCallback(
-    (sourceRow: number, sourceCol: number) => {
-      let deltaScore = 0;
+  const handleOutOfBounds = (sourceRow: number, sourceCol: number) => {
+    let deltaScore = 0;
 
-      const sourceValue = state.board[sourceRow][sourceCol];
+    const sourceValue = state.board[sourceRow][sourceCol];
 
-      // Remove the cell from the board
-      const newBoard = state.board.map((r) => [...r]);
-      newBoard[sourceRow][sourceCol] = null;
-      dispatch({ type: 'UPDATE_BOARD', board: newBoard });
+    // Remove the cell from the board
+    const newBoard = state.board.map((r) => [...r]);
+    newBoard[sourceRow][sourceCol] = null;
+    dispatch({ type: 'UPDATE_BOARD', board: newBoard });
 
-      // Update conflicts map
-      let newConflicts = new Map(state.conflicts);
+    // Update conflicts map
+    let newConflicts = new Map(state.conflicts);
 
-      // Remove source conflcits
-      if (sourceValue !== null) {
-        // Deduct previously granted score if source is a valid cell
-        if (!newConflicts.has(`${sourceRow},${sourceCol}`)) {
-          deltaScore -= 20;
-        }
-
-        newConflicts = removeConflictsForCell(
-          state.board,
-          newConflicts,
-          sourceRow,
-          sourceCol,
-          sourceValue
-        );
+    // Remove source conflcits
+    if (sourceValue !== null) {
+      // Deduct previously granted score if source is a valid cell
+      if (!newConflicts.has(`${sourceRow},${sourceCol}`)) {
+        deltaScore -= 20;
       }
 
-      // Delete the source cell
-      newConflicts.delete(`${sourceRow},${sourceCol}`);
+      newConflicts = removeConflictsForCell(
+        state.board,
+        newConflicts,
+        sourceRow,
+        sourceCol,
+        sourceValue
+      );
+    }
 
-      dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
-      dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
-      dispatch({ type: 'SET_DRAG_VALUE', value: null });
-      dispatch({ type: 'RESET_SELECTION' });
-    },
-    [state.board, state.conflicts, state.score]
-  );
+    // Delete the source cell
+    newConflicts.delete(`${sourceRow},${sourceCol}`);
+
+    dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
+    dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
+    dispatch({ type: 'SET_DRAG_VALUE', value: null });
+    dispatch({ type: 'RESET_SELECTION' });
+  };
 
   /**
    * Handles in-bounds drop.
    * Moves value, computes conflicts and updates state.
    */
-  const handleInBounds = useCallback(
-    (
-      sourceRow: number | undefined,
-      sourceCol: number | undefined,
-      targetRow: number,
-      targetCol: number
-    ) => {
-      let deltaScore = 0;
-      let newLives = state.lives;
+  const handleInBounds = (
+    sourceRow: number | undefined,
+    sourceCol: number | undefined,
+    targetRow: number,
+    targetCol: number
+  ) => {
+    let deltaScore = 0;
+    let newLives = state.lives;
 
-      const newBoard = state.board.map((r) => [...r]);
-      let newConflicts = new Map(state.conflicts);
-      const value = state.dragValue!;
+    const newBoard = state.board.map((r) => [...r]);
+    let newConflicts = new Map(state.conflicts);
+    const value = state.dragValue!;
 
-      // If we have no source to check, check the value at the target
-      if (sourceRow == null || sourceCol == null) {
-        sourceRow = targetRow;
-        sourceCol = targetCol;
+    // If we have no source to check, check the value at the target
+    if (sourceRow == null || sourceCol == null) {
+      sourceRow = targetRow;
+      sourceCol = targetCol;
+    }
+
+    // Remove the source cell and deduct any points given
+    const sourceValue = state.board[sourceRow][sourceCol];
+    newBoard[sourceRow][sourceCol] = null;
+
+    // Remove source conflcits
+    if (sourceValue !== null) {
+      // Deduct previously granted score if source is a valid cell
+      if (!newConflicts.has(`${sourceRow},${sourceCol}`)) {
+        deltaScore -= 20;
       }
 
-      // Remove the source cell and deduct any points given
-      const sourceValue = state.board[sourceRow][sourceCol];
-      newBoard[sourceRow][sourceCol] = null;
+      newConflicts = removeConflictsForCell(
+        state.board,
+        newConflicts,
+        sourceRow,
+        sourceCol,
+        sourceValue
+      );
+    }
 
-      // Remove source conflcits
-      if (sourceValue !== null) {
-        // Deduct previously granted score if source is a valid cell
-        if (!newConflicts.has(`${sourceRow},${sourceCol}`)) {
-          deltaScore -= 20;
-        }
+    // Remove the current target cell
+    const currentTargetValue = state.board[targetRow][targetCol];
+    newBoard[targetRow][targetCol] = null;
 
-        newConflicts = removeConflictsForCell(
-          state.board,
-          newConflicts,
-          sourceRow,
-          sourceCol,
-          sourceValue
-        );
+    // Remove current target conflcits
+    if (currentTargetValue !== null) {
+      console.log(currentTargetValue);
+
+      newConflicts = removeConflictsForCell(
+        state.board,
+        newConflicts,
+        targetRow,
+        targetCol,
+        currentTargetValue
+      );
+    }
+
+    // Add our new value to the board
+    newBoard[targetRow][targetCol] = value;
+
+    // Check for conflicts
+    const targetConflicts = getConflicts(newBoard, targetRow, targetCol, value);
+
+    // Score + lives handling
+    if (targetConflicts.size) {
+      // Increment conflict count for each cell in conflict
+      for (const [conflictKey, countToAdd] of targetConflicts.entries()) {
+        const current = newConflicts.get(conflictKey) ?? 0;
+        newConflicts.set(conflictKey, current + countToAdd);
       }
+      newLives -= 1;
+      deltaScore -= 10;
+    } else if (!state.board[targetRow][targetCol]) {
+      deltaScore += 20;
+    }
 
-      // Remove the current target cell
-      const currentTargetValue = state.board[targetRow][targetCol];
-      newBoard[targetRow][targetCol] = null;
+    dispatch({ type: 'UPDATE_BOARD', board: newBoard });
+    dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
+    dispatch({ type: 'SET_LIVES', lives: newLives });
+    dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
+    dispatch({ type: 'SELECT_CELL', row: targetRow, col: targetCol });
+    dispatch({ type: 'SET_DRAG_VALUE', value: null });
+  };
 
-      // Remove current target conflcits
-      if (currentTargetValue !== null) {
-        console.log(currentTargetValue);
+  /**
+   * Main drop handler.
+   * Delegates to out-of-bounds or in-bounds handlers.
+   */
+  const handleDrop = (e: DragEndEvent) => {
+    const { over, active } = e;
+    if (!active) return;
 
-        newConflicts = removeConflictsForCell(
-          state.board,
-          newConflicts,
-          targetRow,
-          targetCol,
-          currentTargetValue
-        );
-      }
+    const { row: sourceRow, col: sourceCol } = active.data.current?.cell ?? {};
+    const sourceIsCell = sourceRow != null && sourceCol != null;
 
-      // Add our new value to the board
-      newBoard[targetRow][targetCol] = value;
+    // Handle missing target
+    if (!over) {
+      if (sourceIsCell) handleOutOfBounds(sourceRow!, sourceCol!);
+      return;
+    }
 
+    const { row: targetRow, col: targetCol } = over.data.current!.cell;
+    if (isInvalidDrop(sourceRow, sourceCol, targetRow, targetCol)) return;
+
+    // We've dropped onto a valid cell
+    handleInBounds(sourceRow, sourceCol, targetRow, targetCol);
+  };
+
+  /**
+   * Update a cell.
+   */
+  const updateCell = (row: number, col: number, value: number | null) => {
+    // Make sure cell is editable
+    if (state.originalBoard[row][col]) return;
+
+    // Ignore if the target cell contains the same value
+    if (state.board[row][col] === value) return;
+
+    // We're updating a valid cell
+    let deltaScore = 0;
+    let newLives = state.lives;
+    const newBoard = state.board.map((r) => [...r]);
+    let newConflicts = new Map(state.conflicts);
+
+    const currentTargetValue = state.board[row][col];
+
+    // Remove the current target cell
+    newBoard[row][col] = null;
+
+    // Remove current target conflcits
+    if (currentTargetValue !== null) {
+      console.log(currentTargetValue);
+
+      newConflicts = removeConflictsForCell(
+        state.board,
+        newConflicts,
+        row,
+        col,
+        currentTargetValue
+      );
+    }
+
+    // Add our new value to the board
+    newBoard[row][col] = value;
+
+    // Handle numerical (non-null) value
+    if (value !== null) {
       // Check for conflicts
-      const targetConflicts = getConflicts(newBoard, targetRow, targetCol, value);
+      const targetConflicts = getConflicts(newBoard, row, col, value);
 
       // Score + lives handling
       if (targetConflicts.size) {
@@ -342,118 +408,23 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
         }
         newLives -= 1;
         deltaScore -= 10;
-      } else if (!state.board[targetRow][targetCol]) {
+      } else if (!state.board[row][col]) {
         deltaScore += 20;
       }
+    }
 
-      dispatch({ type: 'UPDATE_BOARD', board: newBoard });
-      dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
-      dispatch({ type: 'SET_LIVES', lives: newLives });
-      dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
-      dispatch({ type: 'SELECT_CELL', row: targetRow, col: targetCol });
-      dispatch({ type: 'SET_DRAG_VALUE', value: null });
-    },
-    [state.board, state.conflicts, state.dragValue, state.lives, state.score]
-  );
-
-  /**
-   * Main drop handler.
-   * Delegates to out-of-bounds or in-bounds handlers.
-   */
-  const handleDrop = useCallback(
-    (e: DragEndEvent) => {
-      const { over, active } = e;
-      if (!active) return;
-
-      const { row: sourceRow, col: sourceCol } = active.data.current?.cell ?? {};
-      const sourceIsCell = sourceRow != null && sourceCol != null;
-
-      // Handle missing target
-      if (!over) {
-        if (sourceIsCell) handleOutOfBounds(sourceRow!, sourceCol!);
-        return;
-      }
-
-      const { row: targetRow, col: targetCol } = over.data.current!.cell;
-      if (isInvalidDrop(sourceRow, sourceCol, targetRow, targetCol)) return;
-
-      // We've dropped onto a valid cell
-      handleInBounds(sourceRow, sourceCol, targetRow, targetCol);
-    },
-    [handleOutOfBounds, handleInBounds, isInvalidDrop]
-  );
-
-  /**
-   * Update a cell.
-   */
-  const updateCell = useCallback(
-    (row: number, col: number, value: number | null) => {
-      // Make sure cell is editable
-      if (state.originalBoard[row][col]) return;
-
-      // Ignore if the target cell contains the same value
-      if (state.board[row][col] === value) return;
-
-      // We're updating a valid cell
-      let deltaScore = 0;
-      let newLives = state.lives;
-      const newBoard = state.board.map((r) => [...r]);
-      let newConflicts = new Map(state.conflicts);
-
-      const currentTargetValue = state.board[row][col];
-
-      // Remove the current target cell
-      newBoard[row][col] = null;
-
-      // Remove current target conflcits
-      if (currentTargetValue !== null) {
-        console.log(currentTargetValue);
-
-        newConflicts = removeConflictsForCell(
-          state.board,
-          newConflicts,
-          row,
-          col,
-          currentTargetValue
-        );
-      }
-
-      // Add our new value to the board
-      newBoard[row][col] = value;
-
-      // Handle numerical (non-null) value
-      if (value !== null) {
-        // Check for conflicts
-        const targetConflicts = getConflicts(newBoard, row, col, value);
-
-        // Score + lives handling
-        if (targetConflicts.size) {
-          // Increment conflict count for each cell in conflict
-          for (const [conflictKey, countToAdd] of targetConflicts.entries()) {
-            const current = newConflicts.get(conflictKey) ?? 0;
-            newConflicts.set(conflictKey, current + countToAdd);
-          }
-          newLives -= 1;
-          deltaScore -= 10;
-        } else if (!state.board[row][col]) {
-          deltaScore += 20;
-        }
-      }
-
-      dispatch({ type: 'UPDATE_BOARD', board: newBoard });
-      dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
-      dispatch({ type: 'SET_LIVES', lives: newLives });
-      dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
-      // dispatch({ type: 'SELECT_CELL', row: row, col: col });
-      dispatch({ type: 'SET_DRAG_VALUE', value: null });
-    },
-    [state.board, state.conflicts, state.lives, state.originalBoard, state.score]
-  );
+    dispatch({ type: 'UPDATE_BOARD', board: newBoard });
+    dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
+    dispatch({ type: 'SET_LIVES', lives: newLives });
+    dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
+    // dispatch({ type: 'SELECT_CELL', row: row, col: col });
+    dispatch({ type: 'SET_DRAG_VALUE', value: null });
+  };
 
   /**
    * Add Hint to board
    */
-  const addHint = useCallback(() => {
+  const addHint = () => {
     // Collect all empty, non-fixed cells
     const emptyCells: Array<{ r: number; c: number }> = [];
     for (let r = 0; r < 9; r++) {
@@ -478,7 +449,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
     dispatch({ type: 'SELECT_CELL', row: r, col: c });
     dispatch({ type: 'ADD_HINT', row: r, col: c });
-  }, [fixedCells, state.board, state.solution, state.conflicts, dispatch]);
+  };
 
   // Check win/lose conditions
   useEffect(() => {
