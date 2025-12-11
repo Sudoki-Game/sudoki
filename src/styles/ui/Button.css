@@ -8,6 +8,7 @@
   cursor: pointer;
   flex-shrink: 0;
 
+  font-family: 'Yang Bagus', sans-serif;
   transition: all 0.15s, border-width 0s, box-shadow 0s ease-in-out;
 
   border: 0.15rem solid var(--text);
