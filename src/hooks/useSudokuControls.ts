@@ -121,12 +121,14 @@ const useSudokuControls = (): SudokuControls => {
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (!boardRef.current?.contains(e.target as Node)) {
-        dispatch({ type: 'RESET_SELECTION' });
+        if (game.selected.row !== null || game.selected.col !== null) {
+          dispatch({ type: 'RESET_SELECTION' });
+        }
       }
     };
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
-  }, [boardRef, dispatch]);
+  }, [boardRef, dispatch, game.selected]);
 
   return { dndSensors, boardRef };
 };

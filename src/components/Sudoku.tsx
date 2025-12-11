@@ -16,6 +16,7 @@ import { MAX_LIVES } from '@/util/constants';
 import useSudokuControls from '@/hooks/useSudokuControls';
 import SudokuControls from './SudokuControls';
 import { useEffect } from 'react';
+import { useMenuRouter } from '@/context/MenuRouterContext';
 
 /**
  * Main Sudoku UI component
@@ -30,10 +31,16 @@ const Sudoku = () => {
    */
   useEffect(newGame, [newGame]);
 
+  const { activeMenu } = useMenuRouter();
+
   const isPlaying = game.status === 'playing';
 
   return (
-    <div className={`sudoku ${isPlaying ? '' : 'sudoku--game-over'}`}>
+    <div
+      className={`sudoku ${isPlaying ? '' : 'sudoku--game-over'}`}
+      inert={!!activeMenu}
+      style={{ opacity: activeMenu ? '40%' : '' }}
+    >
       <DndContext sensors={dndSensors} onDragStart={handleDragStart} onDragEnd={handleDrop}>
         <DragOverlay dropAnimation={null}>
           {game.dragValue ? (

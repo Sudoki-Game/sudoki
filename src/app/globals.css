@@ -61,17 +61,12 @@ html {
 }
 
 body {
-  background-color: var(--background);
-  margin: 0;
-}
-
-main {
   display: flex;
   flex-direction: column;
   max-width: 728px;
   width: 100%;
 
-  background-color: var(--color-tone-7);
+  background-color: var(--background);
 
   margin: auto;
   height: 100dvh;
@@ -82,3 +77,6 @@ main {
   }
 }
 
+main {
+  position: relative;
+}

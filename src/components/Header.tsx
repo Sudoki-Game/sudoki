@@ -1,10 +1,14 @@
+'use client';
 import Image from 'next/image';
 import Logo from '../../public/logo.svg';
 import GearIcon from '../../public/game/gear.svg';
 import CrownIcon from '../../public/game/crown.svg';
 import './Header.css';
+import { useMenuRouter } from '@/context/MenuRouterContext';
 
 const Header = () => {
+  const { openMenu } = useMenuRouter();
+
   return (
     <header className='header'>
       <button className='button button--icon' type='button' onClick={() => openMenu('settings')}>
