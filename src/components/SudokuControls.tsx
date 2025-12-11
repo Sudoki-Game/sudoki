@@ -2,6 +2,7 @@ import { useSudoku } from '@/context/SudokuContext';
 import Draggable from './Draggable';
 import HintIcon from '../../public/game/hint.svg';
 import Image from 'next/image';
+import SudokuCell from './SudokuCell';
 import './SudokuControls.css';
 
 const SudokuControls = () => {
@@ -20,12 +21,20 @@ const SudokuControls = () => {
             key={i}
             id={`draggable-${i + 1}`}
             isDisabled={!isPlaying}
-            className={`sudoku__cell ${!isPlaying ? 'sudoku__cell--disabled' : ''}`}
             data={{ cell: { value: i + 1 } }}
             tabIndex={isPlaying ? 0 : -1}
             data-testid={`draggable-${i + 1}`}
           >
-            {i + 1}
+            <SudokuCell
+              value={i + 1}
+              isDisabled={!isPlaying}
+              isSelected={false}
+              isRelated={false}
+              isConflicting={false}
+              isFixed={false}
+              isHint={false}
+              isOver={false}
+            />
           </Draggable>
         ))}
 

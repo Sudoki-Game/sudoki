@@ -6,6 +6,7 @@
 import SudokuCell from './SudokuCell';
 import './SudokuGrid.css';
 import { GameState } from '@/types';
+import BoardCell from './BoardCell';
 
 type SudokuGridProps = {
   game: GameState;
@@ -61,8 +62,6 @@ const SudokuGrid = ({
                 return (
                   <SudokuCell
                     key={`${cellRow}-${cellCol}`}
-                    row={cellRow}
-                    col={cellCol}
                     value={game.solution[cellRow][cellCol]}
                     isDisabled={false}
                     isSelected={
@@ -74,14 +73,14 @@ const SudokuGrid = ({
                     isConflicting={false}
                     isFixed={isFixed}
                     isHint={isHint}
-                    onClick={() => {}}
+                    isOver={false}
                   />
                 );
               }
 
               // Live game view
               return (
-                <SudokuCell
+                <BoardCell
                   key={`${cellRow}-${cellCol}`}
                   row={cellRow}
                   col={cellCol}
@@ -92,7 +91,7 @@ const SudokuGrid = ({
                   isConflicting={game.conflicts.has(`${cellRow},${cellCol}`)}
                   isFixed={isFixed}
                   isHint={isHint}
-                  onClick={handleClick}
+                  onClick={() => handleClick(cellRow, cellCol)}
                 />
               );
             })}

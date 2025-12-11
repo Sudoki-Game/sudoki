@@ -23,17 +23,8 @@ const Draggable = ({ id, data, isDisabled, children, ref, ...props }: DraggableP
 
   return (
     <div ref={ref} className='draggable'>
-      <div
-        ref={setNodeRef}
-        className={'draggable__wrapper'}
-        style={style}
-        {...attributes}
-        {...listeners}
-        tabIndex={props.tabIndex}
-      >
-        <div {...props} tabIndex={-1}>
-          {children}
-        </div>
+      <div ref={setNodeRef} style={style} {...attributes} {...listeners} {...props}>
+        {children}
       </div>
 
       {isDragging && <div className='draggable__placeholder' />}

@@ -3,14 +3,10 @@
  * @license GNU General Public License v3.0
  */
 
-import { useDroppable } from '@dnd-kit/core';
-import Draggable from './Draggable';
 import clsx from 'clsx';
 import './SudokuCell.css';
 
-interface SudokuCellProps {
-  row: number;
-  col: number;
+type SudokuCellProps = {
   value: number | null;
   isDisabled: boolean;
   isSelected: boolean;
@@ -18,17 +14,13 @@ interface SudokuCellProps {
   isConflicting: boolean;
   isFixed: boolean;
   isHint: boolean;
-  onClick: (row: number, col: number) => void;
-}
+  isOver: boolean;
+} & React.ComponentProps<'div'>;
 
 /**
  * A single cell in the Sudoku board.
- * Handles both draggable and droppable behaviors for drag-and-drop.
- * @returns
  */
 const SudokuCell = ({
-  row,
-  col,
   value,
   isDisabled,
   isFixed,
@@ -36,16 +28,9 @@ const SudokuCell = ({
   isSelected,
   isRelated,
   isHint,
-  onClick
+  isOver,
+  ...props
 }: SudokuCellProps) => {
-  const isImmutable = isDisabled || isFixed || isHint;
-
-  const { setNodeRef: setDroppableRef, isOver } = useDroppable({
-    id: `cell-${row}-${col}`,
-    data: { cell: { row, col } },
-    disabled: isImmutable
-  });
-
   const classNames = clsx('sudoku__cell', {
     'sudoku__cell--ok': isSelected,
     'sudoku__cell--disabled': isDisabled,
@@ -58,19 +43,9 @@ const SudokuCell = ({
   });
 
   return (
-    <Draggable
-      ref={setDroppableRef}
-      className={classNames}
-      id={`cell-${row}-${col}`}
-      data-testid={`cell-${row}-${col}`}
-      data={{ cell: { row, col, value } }}
-      isDisabled={isImmutable || value == null}
-      onClick={() => !isDisabled && onClick(row, col)}
-      title={`${row}-${col}`}
-      tabIndex={isImmutable ? -1 : 0}
-    >
+    <div className={classNames} {...props}>
       {value}
-    </Draggable>
+    </div>
   );
 };
 
