@@ -13,7 +13,7 @@ const SudokuControls = () => {
   if (!isReady) return null;
 
   return (
-    <div className={`sudoku__controls ${!isPlaying ? 'sudoku__controls--game-over' : ''}`}>
+    <div className={`sudoku__controls`}>
       <div className='sudoku__controls-numlist'>
         {Array.from({ length: 9 }).map((_, i) => (
           <Draggable

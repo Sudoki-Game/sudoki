@@ -6,16 +6,7 @@
   height: 100%;
 
   transition: opacity 0.3s ease;
-
-  /* padding-bottom: 1rem; */
   overflow: hidden;
-
-  &.sudoku--game-over {
-    transition: grid-template-rows 2s ease;
-    height: 100%;
-    grid-template-rows: 45% 1fr;
-    overflow-y: auto;
-  }
 }
 
 .sudoku__game {

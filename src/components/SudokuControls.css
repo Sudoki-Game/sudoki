@@ -4,10 +4,6 @@
   align-items: center;
   gap: 1.5rem;
   transition: max-height 1s ease;
-
-  &.sudoku__controls--game-over {
-    max-height: 0px;
-  }
 }
 
 .sudoku__controls-numlist {

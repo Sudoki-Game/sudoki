@@ -23,7 +23,7 @@ import { useMenuRouter } from '@/context/MenuRouterContext';
  * @returns
  */
 const Sudoku = () => {
-  const { game, handleDragStart, handleDrop, newGame, dispatch } = useSudoku();
+  const { game, handleDragStart, handleDrop, newGame } = useSudoku();
   const { dndSensors, boardRef } = useSudokuControls();
 
   /**
@@ -33,14 +33,8 @@ const Sudoku = () => {
 
   const { activeMenu } = useMenuRouter();
 
-  const isPlaying = game.status === 'playing';
-
   return (
-    <div
-      className={`sudoku ${isPlaying ? '' : 'sudoku--game-over'}`}
-      inert={!!activeMenu}
-      style={{ opacity: activeMenu ? '40%' : '' }}
-    >
+    <div className={`sudoku`} inert={!!activeMenu} style={{ opacity: activeMenu ? '40%' : '' }}>
       <DndContext sensors={dndSensors} onDragStart={handleDragStart} onDragEnd={handleDrop}>
         <DragOverlay dropAnimation={null}>
           {game.dragValue ? (
@@ -74,63 +68,6 @@ const Sudoku = () => {
           <SudokuControls />
         </div>
       </DndContext>
-
-      {/* Lose and Win screens */}
-      {game.status === 'lose' ? (
-        <div data-testid='game-over-lose' className='sudoku__game-over'>
-          <div className='sudoku__game-over-banner'>
-            <h1>Game Over</h1>
-            <p>Click &apos;Show solution&apos; below to see the correct number combination</p>
-          </div>
-
-          <div>
-            <p className='sudoku__stat'>
-              {'Your Score '}
-              <span>{game.score}</span>
-            </p>
-          </div>
-
-          {/* Solution View */}
-          {game.showSolution ? (
-            <Dynascale margin={0.1} defaultScale={1}>
-              <SudokuGrid showSolution={true} />
-            </Dynascale>
-          ) : (
-            <button
-              className='button'
-              onClick={() => dispatch({ type: 'SHOW_SOLUTION', show: true })}
-            >
-              Show Solution
-            </button>
-          )}
-
-          <button className='button button--active' onClick={newGame}>
-            Play Again
-          </button>
-        </div>
-      ) : game.status === 'win' ? (
-        <div data-testid='game-over-win' className='sudoku__game-over'>
-          <div className='sudoku__game-over-banner'>
-            <h1>Sudoku Complete</h1>
-          </div>
-
-          <div>
-            <p className='sudoku__stat'>
-              {'Your Score '}
-              <span>{game.score}</span>
-            </p>
-
-            <p className='sudoku__stat'>
-              {'Lives Remaining '}
-              <span>{game.lives}</span>
-            </p>
-          </div>
-
-          <button className='button button--active' onClick={newGame}>
-            Play Again
-          </button>
-        </div>
-      ) : null}
     </div>
   );
 };
