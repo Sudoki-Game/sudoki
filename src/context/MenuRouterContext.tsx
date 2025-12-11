@@ -23,16 +23,21 @@ const MenuRouterContext = createContext<MenuRouterProviderState | undefined>(und
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case 'OPEN_MENU':
+    case 'OPEN_MENU': {
+      // ignore if opening same menu twice
+      if (state.history.at(-1) === action.menu) return state;
+
       return {
         ...state,
         history: [...state.history, action.menu]
       };
+    }
 
     case 'GO_BACK': {
       if (state.history.length <= 1) {
         return { history: [] }; // no active menu
       }
+
       return {
         ...state,
         history: state.history.slice(0, -1)
