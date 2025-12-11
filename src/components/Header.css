@@ -1,11 +1,14 @@
 .header {
   display: flex;
   position: relative;
-  justify-content: center;
+  justify-content: space-between;
   padding-top: 2.5rem;
   align-items: center;
   width: 100%;
+  padding: 2.5rem 1rem 0 1rem;
+  box-sizing: border-box;
   transition: all 0.3s ease-in-out;
+  gap: 2rem;
 
   @media screen and (max-width: 768px) {
     padding-top: 2rem;

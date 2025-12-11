@@ -35,6 +35,12 @@
     box-shadow: inset 0 -0.5rem 0 var(--shadow);
   }
 
+  &.button--icon {
+    aspect-ratio: 1/1;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   /* Color Variants */
   &.button--danger {
     color: white;
@@ -53,7 +59,7 @@
 
   /* State */
   &:disabled {
-    cursor: none;
+    cursor: auto;
     opacity: 50%;
   }
 
