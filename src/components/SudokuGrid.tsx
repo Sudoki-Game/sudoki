@@ -11,7 +11,6 @@ import BoardCell from './BoardCell';
 type SudokuGridProps = {
   game: GameState;
   isReady: boolean;
-  highlights: Set<string>;
   showSolution: boolean;
   handleClick: (row: number, col: number) => void;
 } & React.ComponentProps<'div'>;
@@ -24,14 +23,7 @@ type SudokuGridProps = {
  * @param showSolution - If true, displays the solution grid; otherwise, displays the current game board.
  * @returns The rendered Sudoku grid as a set of blocks and cells.
  */
-const SudokuGrid = ({
-  game,
-  isReady,
-  highlights,
-  showSolution,
-  handleClick,
-  ref
-}: SudokuGridProps) => {
+const SudokuGrid = ({ game, isReady, showSolution, handleClick, ref }: SudokuGridProps) => {
   /**
    * Check if a given cell is selected.
    */
@@ -92,7 +84,7 @@ const SudokuGrid = ({
                     cellValue={game.board[cellRow][cellCol]}
                     disabled={!isPlaying}
                     isSelected={isSelected(cellRow, cellCol)}
-                    isRelated={highlights.has(`${cellRow},${cellCol}`)}
+                    isRelated={game.highlights.has(`${cellRow},${cellCol}`)}
                     isConflicting={game.conflicts.has(`${cellRow},${cellCol}`)}
                     isFixed={isFixed}
                     isAutoSolved={isAutoSolved}
@@ -110,7 +102,7 @@ const SudokuGrid = ({
                   cellValue={game.board[cellRow][cellCol]}
                   disabled={!isPlaying}
                   isSelected={isSelected(cellRow, cellCol)}
-                  isRelated={highlights.has(`${cellRow},${cellCol}`)}
+                  isRelated={game.highlights.has(`${cellRow},${cellCol}`)}
                   isConflicting={game.conflicts.has(`${cellRow},${cellCol}`)}
                   isFixed={isFixed}
                   isAutoSolved={isAutoSolved}

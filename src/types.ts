@@ -46,6 +46,12 @@ export type GameState = {
   selected: Selection;
 
   /**
+   * Set of all highlighted cell coords
+   * Each key is a "row,col" string.
+   */
+  highlights: Set<string>;
+
+  /**
    * Map of all conflicting cells and their occurrences.
    * Key is "row,col" string, value is the conflict count.
    */

@@ -124,7 +124,7 @@ const useSudokuControls = (): SudokuControls => {
 
       // Reset selection if clicked outside of the container or the container itself
       if (!containerRef.current?.contains(e.target as Node) || containerRef.current === e.target) {
-        if (game.selected.row !== null || game.selected.col !== null) {
+        if (game.selected.row != null || game.selected.col != null) {
           dispatch({ type: 'RESET_SELECTION' });
         }
       }

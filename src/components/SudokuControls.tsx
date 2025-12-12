@@ -10,7 +10,7 @@ const SudokuControls = () => {
 
   // Click to update current selection
   const handleClick = (value: number) => {
-    if (game.selected.col !== null && game.selected.row !== null) {
+    if (game.selected.col != null && game.selected.row != null) {
       updateCell(game.selected.row, game.selected.col, value);
     }
   };

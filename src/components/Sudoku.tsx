@@ -24,7 +24,6 @@ const Sudoku = () => {
     game,
     isPaused,
     isReady,
-    highlights,
     togglePause,
     handleClick,
     handleDragStart,
@@ -66,7 +65,6 @@ const Sudoku = () => {
               game={game}
               isReady={isReady}
               handleClick={handleClick}
-              highlights={highlights}
               showSolution={false}
             />
           </Dynascale>

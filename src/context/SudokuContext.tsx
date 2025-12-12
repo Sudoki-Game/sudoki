@@ -29,11 +29,6 @@ export type SudokuProviderState = {
   game: GameState;
 
   /**
-   * Set of all highlighted cells
-   */
-  highlights: Set<string>;
-
-  /**
    * Game ready check
    */
   isReady: boolean;
@@ -92,6 +87,7 @@ const initialState: GameState = {
   lives: 0,
   status: 'idle',
   selected: { row: null, col: null },
+  highlights: new Set(),
   conflicts: new Map(),
   autoSolves: new Set(),
   dragValue: null,
@@ -114,15 +110,22 @@ function reducer(state: GameState, action: GameAction): GameState {
         lives: MAX_LIVES,
         status: 'playing',
         selected: { row: null, col: null },
+        highlights: new Set(),
         conflicts: new Map(),
         autoSolves: new Set(),
         dragValue: null,
         showSolution: false
       };
-    case 'SELECT_CELL':
-      return { ...state, selected: { row: action.row, col: action.col } };
+    case 'SELECT_CELL': {
+      const highlights: Set<string> =
+        action.row != null && action.col != null
+          ? computeHighlights(action.row, action.col, state.board)
+          : new Set();
+
+      return { ...state, selected: { row: action.row, col: action.col }, highlights: highlights };
+    }
     case 'RESET_SELECTION':
-      return { ...state, selected: { row: null, col: null } };
+      return { ...state, selected: { row: null, col: null }, highlights: new Set() };
     case 'SET_CONFLICTS':
       return { ...state, conflicts: action.conflicts };
     case 'SET_DRAG_VALUE':
@@ -164,14 +167,6 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    * Grid of all fixed cells
    */
   const fixedCells = state.originalBoard.map((row) => row.map((val) => val !== null));
-
-  /**
-   * Set of all highlighted cells
-   */
-  const highlights: Set<string> =
-    !state.dragValue && state.selected.row != null && state.selected.col != null
-      ? computeHighlights(state.selected.row, state.selected.col, state.board)
-      : new Set();
 
   /**
    * Toggle pause state - only works during active gameplay
@@ -216,9 +211,16 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
   const handleDragStart = (e: DragStartEvent) => {
     if (isPaused || state.status !== 'playing') return;
     const cell = e.active.data.current?.cell;
+
     if (!cell) return;
+
+    const isBoardCell = cell.row != null && cell.col != null;
+
     dispatch({ type: 'SET_DRAG_VALUE', value: cell.value });
-    dispatch({ type: 'SELECT_CELL', row: cell.row, col: cell.col });
+
+    if (isBoardCell) {
+      dispatch({ type: 'SELECT_CELL', row: cell.row, col: cell.col });
+    }
   };
 
   /**
@@ -390,6 +392,8 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     // Handle missing target
     if (!over) {
       if (sourceIsCell) handleOutOfBounds(sourceRow!, sourceCol!);
+      
+      dispatch({ type: 'SET_DRAG_VALUE', value: null });
       return;
     }
 
@@ -522,7 +526,6 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     <SudokuContext.Provider
       value={{
         game: state,
-        highlights,
         isReady,
         isPaused,
         updateCell,
