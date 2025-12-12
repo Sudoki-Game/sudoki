@@ -11,7 +11,7 @@ type BoardCellProps = {
   isRelated: boolean;
   isConflicting: boolean;
   isFixed: boolean;
-  isHint: boolean;
+  isAutoSolved: boolean;
 } & React.ComponentProps<'div'>;
 
 const BoardCell = ({
@@ -23,16 +23,18 @@ const BoardCell = ({
   isConflicting,
   isSelected,
   isRelated,
-  isHint,
+  isAutoSolved,
   ...props
 }: BoardCellProps) => {
-  const isImmutable = isDisabled || isFixed || isHint;
+  const isImmutable = isDisabled || isFixed || isAutoSolved;
 
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({
     id: `cell-${row}-${col}`,
     data: { cell: { row, col } },
     disabled: isImmutable
   });
+
+  if (isAutoSolved) console.log('adasad');
 
   return (
     <Draggable
@@ -52,7 +54,7 @@ const BoardCell = ({
         isRelated={isRelated}
         isConflicting={isConflicting}
         isFixed={isFixed}
-        isHint={isHint}
+        isAutoSolved={isAutoSolved}
         isOver={isOver}
       />
     </Draggable>

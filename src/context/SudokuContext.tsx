@@ -74,9 +74,9 @@ export type SudokuProviderState = {
   newGame: () => void;
 
   /**
-   * Add a hint to the game board
+   * Fill in a random cell on the game board
    */
-  addHint: () => void;
+  autoSolve: () => void;
 
   /**
    * Toggle game pause
@@ -93,7 +93,7 @@ const initialState: GameState = {
   status: 'idle',
   selected: { row: null, col: null },
   conflicts: new Map(),
-  hints: new Set(),
+  autoSolves: new Set(),
   dragValue: null,
   showSolution: false
 };
@@ -115,7 +115,7 @@ function reducer(state: GameState, action: GameAction): GameState {
         status: 'playing',
         selected: { row: null, col: null },
         conflicts: new Map(),
-        hints: new Set(),
+        autoSolves: new Set(),
         dragValue: null,
         showSolution: false
       };
@@ -137,12 +137,12 @@ function reducer(state: GameState, action: GameAction): GameState {
       return { ...state, status: action.status };
     case 'SHOW_SOLUTION':
       return { ...state, showSolution: action.show };
-    case 'ADD_HINT': {
-      const hints = new Set(state.hints);
-      hints.add(`${action.row},${action.col}`);
-      // Hints cost a life
+    case 'AUTO_SOLVE': {
+      const autoSolves = new Set(state.autoSolves);
+      autoSolves.add(`${action.row},${action.col}`);
+      // Auto-Solves cost a life
       const lives = state.lives - 1;
-      return { ...state, hints, lives };
+      return { ...state, autoSolves, lives };
     }
     default:
       return state;
@@ -409,6 +409,9 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     // Make sure cell is editable
     if (state.originalBoard[row][col]) return;
 
+    // Ignore if the target cell is auto-solved
+    if (state.autoSolves.has(`${row},${col}`)) return;
+
     // Ignore if the target cell contains the same value
     if (state.board[row][col] === value) return;
 
@@ -467,9 +470,9 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
   };
 
   /**
-   * Add Hint to board
+   * Fill in a random cell on the game board
    */
-  const addHint = () => {
+  const autoSolve = () => {
     if (isPaused || state.status !== 'playing' || state.lives < 1) return;
 
     // Collect all empty, non-fixed cells
@@ -495,7 +498,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     dispatch({ type: 'UPDATE_BOARD', board: newBoard });
     dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
     dispatch({ type: 'SELECT_CELL', row: r, col: c });
-    dispatch({ type: 'ADD_HINT', row: r, col: c });
+    dispatch({ type: 'AUTO_SOLVE', row: r, col: c });
   };
 
   // Check win/lose conditions
@@ -525,7 +528,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
         updateCell,
         handleDragStart,
         handleDrop,
-        addHint,
+        autoSolve,
         handleClick,
         newGame,
         dispatch,

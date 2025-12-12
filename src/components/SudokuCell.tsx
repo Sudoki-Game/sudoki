@@ -13,7 +13,7 @@ type SudokuCellProps = {
   isRelated: boolean;
   isConflicting: boolean;
   isFixed: boolean;
-  isHint: boolean;
+  isAutoSolved: boolean;
   isOver: boolean;
 } & React.ComponentProps<'div'>;
 
@@ -27,7 +27,7 @@ const SudokuCell = ({
   isConflicting,
   isSelected,
   isRelated,
-  isHint,
+  isAutoSolved,
   isOver,
   ...props
 }: SudokuCellProps) => {
@@ -36,7 +36,7 @@ const SudokuCell = ({
     'sudoku__cell--disabled': isDisabled,
     'sudoku__cell--pre-filled': isFixed && !isRelated,
     'sudoku__cell--empty': !isRelated && value == null,
-    'sudoku__cell--warning': !isSelected && isHint,
+    'sudoku__cell--warning': !isSelected && isAutoSolved,
     'sudoku__cell--danger': !isSelected && isConflicting,
     'sudoku__cell--highlight': !isConflicting && !isSelected && (isRelated || isOver),
     'sudoku__cell--no-outline': isRelated && !isSelected

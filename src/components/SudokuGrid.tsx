@@ -54,7 +54,7 @@ const SudokuGrid = ({
               const cellRow = blockRow * 3 + Math.floor(cellIdx / 3);
               const cellCol = blockCol * 3 + (cellIdx % 3);
 
-              const isHint = game.hints.has(`${cellRow},${cellCol}`);
+              const isAutoSolved = game.autoSolves.has(`${cellRow},${cellCol}`);
               const isFixed = !!game.originalBoard[cellRow][cellCol];
 
               // Solution view
@@ -65,14 +65,14 @@ const SudokuGrid = ({
                     value={game.solution[cellRow][cellCol]}
                     isDisabled={false}
                     isSelected={
-                      !isHint &&
+                      !isAutoSolved &&
                       !isFixed &&
                       game.board[cellRow][cellCol] === game.solution[cellRow][cellCol]
                     }
                     isRelated={false}
                     isConflicting={false}
                     isFixed={isFixed}
-                    isHint={isHint}
+                    isAutoSolved={isAutoSolved}
                     isOver={false}
                   />
                 );
@@ -90,7 +90,7 @@ const SudokuGrid = ({
                   isRelated={highlights.has(`${cellRow},${cellCol}`)}
                   isConflicting={game.conflicts.has(`${cellRow},${cellCol}`)}
                   isFixed={isFixed}
-                  isHint={isHint}
+                  isAutoSolved={isAutoSolved}
                   onClick={() => handleClick(cellRow, cellCol)}
                 />
               );

@@ -5,7 +5,7 @@ import SudokuCell from './SudokuCell';
 import './SudokuControls.css';
 
 const SudokuControls = () => {
-  const { game, isReady, isPaused, addHint } = useSudoku();
+  const { game, isReady, isPaused, autoSolve } = useSudoku();
 
   const isDisabled = isPaused || game.status !== 'playing';
 
@@ -31,7 +31,7 @@ const SudokuControls = () => {
               isRelated={false}
               isConflicting={false}
               isFixed={false}
-              isHint={false}
+              isAutoSolved={false}
               isOver={false}
             />
           </Draggable>
@@ -39,11 +39,11 @@ const SudokuControls = () => {
 
         <button
           disabled={isDisabled}
-          aria-label='Show Hint'
+          title='Auto-Solve (-1 Life)'
           className='button button--warning'
-          onClick={addHint}
+          onClick={autoSolve}
         >
-          <Image src={'/game/hint.svg'} alt={'Hint'} height={28} width={28} />
+          <Image src={'/game/auto-solve.svg'} alt={'Auto-Solve Icon'} height={28} width={28} />
         </button>
       </div>
     </div>
