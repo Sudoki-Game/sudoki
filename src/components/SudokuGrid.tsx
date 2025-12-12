@@ -62,8 +62,8 @@ const SudokuGrid = ({
                 return (
                   <SudokuCell
                     key={`${cellRow}-${cellCol}`}
-                    value={game.solution[cellRow][cellCol]}
-                    isDisabled={false}
+                    cellValue={game.solution[cellRow][cellCol]}
+                    disabled={false}
                     isSelected={
                       !isAutoSolved &&
                       !isFixed &&
@@ -79,19 +79,42 @@ const SudokuGrid = ({
               }
 
               // Live game view
+              const isImmutable = !isPlaying || isFixed || isAutoSolved;
+
+              // Only render cell if immutable
+              if (isImmutable) {
+                return (
+                  <SudokuCell
+                    key={`${cellRow}-${cellCol}`}
+                    id={`cell-${cellRow}-${cellCol}`}
+                    data-testid={`cell-${cellRow}-${cellCol}`}
+                    title={`${cellRow}-${cellCol}`}
+                    cellValue={game.board[cellRow][cellCol]}
+                    disabled={!isPlaying}
+                    isSelected={isSelected(cellRow, cellCol)}
+                    isRelated={highlights.has(`${cellRow},${cellCol}`)}
+                    isConflicting={game.conflicts.has(`${cellRow},${cellCol}`)}
+                    isFixed={isFixed}
+                    isAutoSolved={isAutoSolved}
+                    isOver={false}
+                    onClick={() => handleClick(cellRow, cellCol)}
+                  />
+                );
+              }
+
               return (
                 <BoardCell
                   key={`${cellRow}-${cellCol}`}
                   row={cellRow}
                   col={cellCol}
-                  value={game.board[cellRow][cellCol]}
-                  isDisabled={!isPlaying}
+                  cellValue={game.board[cellRow][cellCol]}
+                  disabled={!isPlaying}
                   isSelected={isSelected(cellRow, cellCol)}
                   isRelated={highlights.has(`${cellRow},${cellCol}`)}
                   isConflicting={game.conflicts.has(`${cellRow},${cellCol}`)}
                   isFixed={isFixed}
                   isAutoSolved={isAutoSolved}
-                  onClick={() => handleClick(cellRow, cellCol)}
+                  handleClick={() => handleClick(cellRow, cellCol)}
                 />
               );
             })}
