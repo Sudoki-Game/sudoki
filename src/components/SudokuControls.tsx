@@ -4,9 +4,16 @@ import './SudokuControls.css';
 import DraggableCell from './DraggableCell';
 
 const SudokuControls = () => {
-  const { game, isReady, isPaused, autoSolve } = useSudoku();
+  const { game, isReady, isPaused, autoSolve, updateCell } = useSudoku();
 
   const disabled = isPaused || game.status !== 'playing';
+
+  // Click to update current selection
+  const handleClick = (value: number) => {
+    if (game.selected.col !== null && game.selected.row !== null) {
+      updateCell(game.selected.row, game.selected.col, value);
+    }
+  };
 
   // Will scale into view when ready
   if (!isReady) return null;
@@ -30,7 +37,8 @@ const SudokuControls = () => {
               isConflicting: false,
               isFixed: false,
               isAutoSolved: false,
-              isOver: false
+              isOver: false,
+              onClick: () => handleClick(i + 1)
             }}
           />
         ))}

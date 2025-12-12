@@ -31,7 +31,7 @@ const Sudoku = () => {
     handleDrop,
     newGame
   } = useSudoku();
-  const { dndSensors, boardRef } = useSudokuControls();
+  const { dndSensors, boardRef, containerRef } = useSudokuControls();
 
   const isDisabled = isPaused || game.status !== 'playing';
 
@@ -56,7 +56,7 @@ const Sudoku = () => {
           ) : null}
         </DragOverlay>
 
-        <div className='sudoku__game'>
+        <div ref={containerRef} className='sudoku__game'>
           <SudokuStats score={game.score} lives={game.lives} />
 
           {/* Game Board */}

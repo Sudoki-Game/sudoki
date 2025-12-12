@@ -26,6 +26,8 @@ interface SudokuControls {
    * the Sudoku grid and to scope keyboard interactions.
    */
   boardRef: React.RefObject<HTMLDivElement | null>;
+
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 /**
@@ -41,6 +43,7 @@ interface SudokuControls {
 const useSudokuControls = (): SudokuControls => {
   const { game, updateCell, dispatch, isPaused } = useSudoku();
   const boardRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   /**
    * Drag-and-drop sensor configuration.
@@ -62,7 +65,6 @@ const useSudokuControls = (): SudokuControls => {
     if (game.status !== 'playing' || !boardRef.current) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-
       // Block all other inputs when paused
       if (isPaused) return;
 
@@ -120,7 +122,8 @@ const useSudokuControls = (): SudokuControls => {
     const onClick = (e: MouseEvent) => {
       if (isPaused || game.status !== 'playing') return;
 
-      if (!boardRef.current?.contains(e.target as Node)) {
+      // Reset selection if clicked outside of the container or the container itself
+      if (!containerRef.current?.contains(e.target as Node) || containerRef.current === e.target) {
         if (game.selected.row !== null || game.selected.col !== null) {
           dispatch({ type: 'RESET_SELECTION' });
         }
@@ -128,9 +131,9 @@ const useSudokuControls = (): SudokuControls => {
     };
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
-  }, [boardRef, dispatch, game.selected, game.status, isPaused]);
+  }, [containerRef, dispatch, game.selected, game.status, isPaused]);
 
-  return { dndSensors, boardRef };
+  return { dndSensors, boardRef, containerRef };
 };
 
 export default useSudokuControls;
