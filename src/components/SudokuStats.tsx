@@ -1,6 +1,4 @@
 import Image from 'next/image';
-import HeartIcon from '../../public/game/heart.svg';
-import EmptyHeartIcon from '../../public/game/heart-empty.svg';
 import { MAX_LIVES } from '@/util/constants';
 import './SudokuStats.css';
 
@@ -20,9 +18,21 @@ const SudokuStats = ({ score, lives }: SudokuStatsProps) => {
       <div className='sudoku__lives-container'>
         {Array.from({ length: MAX_LIVES }).map((_, i) =>
           i < lives ? (
-            <Image key={`heart-${i}`} src={HeartIcon} alt={'Heart'} height={24} />
+            <Image
+              key={`heart-${i}`}
+              src={'/game/heart.svg'}
+              alt={'Heart'}
+              height={24}
+              width={24}
+            />
           ) : (
-            <Image key={`heart-${i}`} src={EmptyHeartIcon} alt={'Empty Heart'} height={24} />
+            <Image
+              key={`heart-${i}`}
+              src={'/game/heart-empty.svg'}
+              alt={'Empty Heart'}
+              height={24}
+              width={24}
+            />
           )
         )}
       </div>

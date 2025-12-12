@@ -1,6 +1,5 @@
 import { useSudoku } from '@/context/SudokuContext';
 import Draggable from './Draggable';
-import HintIcon from '../../public/game/hint.svg';
 import Image from 'next/image';
 import SudokuCell from './SudokuCell';
 import './SudokuControls.css';
@@ -44,7 +43,7 @@ const SudokuControls = () => {
           className='button button--warning'
           onClick={addHint}
         >
-          <Image src={HintIcon} alt={'Hint'} height={28} />
+          <Image src={'/game/hint.svg'} alt={'Hint'} height={28} width={28} />
         </button>
       </div>
     </div>
