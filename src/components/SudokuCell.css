@@ -6,7 +6,7 @@
   font-family: 'Bear Days';
   font-size: 1.5rem;
 
-  transition: background-color 0.5s, opacity 0.15s, transform 0.1s ease;
+  transition: all 0.15s, border-width 0s, box-shadow 0s ease-in-out;
 
   width: 3.25rem;
   height: 3.25rem;
@@ -90,5 +90,12 @@
     border: none;
     box-shadow: none;
     padding: 0;
+  }
+
+  /* State */
+  &:enabled {
+    &:hover {
+      filter: brightness(1.1);
+    }
   }
 }
