@@ -206,6 +206,17 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     (sourceRow === targetRow && sourceCol === targetCol);
 
   /**
+   * Extracted score deduction logic
+   */
+  const deductScoreForValidCell = (
+    conflicts: Map<string, number>,
+    row: number,
+    col: number
+  ): number => {
+    return conflicts.has(`${row},${col}`) ? 0 : -20;
+  };
+
+  /**
    * Clears a source cell when dropped out of bounds.
    */
   const handleOutOfBounds = (sourceRow: number, sourceCol: number) => {
@@ -224,10 +235,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     // Remove source conflcits
     if (sourceValue !== null) {
       // Deduct previously granted score if source is a valid cell
-      if (!newConflicts.has(`${sourceRow},${sourceCol}`)) {
-        deltaScore -= 20;
-      }
-
+      deltaScore = deductScoreForValidCell(newConflicts, sourceRow, sourceCol);
       newConflicts = removeConflictsForCell(
         state.board,
         newConflicts,
