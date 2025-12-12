@@ -39,6 +39,11 @@ export type SudokuProviderState = {
   isReady: boolean;
 
   /**
+   * Game paused check
+   */
+  isPaused: boolean;
+
+  /**
    * Game state dispatcher
    */
   dispatch: React.ActionDispatch<[action: GameAction]>;
@@ -72,6 +77,11 @@ export type SudokuProviderState = {
    * Add a hint to the game board
    */
   addHint: () => void;
+
+  /**
+   * Toggle game pause
+   */
+  togglePause: (override?: boolean) => void;
 };
 
 const initialState: GameState = {
@@ -148,6 +158,7 @@ const SudokuContext = createContext<SudokuProviderState | undefined>(undefined);
 export function SudokuProvider({ children }: SudokuProviderProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isReady, setIsReady] = useState<boolean>(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
 
   /**
    * Grid of all fixed cells
@@ -163,6 +174,21 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
       : new Set();
 
   /**
+   * Toggle pause state - only works during active gameplay
+   */
+  const togglePause = (override?: boolean) => {
+    if (state.status !== 'playing') return;
+
+    const shouldPause = override ?? !isReady;
+
+    setIsPaused((prev) => override ?? !prev);
+
+    if (shouldPause) {
+      dispatch({ type: 'RESET_SELECTION' });
+    }
+  };
+
+  /**
    * Starts a new game.
    * Generates board and resets state.
    */
@@ -172,12 +198,14 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
 
     dispatch({ type: 'NEW_GAME', payload: { board: puzzle, solution } });
     setIsReady(true);
+    setIsPaused(false); // Reset pause state on new game
   };
 
   /**
    * Handle cell selection.
    */
   const handleClick = (row: number, col: number) => {
+    if (isPaused || state.status !== 'playing') return;
     dispatch({ type: 'SELECT_CELL', row, col });
   };
 
@@ -186,6 +214,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    * Capture value and select source cell.
    */
   const handleDragStart = (e: DragStartEvent) => {
+    if (isPaused || state.status !== 'playing') return;
     const cell = e.active.data.current?.cell;
     if (!cell) return;
     dispatch({ type: 'SET_DRAG_VALUE', value: cell.value });
@@ -220,6 +249,8 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    * Clears a source cell when dropped out of bounds.
    */
   const handleOutOfBounds = (sourceRow: number, sourceCol: number) => {
+    if (isPaused || state.status !== 'playing') return;
+
     let deltaScore = 0;
 
     const sourceValue = state.board[sourceRow][sourceCol];
@@ -264,6 +295,8 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     targetRow: number,
     targetCol: number
   ) => {
+    if (isPaused || state.status !== 'playing') return;
+
     let deltaScore = 0;
     let newLives = state.lives;
 
@@ -346,6 +379,8 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    * Delegates to out-of-bounds or in-bounds handlers.
    */
   const handleDrop = (e: DragEndEvent) => {
+    if (isPaused || state.status !== 'playing') return;
+
     const { over, active } = e;
     if (!active) return;
 
@@ -369,6 +404,8 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    * Update a cell.
    */
   const updateCell = (row: number, col: number, value: number | null) => {
+    if (isPaused || state.status !== 'playing') return;
+
     // Make sure cell is editable
     if (state.originalBoard[row][col]) return;
 
@@ -433,6 +470,8 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    * Add Hint to board
    */
   const addHint = () => {
+    if (isPaused || state.status !== 'playing' || state.lives < 1) return;
+
     // Collect all empty, non-fixed cells
     const emptyCells: Array<{ r: number; c: number }> = [];
     for (let r = 0; r < 9; r++) {
@@ -461,7 +500,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
 
   // Check win/lose conditions
   useEffect(() => {
-    if (state.status !== 'playing') return;
+    if (state.status !== 'playing' || isPaused) return;
 
     // Lose
     if (state.lives < 1) {
@@ -474,7 +513,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
       dispatch({ type: 'SET_STATUS', status: 'win' });
       return;
     }
-  }, [state.board, state.conflicts, state.lives, state.status]);
+  }, [isPaused, state.board, state.conflicts, state.lives, state.status]);
 
   return (
     <SudokuContext.Provider
@@ -482,13 +521,15 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
         game: state,
         highlights,
         isReady,
+        isPaused,
         updateCell,
         handleDragStart,
         handleDrop,
         addHint,
         handleClick,
         newGame,
-        dispatch
+        dispatch,
+        togglePause
       }}
     >
       {children}

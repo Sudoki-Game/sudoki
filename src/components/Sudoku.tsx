@@ -7,22 +7,33 @@
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import SudokuGrid from './SudokuGrid';
 import { useSudoku } from '@/context/SudokuContext';
-import './Sudoku.css';
 import { Dynascale } from 'dynascale';
 import useSudokuControls from '@/hooks/useSudokuControls';
 import SudokuControls from './SudokuControls';
 import { useEffect } from 'react';
 import { useMenuRouter } from '@/context/MenuRouterContext';
 import SudokuStats from './SudokuStats';
+import './Sudoku.css';
 
 /**
  * Main Sudoku UI component
  * @returns
  */
 const Sudoku = () => {
-  const { game, isReady, highlights, handleClick, handleDragStart, handleDrop, newGame } =
-    useSudoku();
+  const {
+    game,
+    isPaused,
+    isReady,
+    highlights,
+    togglePause,
+    handleClick,
+    handleDragStart,
+    handleDrop,
+    newGame
+  } = useSudoku();
   const { dndSensors, boardRef } = useSudokuControls();
+
+  const isDisabled = isPaused || game.status !== 'playing';
 
   /**
    * Start new game on mount
@@ -31,8 +42,13 @@ const Sudoku = () => {
 
   const { activeMenu } = useMenuRouter();
 
+  // Disable game on menu active
+  useEffect(() => {
+    togglePause(!!activeMenu);
+  }, [activeMenu, togglePause]);
+
   return (
-    <div className={`sudoku`} inert={!!activeMenu} style={{ opacity: activeMenu ? '40%' : '' }}>
+    <div className={`sudoku`} inert={isDisabled} style={{ opacity: isDisabled ? '40%' : '' }}>
       <DndContext sensors={dndSensors} onDragStart={handleDragStart} onDragEnd={handleDrop}>
         <DragOverlay dropAnimation={null}>
           {game.dragValue ? (

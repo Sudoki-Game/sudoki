@@ -5,9 +5,9 @@ import SudokuCell from './SudokuCell';
 import './SudokuControls.css';
 
 const SudokuControls = () => {
-  const { game, isReady, addHint } = useSudoku();
+  const { game, isReady, isPaused, addHint } = useSudoku();
 
-  const isPlaying = game.status === 'playing';
+  const isDisabled = isPaused || game.status !== 'playing';
 
   // Will scale into view when ready
   if (!isReady) return null;
@@ -19,14 +19,14 @@ const SudokuControls = () => {
           <Draggable
             key={i}
             id={`draggable-${i + 1}`}
-            isDisabled={!isPlaying}
+            isDisabled={isDisabled}
             data={{ cell: { value: i + 1 } }}
-            tabIndex={isPlaying ? 0 : -1}
+            tabIndex={!isDisabled ? 0 : -1}
             data-testid={`draggable-${i + 1}`}
           >
             <SudokuCell
               value={i + 1}
-              isDisabled={!isPlaying}
+              isDisabled={isDisabled}
               isSelected={false}
               isRelated={false}
               isConflicting={false}
@@ -38,7 +38,7 @@ const SudokuControls = () => {
         ))}
 
         <button
-          disabled={!isPlaying}
+          disabled={isDisabled}
           aria-label='Show Hint'
           className='button button--warning'
           onClick={addHint}

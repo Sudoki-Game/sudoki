@@ -37,12 +37,9 @@ interface SudokuControls {
  *
  * This hook centralizes all board-level interaction effects to keep
  * Sudoku view components clean and declarative.
- *
- * @returns An object containing configured drag-and-drop sensors and
- * a reference to the board container element.
  */
 const useSudokuControls = (): SudokuControls => {
-  const { game, updateCell, dispatch } = useSudoku();
+  const { game, updateCell, dispatch, isPaused } = useSudoku();
   const boardRef = useRef<HTMLDivElement>(null);
 
   /**
@@ -59,15 +56,16 @@ const useSudokuControls = (): SudokuControls => {
   );
 
   /**
-   * Handle keyboard input for editing Sudoku cells.
-   */
-  /**
    * Handle keyboard input for editing Sudoku cells and moving selection.
    */
   useEffect(() => {
     if (game.status !== 'playing' || !boardRef.current) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
+
+      // Block all other inputs when paused
+      if (isPaused) return;
+
       const { row, col } = game.selected;
 
       const isArrow =
@@ -113,13 +111,15 @@ const useSudokuControls = (): SudokuControls => {
 
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [boardRef, game.selected, game.status, updateCell, dispatch]);
+  }, [boardRef, game.selected, game.status, updateCell, dispatch, isPaused]);
 
   /**
    * Deselect the active cell when clicking outside the board area.
    */
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
+      if (isPaused || game.status !== 'playing') return;
+
       if (!boardRef.current?.contains(e.target as Node)) {
         if (game.selected.row !== null || game.selected.col !== null) {
           dispatch({ type: 'RESET_SELECTION' });
@@ -128,7 +128,7 @@ const useSudokuControls = (): SudokuControls => {
     };
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
-  }, [boardRef, dispatch, game.selected]);
+  }, [boardRef, dispatch, game.selected, game.status, isPaused]);
 
   return { dndSensors, boardRef };
 };
