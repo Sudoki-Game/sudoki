@@ -13,9 +13,21 @@ const GameOverModal = () => {
     <Modal className='gameover-modal'>
       <div className='modal__content'>
         {game.status === 'win' ? (
-          <Image src={'/game/you-win-text.png'} alt={'You Win!'} height={84} width={328} />
+          <Image
+            className='gameover-modal__state-image'
+            src={'/game/you-win-text.png'}
+            alt={'You Win!'}
+            height={84}
+            width={328}
+          />
         ) : (
-          <Image src={'/game/game-over-text.png'} alt={'Game Over!'} height={70} width={352} />
+          <Image
+            className='gameover-modal__state-image'
+            src={'/game/game-over-text.png'}
+            alt={'Game Over!'}
+            height={70}
+            width={352}
+          />
         )}
 
         <div className='gameover-modal__lives-container'>

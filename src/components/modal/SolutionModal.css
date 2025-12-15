@@ -10,6 +10,7 @@
 }
 
 .solution-modal__key-color {
+  flex-shrink: 0;
   width: 2rem;
   height: 2rem;
   background: var(--grey-gradient);

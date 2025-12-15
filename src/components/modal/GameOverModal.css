@@ -1,3 +1,8 @@
+.gameover-modal__state-image {
+  width: 100%;
+  height: auto;
+}
+
 .gameover-modal__lives-container {
   display: flex;
   flex-direction: row-reverse;
