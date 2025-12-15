@@ -17,6 +17,7 @@ import {
   computeHighlights
 } from '../util/util';
 import { MAX_LIVES } from '@/util/constants';
+import { playSound } from '@/util/sound';
 
 type SudokuProviderProps = {
   children: React.ReactNode;
@@ -29,14 +30,14 @@ export type SudokuProviderState = {
   game: GameState;
 
   /**
-   * Set of all highlighted cells
-   */
-  highlights: Set<string>;
-
-  /**
    * Game ready check
    */
   isReady: boolean;
+
+  /**
+   * Game paused check
+   */
+  isPaused: boolean;
 
   /**
    * Game state dispatcher
@@ -69,9 +70,14 @@ export type SudokuProviderState = {
   newGame: () => void;
 
   /**
-   * Add a hint to the game board
+   * Fill in a random cell on the game board
    */
-  addHint: () => void;
+  autoSolve: () => void;
+
+  /**
+   * Toggle game pause
+   */
+  togglePause: (override?: boolean) => void;
 };
 
 const initialState: GameState = {
@@ -82,8 +88,9 @@ const initialState: GameState = {
   lives: 0,
   status: 'idle',
   selected: { row: null, col: null },
+  highlights: new Set(),
   conflicts: new Map(),
-  hints: new Set(),
+  autoSolves: new Set(),
   dragValue: null,
   showSolution: false
 };
@@ -104,15 +111,22 @@ function reducer(state: GameState, action: GameAction): GameState {
         lives: MAX_LIVES,
         status: 'playing',
         selected: { row: null, col: null },
+        highlights: new Set(),
         conflicts: new Map(),
-        hints: new Set(),
+        autoSolves: new Set(),
         dragValue: null,
         showSolution: false
       };
-    case 'SELECT_CELL':
-      return { ...state, selected: { row: action.row, col: action.col } };
+    case 'SELECT_CELL': {
+      const highlights: Set<string> =
+        action.row != null && action.col != null
+          ? computeHighlights(action.row, action.col, state.board)
+          : new Set();
+
+      return { ...state, selected: { row: action.row, col: action.col }, highlights: highlights };
+    }
     case 'RESET_SELECTION':
-      return { ...state, selected: { row: null, col: null } };
+      return { ...state, selected: { row: null, col: null }, highlights: new Set() };
     case 'SET_CONFLICTS':
       return { ...state, conflicts: action.conflicts };
     case 'SET_DRAG_VALUE':
@@ -127,12 +141,12 @@ function reducer(state: GameState, action: GameAction): GameState {
       return { ...state, status: action.status };
     case 'SHOW_SOLUTION':
       return { ...state, showSolution: action.show };
-    case 'ADD_HINT': {
-      const hints = new Set(state.hints);
-      hints.add(`${action.row},${action.col}`);
-      // Hints cost a life
+    case 'AUTO_SOLVE': {
+      const autoSolves = new Set(state.autoSolves);
+      autoSolves.add(`${action.row},${action.col}`);
+      // Auto-Solves cost a life
       const lives = state.lives - 1;
-      return { ...state, hints, lives };
+      return { ...state, autoSolves, lives };
     }
     default:
       return state;
@@ -148,6 +162,7 @@ const SudokuContext = createContext<SudokuProviderState | undefined>(undefined);
 export function SudokuProvider({ children }: SudokuProviderProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isReady, setIsReady] = useState<boolean>(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
 
   /**
    * Grid of all fixed cells
@@ -155,12 +170,19 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
   const fixedCells = state.originalBoard.map((row) => row.map((val) => val !== null));
 
   /**
-   * Set of all highlighted cells
+   * Toggle pause state - only works during active gameplay
    */
-  const highlights: Set<string> =
-    !state.dragValue && state.selected.row != null && state.selected.col != null
-      ? computeHighlights(state.selected.row, state.selected.col, state.board)
-      : new Set();
+  const togglePause = (override?: boolean) => {
+    if (state.status !== 'playing') return;
+
+    const shouldPause = override ?? !isReady;
+
+    setIsPaused((prev) => override ?? !prev);
+
+    if (shouldPause) {
+      dispatch({ type: 'RESET_SELECTION' });
+    }
+  };
 
   /**
    * Starts a new game.
@@ -172,12 +194,18 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
 
     dispatch({ type: 'NEW_GAME', payload: { board: puzzle, solution } });
     setIsReady(true);
+    setIsPaused(false); // Reset pause state on new game
   };
 
   /**
    * Handle cell selection.
    */
   const handleClick = (row: number, col: number) => {
+    if (isPaused || state.status !== 'playing') return;
+
+    // Select sound
+    playSound('/game/audio/metronome.mp3', { pitch: 1.8 });
+    
     dispatch({ type: 'SELECT_CELL', row, col });
   };
 
@@ -186,10 +214,21 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    * Capture value and select source cell.
    */
   const handleDragStart = (e: DragStartEvent) => {
+    if (isPaused || state.status !== 'playing') return;
     const cell = e.active.data.current?.cell;
+
     if (!cell) return;
+
+    const isBoardCell = cell.row != null && cell.col != null;
+
     dispatch({ type: 'SET_DRAG_VALUE', value: cell.value });
-    dispatch({ type: 'SELECT_CELL', row: cell.row, col: cell.col });
+
+    // Play pickup sound
+    playSound('/game/audio/metronome.mp3', { pitch: 2 });
+
+    if (isBoardCell) {
+      dispatch({ type: 'SELECT_CELL', row: cell.row, col: cell.col });
+    }
   };
 
   /**
@@ -206,9 +245,22 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     (sourceRow === targetRow && sourceCol === targetCol);
 
   /**
+   * Extracted score deduction logic
+   */
+  const deductScoreForValidCell = (
+    conflicts: Map<string, number>,
+    row: number,
+    col: number
+  ): number => {
+    return conflicts.has(`${row},${col}`) ? 0 : -20;
+  };
+
+  /**
    * Clears a source cell when dropped out of bounds.
    */
   const handleOutOfBounds = (sourceRow: number, sourceCol: number) => {
+    if (isPaused || state.status !== 'playing') return;
+
     let deltaScore = 0;
 
     const sourceValue = state.board[sourceRow][sourceCol];
@@ -224,10 +276,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     // Remove source conflcits
     if (sourceValue !== null) {
       // Deduct previously granted score if source is a valid cell
-      if (!newConflicts.has(`${sourceRow},${sourceCol}`)) {
-        deltaScore -= 20;
-      }
-
+      deltaScore = deductScoreForValidCell(newConflicts, sourceRow, sourceCol);
       newConflicts = removeConflictsForCell(
         state.board,
         newConflicts,
@@ -239,6 +288,9 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
 
     // Delete the source cell
     newConflicts.delete(`${sourceRow},${sourceCol}`);
+
+    // Play delete sound
+    playSound('/game/audio/metronome.mp3', { pitch: 0.9 });
 
     dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
     dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
@@ -256,6 +308,8 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     targetRow: number,
     targetCol: number
   ) => {
+    if (isPaused || state.status !== 'playing') return;
+
     let deltaScore = 0;
     let newLives = state.lives;
 
@@ -338,6 +392,8 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    * Delegates to out-of-bounds or in-bounds handlers.
    */
   const handleDrop = (e: DragEndEvent) => {
+    if (isPaused || state.status !== 'playing') return;
+
     const { over, active } = e;
     if (!active) return;
 
@@ -347,6 +403,8 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     // Handle missing target
     if (!over) {
       if (sourceIsCell) handleOutOfBounds(sourceRow!, sourceCol!);
+      
+      dispatch({ type: 'SET_DRAG_VALUE', value: null });
       return;
     }
 
@@ -355,14 +413,22 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
 
     // We've dropped onto a valid cell
     handleInBounds(sourceRow, sourceCol, targetRow, targetCol);
+
+    // Play drop sound
+    playSound('/game/audio/metronome.mp3', { pitch: 1.4 });
   };
 
   /**
    * Update a cell.
    */
   const updateCell = (row: number, col: number, value: number | null) => {
+    if (isPaused || state.status !== 'playing') return;
+
     // Make sure cell is editable
     if (state.originalBoard[row][col]) return;
+
+    // Ignore if the target cell is auto-solved
+    if (state.autoSolves.has(`${row},${col}`)) return;
 
     // Ignore if the target cell contains the same value
     if (state.board[row][col] === value) return;
@@ -422,9 +488,11 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
   };
 
   /**
-   * Add Hint to board
+   * Fill in a random cell on the game board
    */
-  const addHint = () => {
+  const autoSolve = () => {
+    if (isPaused || state.status !== 'playing' || state.lives < 1) return;
+
     // Collect all empty, non-fixed cells
     const emptyCells: Array<{ r: number; c: number }> = [];
     for (let r = 0; r < 9; r++) {
@@ -448,12 +516,12 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     dispatch({ type: 'UPDATE_BOARD', board: newBoard });
     dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
     dispatch({ type: 'SELECT_CELL', row: r, col: c });
-    dispatch({ type: 'ADD_HINT', row: r, col: c });
+    dispatch({ type: 'AUTO_SOLVE', row: r, col: c });
   };
 
   // Check win/lose conditions
   useEffect(() => {
-    if (state.status !== 'playing') return;
+    if (state.status !== 'playing' || isPaused) return;
 
     // Lose
     if (state.lives < 1) {
@@ -466,21 +534,22 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
       dispatch({ type: 'SET_STATUS', status: 'win' });
       return;
     }
-  }, [state.board, state.conflicts, state.lives, state.status]);
+  }, [isPaused, state.board, state.conflicts, state.lives, state.status]);
 
   return (
     <SudokuContext.Provider
       value={{
         game: state,
-        highlights,
         isReady,
+        isPaused,
         updateCell,
         handleDragStart,
         handleDrop,
-        addHint,
+        autoSolve,
         handleClick,
         newGame,
-        dispatch
+        dispatch,
+        togglePause
       }}
     >
       {children}

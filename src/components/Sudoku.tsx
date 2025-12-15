@@ -7,32 +7,62 @@
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import SudokuGrid from './SudokuGrid';
 import { useSudoku } from '@/context/SudokuContext';
-import './Sudoku.css';
 import { Dynascale } from 'dynascale';
 import useSudokuControls from '@/hooks/useSudokuControls';
 import SudokuControls from './SudokuControls';
 import { useEffect } from 'react';
-import { useMenuRouter } from '@/context/MenuRouterContext';
+import { useModalRouter } from '@/context/ModalRouterContext';
 import SudokuStats from './SudokuStats';
+import './Sudoku.css';
 
 /**
  * Main Sudoku UI component
  * @returns
  */
 const Sudoku = () => {
-  const { game, isReady, highlights, handleClick, handleDragStart, handleDrop, newGame } =
-    useSudoku();
-  const { dndSensors, boardRef } = useSudokuControls();
+  const {
+    game,
+    isPaused,
+    isReady,
+    togglePause,
+    handleClick,
+    handleDragStart,
+    handleDrop,
+    newGame
+  } = useSudoku();
+  const { dndSensors, boardRef, containerRef } = useSudokuControls();
+  const { openModal } = useModalRouter();
+
+  const isDisabled = isPaused || game.status !== 'playing';
 
   /**
    * Start new game on mount
    */
   useEffect(newGame, [newGame]);
 
-  const { activeMenu } = useMenuRouter();
+  const { activeModal } = useModalRouter();
+
+  // Disable game on menu active
+  useEffect(() => {
+    togglePause(!!activeModal);
+  }, [activeModal, togglePause]);
+
+  // Win/Lost modals
+  useEffect(() => {
+    switch (game.status) {
+      case 'win':
+      case 'lose':
+        openModal('gameover');
+        break;
+      case 'playing':
+      case 'idle':
+      default:
+        break;
+    }
+  }, [openModal, game.status]);
 
   return (
-    <div className={`sudoku`} inert={!!activeMenu} style={{ opacity: activeMenu ? '40%' : '' }}>
+    <div className={`sudoku`} inert={isDisabled} style={{ opacity: isDisabled ? '40%' : '' }}>
       <DndContext sensors={dndSensors} onDragStart={handleDragStart} onDragEnd={handleDrop}>
         <DragOverlay dropAnimation={null}>
           {game.dragValue ? (
@@ -40,8 +70,8 @@ const Sudoku = () => {
           ) : null}
         </DragOverlay>
 
-        <div className='sudoku__game'>
-          <SudokuStats />
+        <div ref={containerRef} className='sudoku__game'>
+          <SudokuStats score={game.score} lives={game.lives} />
 
           {/* Game Board */}
           <Dynascale defaultScale={0} margin={0}>
@@ -50,7 +80,6 @@ const Sudoku = () => {
               game={game}
               isReady={isReady}
               handleClick={handleClick}
-              highlights={highlights}
               showSolution={false}
             />
           </Dynascale>

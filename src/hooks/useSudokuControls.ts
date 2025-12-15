@@ -4,6 +4,7 @@
  */
 
 import { useSudoku } from '@/context/SudokuContext';
+import { playSound } from '@/util/sound';
 import {
   useSensors,
   useSensor,
@@ -26,6 +27,8 @@ interface SudokuControls {
    * the Sudoku grid and to scope keyboard interactions.
    */
   boardRef: React.RefObject<HTMLDivElement | null>;
+
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 /**
@@ -37,13 +40,11 @@ interface SudokuControls {
  *
  * This hook centralizes all board-level interaction effects to keep
  * Sudoku view components clean and declarative.
- *
- * @returns An object containing configured drag-and-drop sensors and
- * a reference to the board container element.
  */
 const useSudokuControls = (): SudokuControls => {
-  const { game, updateCell, dispatch } = useSudoku();
+  const { game, updateCell, dispatch, isPaused } = useSudoku();
   const boardRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   /**
    * Drag-and-drop sensor configuration.
@@ -59,15 +60,15 @@ const useSudokuControls = (): SudokuControls => {
   );
 
   /**
-   * Handle keyboard input for editing Sudoku cells.
-   */
-  /**
    * Handle keyboard input for editing Sudoku cells and moving selection.
    */
   useEffect(() => {
     if (game.status !== 'playing' || !boardRef.current) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
+      // Block all other inputs when paused
+      if (isPaused) return;
+
       const { row, col } = game.selected;
 
       const isArrow =
@@ -94,6 +95,9 @@ const useSudokuControls = (): SudokuControls => {
           return col;
         })();
 
+        // Select sound
+        playSound('/game/audio/metronome.mp3', { pitch: 1.8 });
+
         dispatch({ type: 'SELECT_CELL', row: newRow, col: newCol });
         return;
       }
@@ -105,32 +109,39 @@ const useSudokuControls = (): SudokuControls => {
 
         if (isNumber) {
           updateCell(row, col, Number(e.key));
+          // Play drop sound
+          playSound('/game/audio/metronome.mp3', { pitch: 1.4 });
         } else if (isDeleteOrBackspace) {
           updateCell(row, col, null);
+          // Play delete sound
+          playSound('/game/audio/metronome.mp3', { pitch: 0.9 });
         }
       }
     };
 
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [boardRef, game.selected, game.status, updateCell, dispatch]);
+  }, [boardRef, game.selected, game.status, updateCell, dispatch, isPaused]);
 
   /**
    * Deselect the active cell when clicking outside the board area.
    */
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      if (!boardRef.current?.contains(e.target as Node)) {
-        if (game.selected.row !== null || game.selected.col !== null) {
+      if (isPaused || game.status !== 'playing') return;
+
+      // Reset selection if clicked outside of the container or the container itself
+      if (!containerRef.current?.contains(e.target as Node) || containerRef.current === e.target) {
+        if (game.selected.row != null || game.selected.col != null) {
           dispatch({ type: 'RESET_SELECTION' });
         }
       }
     };
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
-  }, [boardRef, dispatch, game.selected]);
+  }, [containerRef, dispatch, game.selected, game.status, isPaused]);
 
-  return { dndSensors, boardRef };
+  return { dndSensors, boardRef, containerRef };
 };
 
 export default useSudokuControls;

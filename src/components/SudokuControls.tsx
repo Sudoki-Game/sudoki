@@ -1,13 +1,21 @@
 import { useSudoku } from '@/context/SudokuContext';
-import Draggable from './Draggable';
-import HintIcon from '../../public/game/hint.svg';
 import Image from 'next/image';
 import './SudokuControls.css';
+import DraggableCell from './DraggableCell';
+import { playSound } from '@/util/sound';
 
 const SudokuControls = () => {
-  const { game, isReady, addHint } = useSudoku();
+  const { game, isReady, isPaused, autoSolve, updateCell } = useSudoku();
 
-  const isPlaying = game.status === 'playing';
+  const disabled = isPaused || game.status !== 'playing';
+
+  // Click to update current selection
+  const handleClick = (value: number) => {
+    if (game.selected.col != null && game.selected.row != null) {
+      updateCell(game.selected.row, game.selected.col, value);
+      playSound('/game/audio/metronome.mp3', { pitch: 1.8 });
+    }
+  };
 
   // Will scale into view when ready
   if (!isReady) return null;
@@ -16,26 +24,34 @@ const SudokuControls = () => {
     <div className={`sudoku__controls}`}>
       <div className='sudoku__controls-numlist'>
         {Array.from({ length: 9 }).map((_, i) => (
-          <Draggable
+          <DraggableCell
             key={i}
             id={`draggable-${i + 1}`}
-            isDisabled={!isPlaying}
-            className={`sudoku__cell ${!isPlaying ? 'sudoku__cell--disabled' : ''}`}
+            disabled={disabled}
             data={{ cell: { value: i + 1 } }}
-            tabIndex={isPlaying ? 0 : -1}
+            // tabIndex={!isDisabled ? 0 : -1}
             data-testid={`draggable-${i + 1}`}
-          >
-            {i + 1}
-          </Draggable>
+            cellProps={{
+              cellValue: i + 1,
+              disabled: disabled,
+              isSelected: false,
+              isRelated: false,
+              isConflicting: false,
+              isFixed: false,
+              isAutoSolved: false,
+              isOver: false,
+              onClick: () => handleClick(i + 1)
+            }}
+          />
         ))}
 
         <button
-          disabled={!isPlaying}
-          aria-label='Show Hint'
+          disabled={disabled}
+          title='Auto-Solve (-1 Life)'
           className='button button--warning'
-          onClick={addHint}
+          onClick={autoSolve}
         >
-          <Image src={HintIcon} alt={'Hint'} height={28} />
+          <Image src={'/game/auto-solve.svg'} alt={'Auto-Solve Icon'} height={28} width={28} />
         </button>
       </div>
     </div>

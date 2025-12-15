@@ -88,6 +88,7 @@ h3,
 h4,
 h5,
 h6 {
+  color: var(--text);
   font-weight: normal;
 }
 
@@ -105,5 +106,10 @@ h3 {
 
 h4 {
   font-size: 1.25rem;
+}
+
+.dynascale {
+  width: 100%;
+  aspect-ratio: 1/1;
 }
 

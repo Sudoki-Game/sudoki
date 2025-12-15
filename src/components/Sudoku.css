@@ -20,11 +20,6 @@
   width: 100%;
   height: 100%;
 
-  > .dynascale {
-    width: 100%;
-    aspect-ratio: 1/1;
-  }
-
   @media (orientation: portrait) and (max-width: 640px) {
     justify-content: space-evenly;
     padding: 1.25rem 1rem;

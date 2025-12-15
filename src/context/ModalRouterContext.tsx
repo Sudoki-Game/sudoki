@@ -1,25 +1,25 @@
 'use client';
 import { createContext, useContext, useReducer, ReactNode } from 'react';
 
-export type MenuType = 'win' | 'lose' | 'solution' | 'leaderboard' | 'settings';
+export type ModalType = 'gameover' | 'solution' | 'leaderboard' | 'settings';
 
-type MenuRouterProviderProps = {
+type ModalRouterProviderProps = {
   children: ReactNode;
 };
 
 type State = {
-  history: MenuType[];
+  history: ModalType[];
 };
 
-type Action = { type: 'OPEN_MENU'; menu: MenuType } | { type: 'GO_BACK' };
+type Action = { type: 'OPEN_MENU'; menu: ModalType } | { type: 'GO_BACK' };
 
-export type MenuRouterProviderState = {
-  activeMenu: MenuType | null;
-  openMenu: (menu: MenuType) => void;
+export type ModalRouterProviderState = {
+  activeModal: ModalType | null;
+  openModal: (menu: ModalType) => void;
   goBack: () => void;
 };
 
-const MenuRouterContext = createContext<MenuRouterProviderState | undefined>(undefined);
+const ModalRouterContext = createContext<ModalRouterProviderState | undefined>(undefined);
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -49,14 +49,14 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-export function MenuRouterProvider({ children }: MenuRouterProviderProps) {
+export function ModalRouterProvider({ children }: ModalRouterProviderProps) {
   const [state, dispatch] = useReducer(reducer, {
     history: []
   });
 
-  const activeMenu = state.history[state.history.length - 1] || null;
+  const activeModal = state.history[state.history.length - 1] || null;
 
-  const openMenu = (menu: MenuType) => {
+  const openModal = (menu: ModalType) => {
     dispatch({ type: 'OPEN_MENU', menu });
   };
 
@@ -65,16 +65,16 @@ export function MenuRouterProvider({ children }: MenuRouterProviderProps) {
   };
 
   return (
-    <MenuRouterContext.Provider value={{ activeMenu, openMenu, goBack }}>
+    <ModalRouterContext.Provider value={{ activeModal, openModal, goBack }}>
       {children}
-    </MenuRouterContext.Provider>
+    </ModalRouterContext.Provider>
   );
 }
 
-export const useMenuRouter = () => {
-  const context = useContext(MenuRouterContext);
+export const useModalRouter = () => {
+  const context = useContext(ModalRouterContext);
   if (!context) {
-    throw new Error('useMenuRouter must be used within an MenuRouterProvider');
+    throw new Error('useModalRouter must be used within an ModalRouterProvider');
   }
   return context;
 };

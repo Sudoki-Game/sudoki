@@ -46,16 +46,22 @@ export type GameState = {
   selected: Selection;
 
   /**
+   * Set of all highlighted cell coords
+   * Each key is a "row,col" string.
+   */
+  highlights: Set<string>;
+
+  /**
    * Map of all conflicting cells and their occurrences.
    * Key is "row,col" string, value is the conflict count.
    */
   conflicts: Map<string, number>;
 
   /**
-   * Set of all hint cells added to the board.
+   * Set of all auto-solved cells added to the board.
    * Each key is a "row,col" string.
    */
-  hints: Set<string>;
+  autoSolves: Set<string>;
 
   /**
    * The number currently being dragged
@@ -72,7 +78,7 @@ export type GameAction =
   | { type: 'NEW_GAME'; payload: { board: Board; solution: Board } }
   | { type: 'SELECT_CELL'; row: number; col: number }
   | { type: 'SET_CONFLICTS'; conflicts: Map<string, number> }
-  | { type: 'ADD_HINT'; row: number; col: number }
+  | { type: 'AUTO_SOLVE'; row: number; col: number }
   | { type: 'SET_DRAG_VALUE'; value: number | null }
   | { type: 'UPDATE_BOARD'; board: Board }
   | { type: 'SET_SCORE'; score: number }

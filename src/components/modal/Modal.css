@@ -1,0 +1,28 @@
+.modal {
+  position: absolute;
+  background-color: white;
+  border: 2px solid var(--pink);
+  border-radius: 0.75rem;
+  box-sizing: border-box;
+  min-width: 20rem;
+  max-width: calc(100% - 1rem);
+  padding: 1.5rem;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(1);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  @starting-style {
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
+
+.modal__content {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  gap: 1.5rem;
+}
