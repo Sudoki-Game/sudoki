@@ -1,12 +1,12 @@
 import Header from '@/components/Header';
-import MenuHandler from '@/components/menu/MenuHandler';
+import MenuHandler from '@/components/modal/ModalRouter';
 import Sudoku from '@/components/Sudoku';
-import { MenuRouterProvider } from '@/context/MenuRouterContext';
+import { ModalRouterProvider } from '@/context/ModalRouterContext';
 import { SudokuProvider } from '@/context/SudokuContext';
 
 export default function Home() {
   return (
-    <MenuRouterProvider>
+    <ModalRouterProvider>
       <SudokuProvider>
         <Header />
         <main>
@@ -14,7 +14,6 @@ export default function Home() {
           <MenuHandler />
         </main>
       </SudokuProvider>
-    </MenuRouterProvider>
+    </ModalRouterProvider>
   );
 }
-

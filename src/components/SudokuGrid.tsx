@@ -10,9 +10,9 @@ import BoardCell from './BoardCell';
 
 type SudokuGridProps = {
   game: GameState;
-  isReady: boolean;
   showSolution: boolean;
-  handleClick: (row: number, col: number) => void;
+  isReady: boolean;
+  handleClick?: (row: number, col: number) => void;
 } & React.ComponentProps<'div'>;
 
 /**
@@ -55,7 +55,7 @@ const SudokuGrid = ({ game, isReady, showSolution, handleClick, ref }: SudokuGri
                   <SudokuCell
                     key={`${cellRow}-${cellCol}`}
                     cellValue={game.solution[cellRow][cellCol]}
-                    disabled={false}
+                    disabled={true}
                     isSelected={
                       !isAutoSolved &&
                       !isFixed &&
@@ -89,7 +89,7 @@ const SudokuGrid = ({ game, isReady, showSolution, handleClick, ref }: SudokuGri
                     isFixed={isFixed}
                     isAutoSolved={isAutoSolved}
                     isOver={false}
-                    onClick={() => handleClick(cellRow, cellCol)}
+                    onClick={() => handleClick && handleClick(cellRow, cellCol)}
                   />
                 );
               }
@@ -106,7 +106,7 @@ const SudokuGrid = ({ game, isReady, showSolution, handleClick, ref }: SudokuGri
                   isConflicting={game.conflicts.has(`${cellRow},${cellCol}`)}
                   isFixed={isFixed}
                   isAutoSolved={isAutoSolved}
-                  handleClick={() => handleClick(cellRow, cellCol)}
+                  handleClick={() => handleClick && handleClick(cellRow, cellCol)}
                 />
               );
             })}

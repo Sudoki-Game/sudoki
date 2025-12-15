@@ -1,14 +1,14 @@
 'use client';
 import Image from 'next/image';
-import { useMenuRouter } from '@/context/MenuRouterContext';
+import { useModalRouter } from '@/context/ModalRouterContext';
 import './Header.css';
 
 const Header = () => {
-  const { openMenu } = useMenuRouter();
+  const { openModal } = useModalRouter();
 
   return (
     <header className='header'>
-      <button className='button button--icon' type='button' onClick={() => openMenu('settings')}>
+      <button className='button button--icon' type='button' onClick={() => openModal('settings')}>
         <Image src={'/game/gear.svg'} alt='Settings Icon' height={32} width={32} />
       </button>
 
@@ -25,7 +25,7 @@ const Header = () => {
         disabled
         className='button button--icon button--warning'
         type='button'
-        onClick={() => openMenu('leaderboard')}
+        onClick={() => openModal('leaderboard')}
       >
         <Image src={'/game/crown.svg'} alt='Leaderboard Icon' height={32} width={32} />
       </button>

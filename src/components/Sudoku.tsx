@@ -11,7 +11,7 @@ import { Dynascale } from 'dynascale';
 import useSudokuControls from '@/hooks/useSudokuControls';
 import SudokuControls from './SudokuControls';
 import { useEffect } from 'react';
-import { useMenuRouter } from '@/context/MenuRouterContext';
+import { useModalRouter } from '@/context/ModalRouterContext';
 import SudokuStats from './SudokuStats';
 import './Sudoku.css';
 
@@ -31,6 +31,7 @@ const Sudoku = () => {
     newGame
   } = useSudoku();
   const { dndSensors, boardRef, containerRef } = useSudokuControls();
+  const { openModal } = useModalRouter();
 
   const isDisabled = isPaused || game.status !== 'playing';
 
@@ -39,12 +40,26 @@ const Sudoku = () => {
    */
   useEffect(newGame, [newGame]);
 
-  const { activeMenu } = useMenuRouter();
+  const { activeModal } = useModalRouter();
 
   // Disable game on menu active
   useEffect(() => {
-    togglePause(!!activeMenu);
-  }, [activeMenu, togglePause]);
+    togglePause(!!activeModal);
+  }, [activeModal, togglePause]);
+
+  // Win/Lost modals
+  useEffect(() => {
+    switch (game.status) {
+      case 'win':
+      case 'lose':
+        openModal('gameover');
+        break;
+      case 'playing':
+      case 'idle':
+      default:
+        break;
+    }
+  }, [openModal, game.status]);
 
   return (
     <div className={`sudoku`} inert={isDisabled} style={{ opacity: isDisabled ? '40%' : '' }}>

@@ -1,0 +1,29 @@
+.solution-modal__key {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.solution-modal__key-pair {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.solution-modal__key-color {
+  width: 2rem;
+  height: 2rem;
+  background: var(--grey-gradient);
+
+  border-radius: 0.75rem;
+  border: 2px solid var(--text);
+
+  box-shadow: inset 0 -0.35rem 0 var(--shadow);
+
+  &.solution-modal__key-color--ok {
+    background: var(--green-gradient);
+  }
+
+  &.solution-modal__key-color--hint {
+    background: var(--yellow-gradient);
+  }
+}

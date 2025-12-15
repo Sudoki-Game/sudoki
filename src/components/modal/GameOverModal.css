@@ -1,0 +1,28 @@
+.gameover-modal__lives-container {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 0.75rem;
+}
+
+.gameover-modal__stat-container {
+  display: grid;
+  grid-template-columns: 1fr 6rem;
+  gap: 1rem;
+  padding: 1.25rem;
+
+  width: 100%;
+  align-items: center;
+  box-sizing: border-box;
+
+  border-radius: 0.75rem;
+  border: 2px solid var(--pink);
+  background-color: var(--cyan);
+}
+
+.gameover-modal__stat--numerical {
+  font-family: 'Bear Days';
+  margin-top: 0;
+  font-size: 1.5rem;
+  color: var(--red);
+  margin-left: auto;
+}
