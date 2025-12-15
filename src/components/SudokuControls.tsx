@@ -2,6 +2,7 @@ import { useSudoku } from '@/context/SudokuContext';
 import Image from 'next/image';
 import './SudokuControls.css';
 import DraggableCell from './DraggableCell';
+import { playSound } from '@/util/sound';
 
 const SudokuControls = () => {
   const { game, isReady, isPaused, autoSolve, updateCell } = useSudoku();
@@ -12,6 +13,7 @@ const SudokuControls = () => {
   const handleClick = (value: number) => {
     if (game.selected.col != null && game.selected.row != null) {
       updateCell(game.selected.row, game.selected.col, value);
+      playSound('/game/audio/metronome.mp3', { pitch: 1.8 });
     }
   };
 

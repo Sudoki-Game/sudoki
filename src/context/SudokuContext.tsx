@@ -17,6 +17,7 @@ import {
   computeHighlights
 } from '../util/util';
 import { MAX_LIVES } from '@/util/constants';
+import { playSound } from '@/util/sound';
 
 type SudokuProviderProps = {
   children: React.ReactNode;
@@ -201,6 +202,10 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    */
   const handleClick = (row: number, col: number) => {
     if (isPaused || state.status !== 'playing') return;
+
+    // Select sound
+    playSound('/game/audio/metronome.mp3', { pitch: 1.8 });
+    
     dispatch({ type: 'SELECT_CELL', row, col });
   };
 
@@ -217,6 +222,9 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     const isBoardCell = cell.row != null && cell.col != null;
 
     dispatch({ type: 'SET_DRAG_VALUE', value: cell.value });
+
+    // Play pickup sound
+    playSound('/game/audio/metronome.mp3', { pitch: 2 });
 
     if (isBoardCell) {
       dispatch({ type: 'SELECT_CELL', row: cell.row, col: cell.col });
@@ -280,6 +288,9 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
 
     // Delete the source cell
     newConflicts.delete(`${sourceRow},${sourceCol}`);
+
+    // Play delete sound
+    playSound('/game/audio/metronome.mp3', { pitch: 0.9 });
 
     dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
     dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
@@ -402,6 +413,9 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
 
     // We've dropped onto a valid cell
     handleInBounds(sourceRow, sourceCol, targetRow, targetCol);
+
+    // Play drop sound
+    playSound('/game/audio/metronome.mp3', { pitch: 1.4 });
   };
 
   /**

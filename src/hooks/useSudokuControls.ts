@@ -4,6 +4,7 @@
  */
 
 import { useSudoku } from '@/context/SudokuContext';
+import { playSound } from '@/util/sound';
 import {
   useSensors,
   useSensor,
@@ -94,6 +95,9 @@ const useSudokuControls = (): SudokuControls => {
           return col;
         })();
 
+        // Select sound
+        playSound('/game/audio/metronome.mp3', { pitch: 1.8 });
+
         dispatch({ type: 'SELECT_CELL', row: newRow, col: newCol });
         return;
       }
@@ -105,8 +109,12 @@ const useSudokuControls = (): SudokuControls => {
 
         if (isNumber) {
           updateCell(row, col, Number(e.key));
+          // Play drop sound
+          playSound('/game/audio/metronome.mp3', { pitch: 1.4 });
         } else if (isDeleteOrBackspace) {
           updateCell(row, col, null);
+          // Play delete sound
+          playSound('/game/audio/metronome.mp3', { pitch: 0.9 });
         }
       }
     };
