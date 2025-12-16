@@ -3,6 +3,7 @@ import { useModalRouter } from '@/context/ModalRouterContext';
 import SettingsModal from './SettingsModal';
 import GameOverModal from './GameOverModal';
 import SolutionModal from './SolutionModal';
+import ReportBugModal from './ReportBugModal';
 
 const ModalRouter = () => {
   const { activeModal } = useModalRouter();
@@ -12,6 +13,7 @@ const ModalRouter = () => {
   if (activeModal === 'settings') return <SettingsModal />;
   if (activeModal === 'gameover') return <GameOverModal />;
   if (activeModal === 'solution') return <SolutionModal />;
+  if (activeModal === 'bug-report') return <ReportBugModal />;
 };
 
 export default ModalRouter;
