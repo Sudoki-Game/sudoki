@@ -1,4 +1,5 @@
 @import url('../styles/ui/Button.css');
+@import url('../styles/ui/Form.css');
 
 @font-face {
   font-family: 'Yang Bagus';
@@ -15,7 +16,7 @@
   --blue: #4fa8fc;
   --red: #fc4f6a;
   --green: #8acc37;
-  --green: #679929;
+  --dark-green: #679929;
   --yellow: #ffe18e;
   --bronze: #db4500;
   --pink: #ff91a8;
@@ -47,6 +48,7 @@
 
 * {
   margin: 0;
+  color: var(--text);
 }
 
 html {
@@ -88,7 +90,6 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--text);
   font-weight: normal;
 }
 
@@ -112,4 +113,3 @@ h4 {
   width: 100%;
   aspect-ratio: 1/1;
 }
-

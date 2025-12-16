@@ -77,7 +77,7 @@
       padding-bottom: 0;
     }
 
-    &:focus {
+    &:focus-visible {
       outline-color: var(--pink);
     }
   }
