@@ -81,7 +81,7 @@ textarea {
     color: var(--blue);
   }
 
-  &form__message--error {
+  &.form__message--error {
     color: var(--red);
   }
 }
