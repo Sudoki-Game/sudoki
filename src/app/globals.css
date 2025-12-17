@@ -113,3 +113,11 @@ h4 {
   width: 100%;
   aspect-ratio: 1/1;
 }
+
+.copyright {
+  margin: auto;
+  margin-bottom: 2.5rem;
+  text-decoration: none;
+  color: var(--shadow);
+  font-size: 0.875rem;
+}

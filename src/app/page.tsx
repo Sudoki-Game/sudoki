@@ -13,6 +13,15 @@ export default function Home() {
           <Sudoku />
           <MenuHandler />
         </main>
+
+        <a
+          className='copyright'
+          href='https://dylanalmond.net'
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          @{new Date().getFullYear()} Dylan Almond
+        </a>
       </SudokuProvider>
     </ModalRouterProvider>
   );
