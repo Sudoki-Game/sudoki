@@ -1,3 +1,7 @@
+.gameover-modal {
+  max-width: 400px;
+}
+
 .gameover-modal__state-image {
   width: 100%;
   height: auto;
@@ -13,7 +17,7 @@
   display: grid;
   grid-template-columns: 1fr 6rem;
   gap: 1rem;
-  padding: 1.25rem;
+  padding: 1.5rem;
 
   width: 100%;
   align-items: center;
@@ -26,7 +30,7 @@
 
 .gameover-modal__stat--numerical {
   font-family: 'Bear Days';
-  margin-top: 0;
+  margin-bottom: 0.25rem;
   font-size: 1.5rem;
   color: var(--red);
   margin-left: auto;

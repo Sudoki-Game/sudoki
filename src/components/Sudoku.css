@@ -23,6 +23,6 @@
   @media (orientation: portrait) and (max-width: 640px) {
     justify-content: space-evenly;
     padding: 1.25rem 1rem;
-    gap: 1rem;
+    /* gap: 1rem; */
   }
 }

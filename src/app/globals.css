@@ -82,6 +82,7 @@ body {
 
 main {
   position: relative;
+  flex: 1;
 }
 
 h1,
