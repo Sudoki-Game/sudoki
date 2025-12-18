@@ -1,4 +1,3 @@
-// /app/actions/reportBug.ts
 'use server';
 
 import nodemailer from 'nodemailer';
@@ -9,7 +8,7 @@ export type BugReportState = {
 };
 
 export async function reportBug(
-  prevState: BugReportState,
+  _prevState: BugReportState,
   formData: FormData
 ): Promise<BugReportState> {
   try {
