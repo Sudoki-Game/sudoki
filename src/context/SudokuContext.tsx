@@ -6,7 +6,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useReducer, useState } from 'react';
-import type { GameAction, GameState } from '../types';
+import type { GameAction, GameState } from '../types/sudoku';
 import { type DragStartEvent, type DragEndEvent } from '@dnd-kit/core';
 import {
   generatePuzzledifficulty,

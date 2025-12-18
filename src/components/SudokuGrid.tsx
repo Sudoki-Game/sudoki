@@ -5,7 +5,7 @@
 
 import SudokuCell from './SudokuCell';
 import './SudokuGrid.css';
-import { GameState } from '@/types';
+import { GameState } from '@/types/sudoku';
 import BoardCell from './BoardCell';
 
 type SudokuGridProps = {

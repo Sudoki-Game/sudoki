@@ -1,6 +1,6 @@
 import { useModalRouter } from '@/context/ModalRouterContext';
 import Modal from './Modal';
-import BugReport from '../BugReport';
+import BugReport from '../form/BugReport';
 
 const ReportBugModal = () => {
   const { goBack } = useModalRouter();
