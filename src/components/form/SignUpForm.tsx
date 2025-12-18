@@ -4,7 +4,7 @@ import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { FirebaseError } from 'firebase/app';
 import { SessionResult } from '@/types';
-import { mapFirebaseError, signInWithEmail, signInWithGoogle } from '@/lib/firebase/auth';
+import { mapFirebaseError, signInWithGoogle, signUpWithEmail } from '@/lib/firebase/auth';
 import './AuthForm.css';
 import Link from 'next/link';
 
@@ -23,12 +23,12 @@ function SubmitButton() {
       disabled={pending}
       className='form__submit button button--fill button--lg button--warning'
     >
-      {pending ? 'Loading...' : 'Sign In'}
+      {pending ? 'Loading...' : 'Continue'}
     </button>
   );
 }
 
-const LoginForm = () => {
+const SignUpForm = () => {
   const [googleError, setGoogleError] = useState<string | null>();
 
   async function handleSubmit(
@@ -56,7 +56,7 @@ const LoginForm = () => {
     }
 
     try {
-      await signInWithEmail(email, password);
+      await signUpWithEmail(email, password);
     } catch (error) {
       return {
         success: false,
@@ -83,7 +83,7 @@ const LoginForm = () => {
 
   return (
     <div className='auth-form__wrapper'>
-      <h1>Sign In</h1>
+      <h1>Create an Account</h1>
 
       <form className='form' action={formAction}>
         <div className='form__field'>
@@ -131,11 +131,11 @@ const LoginForm = () => {
       </button>
 
       <p>
-        <span>Don&apos;t have an account? </span>
-        <Link href={'/signup'}>Sign Up</Link>
+        <span>Already have an account? </span>
+        <Link href={'/login'}>Login</Link>
       </p>
     </div>
   );
 };
 
-export default LoginForm;
+export default SignUpForm;
