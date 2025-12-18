@@ -9,3 +9,10 @@
 
   gap: 1.5rem;
 }
+
+.auth-form__heading {
+  /* color: var(--label); */
+}
+
+.auth-form {
+}

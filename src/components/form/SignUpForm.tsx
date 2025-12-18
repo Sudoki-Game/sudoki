@@ -2,7 +2,6 @@
 
 import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { FirebaseError } from 'firebase/app';
 import { SessionResult } from '@/types';
 import { mapFirebaseError, signInWithGoogle, signUpWithEmail } from '@/lib/firebase/auth';
 import './AuthForm.css';
@@ -83,9 +82,9 @@ const SignUpForm = () => {
 
   return (
     <div className='auth-form__wrapper'>
-      <h1>Create an Account</h1>
+      <h1 className='auth-form__heading'>Create an Account</h1>
 
-      <form className='form' action={formAction}>
+      <form className='form auth-form' action={formAction}>
         <div className='form__field'>
           <label className='form__label' htmlFor='email'>
             Email
@@ -120,7 +119,7 @@ const SignUpForm = () => {
         <SubmitButton />
       </form>
 
-      <span style={{ fontSize: '1.5rem' }}>or</span>
+      <span style={{ fontSize: '1.25rem' }}>or</span>
 
       <button
         type='button'

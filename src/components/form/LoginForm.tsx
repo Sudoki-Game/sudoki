@@ -2,11 +2,10 @@
 
 import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { FirebaseError } from 'firebase/app';
 import { SessionResult } from '@/types';
 import { mapFirebaseError, signInWithEmail, signInWithGoogle } from '@/lib/firebase/auth';
-import './AuthForm.css';
 import Link from 'next/link';
+import './AuthForm.css';
 
 const initialState: SessionResult = {
   success: false,
@@ -83,9 +82,9 @@ const LoginForm = () => {
 
   return (
     <div className='auth-form__wrapper'>
-      <h1>Sign In</h1>
+      <h1 className='auth-form__heading'>Sign In</h1>
 
-      <form className='form' action={formAction}>
+      <form className='form auth-form' action={formAction}>
         <div className='form__field'>
           <label className='form__label' htmlFor='email'>
             Email
@@ -120,7 +119,7 @@ const LoginForm = () => {
         <SubmitButton />
       </form>
 
-      <span style={{ fontSize: '1.5rem' }}>or</span>
+      <span style={{ fontSize: '1.25rem' }}>or</span>
 
       <button
         type='button'
