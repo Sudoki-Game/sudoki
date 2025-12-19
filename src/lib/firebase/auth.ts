@@ -1,14 +1,19 @@
 import {
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
   onAuthStateChanged as _onAuthStateChanged,
   NextOrObserver,
-  User
+  User,
+  sendSignInLinkToEmail
 } from 'firebase/auth';
 import { auth } from './client';
 import { FirebaseError } from 'firebase/app';
+
+const actionCodeSettings = {
+  url: process.env.NODE_ENV === 'development' ? 'http://localhost:3000/finishSignIn' : 'https://sudoki.uk/finishSignIn',
+  handleCodeInApp: true
+};
 
 export function onAuthStateChanged(cb: NextOrObserver<User>) {
   return _onAuthStateChanged(auth, cb);
@@ -18,8 +23,15 @@ export async function signUpWithEmail(email: string, password: string) {
   return await createUserWithEmailAndPassword(auth, email, password);
 }
 
-export async function signInWithEmail(email: string, password: string) {
-  return await signInWithEmailAndPassword(auth, email, password);
+export async function sendMagicLink(email: string) {
+  try {
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+    // Save the email locally to prevent the user from typing it again
+    localStorage.setItem('emailForSignIn', email);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    throw 'Failed to send magic link: ' + error.message;
+  }
 }
 
 export async function signInWithGoogle() {

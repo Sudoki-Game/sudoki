@@ -3,7 +3,7 @@
 import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { SessionResult } from '@/types';
-import { mapFirebaseError, signInWithEmail, signInWithGoogle } from '@/lib/firebase/auth';
+import { mapFirebaseError, sendMagicLink, signInWithGoogle } from '@/lib/firebase/auth';
 import Link from 'next/link';
 import './AuthForm.css';
 
@@ -37,25 +37,19 @@ const LoginForm = () => {
     setGoogleError(null);
 
     const rawEmail = formData.get('email');
-    const rawPassword = formData.get('password');
 
-    if (typeof rawEmail !== 'string' || typeof rawPassword !== 'string') {
+    if (typeof rawEmail !== 'string') {
       return { success: false, error: 'Invalid form submission' };
     }
 
     const email = rawEmail.trim().toLowerCase();
-    const password = rawPassword;
 
-    if (!email || !password) {
+    if (!email) {
       return { success: false, error: 'Email and password are required' };
     }
 
-    if (password.length < 6) {
-      return { success: false, error: 'Password must be at least 6 characters' };
-    }
-
     try {
-      await signInWithEmail(email, password);
+      await sendMagicLink(email);
     } catch (error) {
       return {
         success: false,
@@ -85,34 +79,14 @@ const LoginForm = () => {
       <h1 className='auth-form__heading'>Sign In</h1>
 
       <form className='form auth-form' action={formAction}>
-        <div className='form__field'>
-          <label className='form__label' htmlFor='email'>
-            Email
-          </label>
-          <input
-            className='form__input'
-            type='email'
-            name='email'
-            id='email'
-            placeholder='Email'
-            required
-          />
-        </div>
-
-        <div className='form__field'>
-          <label className='form__label' htmlFor='password'>
-            Password
-          </label>
-          <input
-            className='form__input'
-            type='password'
-            name='password'
-            id='password'
-            placeholder='Password'
-            required
-            minLength={6}
-          />
-        </div>
+        <input
+          className='form__input'
+          type='email'
+          name='email'
+          id='email'
+          placeholder='Email'
+          required
+        />
 
         {errorMessage && <p className='form__message form__message--error'>{errorMessage}</p>}
 
@@ -128,11 +102,6 @@ const LoginForm = () => {
       >
         Continue with Google
       </button>
-
-      <p>
-        <span>Don&apos;t have an account? </span>
-        <Link href={'/signup'}>Sign Up</Link>
-      </p>
     </div>
   );
 };
