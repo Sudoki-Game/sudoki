@@ -3,6 +3,8 @@ import Modal from './Modal';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { auth } from '@/lib/firebase/client';
+import modalStyles from './Modal.module.css';
+import Button from '../ui/Button';
 
 const SettingsModal = () => {
   const { user } = useAuth();
@@ -11,42 +13,34 @@ const SettingsModal = () => {
 
   return (
     <Modal className='settings-modal'>
-      <div className='modal__content'>
+      <div className={modalStyles.content}>
         <h2>Settings</h2>
 
         {user == null ? (
-          <button
-            className='button button--fill button--lg button--ok'
-            type='button'
-            onClick={() => router.push('/login')}
-          >
+          <Button fill size='lg' variant='ok' type='button' onClick={() => router.push('/login')}>
             Sign In
-          </button>
+          </Button>
         ) : (
-          <button
-            className='button button--fill button--lg button--ok'
-            type='button'
-            onClick={() => auth.signOut()}
-          >
+          <Button fill size='lg' variant='ok' type='button' onClick={() => auth.signOut()}>
             Sign Out
-          </button>
+          </Button>
         )}
 
-        <div className='form__field'>
-          <p>Need to report a bug?</p>
+        <p>Need to report a bug?</p>
 
-          <button
-            className='button button--fill button--lg button--warning'
-            type='button'
-            onClick={() => openModal('bug-report')}
-          >
-            Report a Bug
-          </button>
-        </div>
+        <Button
+          fill
+          size='lg'
+          variant='warning'
+          type='button'
+          onClick={() => openModal('bug-report')}
+        >
+          Report a Bug
+        </Button>
 
-        <button className='button button--fill button--lg' type='button' onClick={goBack}>
+        <Button fill size='lg' type='button' onClick={goBack}>
           Go Back
-        </button>
+        </Button>
       </div>
     </Modal>
   );

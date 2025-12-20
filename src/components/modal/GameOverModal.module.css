@@ -1,19 +1,19 @@
-.gameover-modal {
+.gameoverModal {
   max-width: 400px;
 }
 
-.gameover-modal__state-image {
+.stateImage {
   width: 100%;
   height: auto;
 }
 
-.gameover-modal__lives-container {
+.livesContainer {
   display: flex;
   flex-direction: row-reverse;
   gap: 0.75rem;
 }
 
-.gameover-modal__stat-container {
+.statContainer {
   display: grid;
   grid-template-columns: 1fr 6rem;
   gap: 1rem;
@@ -28,7 +28,7 @@
   background-color: var(--cyan);
 }
 
-.gameover-modal__stat--numerical {
+.statNumerical {
   font-family: 'Bear Days';
   margin-bottom: 0.25rem;
   font-size: 1.5rem;

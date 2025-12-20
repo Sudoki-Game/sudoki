@@ -3,18 +3,20 @@ import Modal from './Modal';
 import { useSudoku } from '@/context/SudokuContext';
 import Image from 'next/image';
 import { MAX_LIVES } from '@/util/constants';
-import './GameOverModal.css';
+import styles from './GameOverModal.module.css';
+import modalStyles from './Modal.module.css';
+import Button from '../ui/Button';
 
 const GameOverModal = () => {
   const { game } = useSudoku();
   const { openModal } = useModalRouter();
 
   return (
-    <Modal className='gameover-modal'>
-      <div className='modal__content'>
+    <Modal className={styles.gameoverModal}>
+      <div className={modalStyles.content}>
         {game.status === 'win' ? (
           <Image
-            className='gameover-modal__state-image'
+            className={styles.stateImage}
             src={'/game/you-win-text.png'}
             alt={'You Win!'}
             height={84}
@@ -22,7 +24,7 @@ const GameOverModal = () => {
           />
         ) : (
           <Image
-            className='gameover-modal__state-image'
+            className={styles.stateImage}
             src={'/game/game-over-text.png'}
             alt={'Game Over!'}
             height={70}
@@ -30,7 +32,7 @@ const GameOverModal = () => {
           />
         )}
 
-        <div className='gameover-modal__lives-container'>
+        <div className={styles.livesContainer}>
           {Array.from({ length: MAX_LIVES }).map((_, i) =>
             i < game.lives ? (
               <Image
@@ -52,23 +54,18 @@ const GameOverModal = () => {
           )}
         </div>
 
-        <section className='gameover-modal__stat-container'>
+        <section className={styles.statContainer}>
           <h3>Your Score</h3>
-          <span className='gameover-modal__stat--numerical'>{game.score}</span>
+          <span className={styles.statNumerical}>{game.score}</span>
         </section>
 
         {/* <button disabled className='button button--ok button--fill button--lg' type='button'>
           Leaderboard
         </button> */}
 
-        <button
-          disabled={game.status !== 'lose'}
-          className='button button--fill button--lg'
-          type='button'
-          onClick={() => openModal('solution')}
-        >
+        <Button disabled={game.status !== 'lose'} fill size='lg' type='button' onClick={() => openModal('solution')}>
           View Solution
-        </button>
+        </Button>
       </div>
     </Modal>
   );

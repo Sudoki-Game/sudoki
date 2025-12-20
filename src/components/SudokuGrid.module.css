@@ -1,4 +1,4 @@
-.sudoku__grid {
+.grid {
   display: grid;
   grid-template-columns: repeat(3, auto);
   grid-template-rows: repeat(3, auto);
@@ -9,20 +9,20 @@
   border: 2px solid var(--pink);
   border-radius: 0.75rem;
 
-  > .sudoku__block:nth-child(3n) {
+  > .block:nth-child(3n) {
     border-right: none;
   }
 
-  > .sudoku__block:nth-child(n + 7) {
+  > .block:nth-child(n + 7) {
     border-bottom: none;
   }
 
-  &.sudoku__grid--show-solution {
+  &.gridShowSolution {
     pointer-events: none;
   }
 }
 
-.sudoku__block {
+.block {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);

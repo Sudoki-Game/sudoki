@@ -1,4 +1,4 @@
-.auth-form__wrapper {
+.wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8,11 +8,4 @@
   max-width: min(400px, calc(100% - 2rem));
 
   gap: 1.5rem;
-}
-
-.auth-form__heading {
-  /* color: var(--label); */
-}
-
-.auth-form {
 }

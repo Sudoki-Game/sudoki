@@ -1,4 +1,4 @@
-.sudoku__controls {
+.controls {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -6,7 +6,7 @@
   transition: max-height 1s ease;
 }
 
-.sudoku__controls-numlist {
+.numlist {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   gap: 0.5rem;
@@ -18,7 +18,7 @@
   border: 2px solid var(--pink);
   border-radius: 0.75rem;
 
-  .sudoku__cell {
+  .cell {
     margin: auto;
   }
 

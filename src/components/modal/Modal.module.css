@@ -22,7 +22,7 @@
   }
 }
 
-.modal__content {
+.content {
   display: flex;
   flex-direction: column;
 

@@ -1,19 +1,20 @@
 'use client';
 import Image from 'next/image';
 import { useModalRouter } from '@/context/ModalRouterContext';
-import './Header.css';
+import styles from './Header.module.css';
+import Button from './ui/Button';
 
 const Header = () => {
   const { openModal } = useModalRouter();
 
   return (
-    <header className='header'>
-      <button className='button button--icon' type='button' onClick={() => openModal('settings')}>
+    <header className={styles.header}>
+      <Button size='icon' type='button' onClick={() => openModal('settings')}>
         <Image src={'/game/gear.svg'} alt='Settings Icon' height={32} width={32} />
-      </button>
+      </Button>
 
       <Image
-        className='header__logo'
+        className={styles.logo}
         src={'/logo.svg'}
         alt='Sudoki! Logo'
         loading='eager'
@@ -21,14 +22,15 @@ const Header = () => {
         width={275}
       />
 
-      <button
+      <Button
         disabled
-        className='button button--icon button--warning'
+        size='icon'
+        variant='warning'
         type='button'
         onClick={() => openModal('leaderboard')}
       >
         <Image src={'/game/crown.svg'} alt='Leaderboard Icon' height={32} width={32} />
-      </button>
+      </Button>
     </header>
   );
 };

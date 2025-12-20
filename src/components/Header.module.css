@@ -14,7 +14,7 @@
   }
 }
 
-.header__logo {
+.logo {
   transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1);
   @media screen and (max-width: 768px) {
     height: 3.5rem;

@@ -4,7 +4,7 @@
  */
 
 import SudokuCell from './SudokuCell';
-import './SudokuGrid.css';
+import styles from './SudokuGrid.module.css';
 import { GameState } from '@/types/sudoku';
 import BoardCell from './BoardCell';
 
@@ -36,12 +36,12 @@ const SudokuGrid = ({ game, isReady, showSolution, handleClick, ref }: SudokuGri
   if (!isReady) return null;
 
   return (
-    <div ref={ref} className={`sudoku__grid ${showSolution ? 'sudoku__grid--show-solution' : ''}`}>
+    <div ref={ref} className={`${styles.grid} ${showSolution ? styles.gridShowSolution : ''}`}>
       {Array.from({ length: 9 }).map((_, blockIdx) => {
         const blockRow = Math.floor(blockIdx / 3);
         const blockCol = blockIdx % 3;
         return (
-          <div key={blockIdx} className='sudoku__block'>
+          <div key={blockIdx} className={styles.block}>
             {Array.from({ length: 9 }).map((_, cellIdx) => {
               const cellRow = blockRow * 3 + Math.floor(cellIdx / 3);
               const cellCol = blockCol * 3 + (cellIdx % 3);

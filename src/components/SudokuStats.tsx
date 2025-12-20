@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { MAX_LIVES } from '@/util/constants';
-import './SudokuStats.css';
+import styles from './SudokuStats.module.css';
 
 interface SudokuStatsProps {
   score: number;
@@ -9,13 +9,13 @@ interface SudokuStatsProps {
 
 const SudokuStats = ({ score, lives }: SudokuStatsProps) => {
   return (
-    <div className='sudoku__stats'>
-      <div className='sudoku__stat-container'>
-        <span className='sudoku__stat'>Score</span>
-        <span className='sudoku__stat sudoku__stat--numerical'>{score}</span>
+    <div className={styles.stats}>
+      <div className={styles.statContainer}>
+        <span className={styles.stat}>Score</span>
+        <span className={`${styles.stat} ${styles.statNumerical}`}>{score}</span>
       </div>
 
-      <div className='sudoku__lives-container'>
+      <div className={styles.livesContainer}>
         {Array.from({ length: MAX_LIVES }).map((_, i) =>
           i < lives ? (
             <Image

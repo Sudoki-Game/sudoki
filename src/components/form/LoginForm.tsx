@@ -4,8 +4,10 @@ import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { SessionResult } from '@/types';
 import { mapFirebaseError, sendMagicLink, signInWithGoogle } from '@/lib/firebase/auth';
-import Link from 'next/link';
-import './AuthForm.css';
+import styles from './LoginForm.module.css';
+import Button from '../ui/Button';
+import Form from '../ui/Form';
+import Input from '../ui/Input';
 
 const initialState: SessionResult = {
   success: false,
@@ -17,13 +19,9 @@ function SubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <button
-      type='submit'
-      disabled={pending}
-      className='form__submit button button--fill button--lg button--warning'
-    >
+    <Button type='submit' disabled={pending} variant='warning' fill size='lg'>
       {pending ? 'Loading...' : 'Sign In'}
-    </button>
+    </Button>
   );
 }
 
@@ -75,33 +73,22 @@ const LoginForm = () => {
   const errorMessage = state.error || googleError || null;
 
   return (
-    <div className='auth-form__wrapper'>
-      <h1 className='auth-form__heading'>Sign In</h1>
+    <div className={styles.wrapper}>
+      <h1>Sign In</h1>
 
-      <form className='form auth-form' action={formAction}>
-        <input
-          className='form__input'
-          type='email'
-          name='email'
-          id='email'
-          placeholder='Email'
-          required
-        />
+      <Form action={formAction}>
+        <Input type='email' name='email' id='email' placeholder='Email' required />
 
-        {errorMessage && <p className='form__message form__message--error'>{errorMessage}</p>}
+        {errorMessage && <p>{errorMessage}</p>}
 
         <SubmitButton />
-      </form>
+      </Form>
 
-      <span style={{ fontSize: '1.25rem' }}>or</span>
+      <span style={{ fontSize: '1.25rem' }}>- or -</span>
 
-      <button
-        type='button'
-        className='form__submit button button--fill button--lg'
-        onClick={handleGoogle}
-      >
+      <Button type='button' fill size='lg' onClick={handleGoogle}>
         Continue with Google
-      </button>
+      </Button>
     </div>
   );
 };

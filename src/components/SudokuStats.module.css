@@ -1,9 +1,9 @@
-.sudoku__stats {
+.stats {
   display: flex;
   gap: 2rem;
 }
 
-.sudoku__stat-container {
+.statContainer {
   display: flex;
   gap: 0.75rem;
   justify-content: center;
@@ -18,7 +18,7 @@
   border-radius: 0.75rem;
 }
 
-.sudoku__lives-container {
+.livesContainer {
   display: flex;
   gap: 0.5rem;
   justify-content: center;
@@ -34,13 +34,13 @@
   border-radius: 0.75rem;
 }
 
-.sudoku__stat {
+.stat {
   font-size: 1.5rem;
   margin-top: 0.375rem;
   text-transform: uppercase;
   color: var(--red);
 
-  &.sudoku__stat--numerical {
+  &.statNumerical {
     font-family: 'Bear Days';
     margin-top: 0;
     font-size: 2rem;
