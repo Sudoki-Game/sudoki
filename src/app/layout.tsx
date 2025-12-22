@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
   title: 'Sudoki! - Alpha',
@@ -7,17 +8,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  modal,
   children
 }: Readonly<{
-  modal: React.ReactNode;
   children: React.ReactNode;
 }>) {
   return (
     <html lang='en'>
       <body>
-        {children}
-        {modal}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

@@ -1,39 +1,44 @@
 import { useModalRouter } from '@/context/ModalRouterContext';
 import Modal from './Modal';
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { auth } from '@/lib/firebase/client';
+import modalStyles from './Modal.module.css';
+import Button from '../ui/Button';
 
 const SettingsModal = () => {
+  const { user } = useAuth();
   const { openModal, goBack } = useModalRouter();
-  // const router = useRouter();
+  const router = useRouter();
 
   return (
-    <Modal className='settings-modal'>
-      <div className='modal__content'>
-        <h2>Settings</h2>
+    <Modal>
+      <div className={modalStyles.content}>
+        <h2 className={modalStyles.title}>Settings</h2>
 
-        {/* <button
-          className='button button--fill button--lg button--ok'
+        {user == null ? (
+          <Button fill size='lg' variant='ok' type='button' onClick={() => router.push('/login')}>
+            Sign In
+          </Button>
+        ) : (
+          <Button fill size='lg' variant='ok' type='button' onClick={() => auth.signOut()}>
+            Sign Out
+          </Button>
+        )}
+
+        <Button
+          fill
+          size='lg'
+          variant='warning'
           type='button'
-          onClick={() => router.push('auth')}
+          onClick={() => openModal('bug-report')}
         >
-          Sign In
-        </button> */}
+          Report a Bug
+        </Button>
 
-        <div className='form__field'>
-          <p>Need to report a bug?</p>
-
-          <button
-            className='button button--fill button--lg button--warning'
-            type='button'
-            onClick={() => openModal('bug-report')}
-          >
-            Report a Bug
-          </button>
-        </div>
-
-        <button className='button button--fill button--lg' type='button' onClick={goBack}>
+        <Button fill size='lg' type='button' onClick={goBack}>
           Go Back
-        </button>
+        </Button>
       </div>
     </Modal>
   );

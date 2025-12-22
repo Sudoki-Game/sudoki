@@ -1,28 +1,22 @@
+import Copyright from '@/components/Copyright';
 import Header from '@/components/Header';
-import MenuHandler from '@/components/modal/ModalRouter';
 import Sudoku from '@/components/Sudoku';
+import ModalHandler from '@/components/modal/ModalRouter';
 import { ModalRouterProvider } from '@/context/ModalRouterContext';
 import { SudokuProvider } from '@/context/SudokuContext';
 
 export default function Home() {
   return (
-    <ModalRouterProvider>
-      <SudokuProvider>
+    <SudokuProvider>
+      <ModalRouterProvider>
         <Header />
         <main>
           <Sudoku />
-          <MenuHandler />
+          <ModalHandler />
         </main>
 
-        <a
-          className='copyright'
-          href='https://dylanalmond.net'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          @{new Date().getFullYear()} Dylan Almond
-        </a>
-      </SudokuProvider>
-    </ModalRouterProvider>
+        <Copyright />
+      </ModalRouterProvider>
+    </SudokuProvider>
   );
 }

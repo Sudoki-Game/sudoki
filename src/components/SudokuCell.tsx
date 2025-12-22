@@ -4,7 +4,23 @@
  */
 
 import clsx from 'clsx';
-import './SudokuCell.css';
+import { cva } from 'class-variance-authority';
+import styles from './SudokuCell.module.css';
+
+/**
+ * A single cell in the Sudoku board.
+ */
+const sudokuCellVariants = cva(styles.cell, {
+  variants: {
+    selected: { true: styles.cellOk },
+    preFilled: { true: styles.cellPreFilled },
+    empty: { true: styles.cellEmpty },
+    autoSolved: { true: styles.cellWarning },
+    danger: { true: styles.cellDanger },
+    highlight: { true: styles.cellHighlight },
+    noOutline: { true: styles.cellNoOutline }
+  }
+});
 
 export type SudokuCellProps = {
   cellValue: number | null;
@@ -16,9 +32,6 @@ export type SudokuCellProps = {
   isOver: boolean;
 } & React.ComponentProps<'button'>;
 
-/**
- * A single cell in the Sudoku board.
- */
 const SudokuCell = ({
   cellValue,
   isFixed,
@@ -27,18 +40,22 @@ const SudokuCell = ({
   isRelated,
   isAutoSolved,
   isOver,
+  className,
   ref,
   ...props
 }: SudokuCellProps) => {
-  const classNames = clsx('sudoku__cell', {
-    'sudoku__cell--ok': isSelected,
-    'sudoku__cell--pre-filled': isFixed && !isRelated,
-    'sudoku__cell--empty': !isRelated && cellValue == null,
-    'sudoku__cell--warning': !isSelected && isAutoSolved,
-    'sudoku__cell--danger': !isSelected && isConflicting,
-    'sudoku__cell--highlight': !isConflicting && !isSelected && (isRelated || isOver),
-    'sudoku__cell--no-outline': isRelated && !isSelected
-  });
+  const classNames = clsx(
+    sudokuCellVariants({
+      selected: isSelected,
+      preFilled: isFixed && !isRelated,
+      empty: !isRelated && cellValue == null,
+      autoSolved: !isSelected && isAutoSolved,
+      danger: !isSelected && isConflicting,
+      highlight: !isConflicting && !isSelected && (isRelated || isOver),
+      noOutline: isRelated && !isSelected
+    }),
+    className
+  );
 
   return (
     <button ref={ref} type='button' className={classNames} {...props}>

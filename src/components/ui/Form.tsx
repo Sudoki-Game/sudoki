@@ -1,0 +1,25 @@
+import React from 'react';
+import clsx from 'clsx';
+import styles from './Form.module.css';
+
+export type FormProps = React.ComponentPropsWithRef<'form'>;
+
+const Form = ({ children, className, ref, ...props }: FormProps) => {
+  return (
+    <form ref={ref} className={clsx(styles.form, className)} {...props}>
+      {children}
+    </form>
+  );
+};
+
+export type FormFieldProps = React.ComponentPropsWithRef<'div'>;
+
+export const FormField = ({ children, className, ref, ...props }: FormFieldProps) => {
+  return (
+    <div ref={ref} className={clsx(styles.formField, className)} {...props}>
+      {children}
+    </div>
+  );
+};
+
+export default Form;

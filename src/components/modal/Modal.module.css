@@ -1,7 +1,7 @@
 .modal {
   position: absolute;
   background-color: white;
-  border: 2px solid var(--pink);
+  border: 2px solid var(--hot-pink);
   border-radius: 0.75rem;
   box-sizing: border-box;
   width: 100%;
@@ -15,14 +15,20 @@
   transform-origin: center center;
   transform: translate(-50%, -50%) scale(1);
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  font-size: 1.25rem;
+  /* font-size: 1.25rem; */
 
   @starting-style {
     transform: translate(-50%, -50%) scale(0);
   }
 }
 
-.modal__content {
+.title {
+  font-family: 'Yang Bagus';
+  font-weight: normal;
+  color: var(--hot-pink);
+}
+
+.content {
   display: flex;
   flex-direction: column;
 

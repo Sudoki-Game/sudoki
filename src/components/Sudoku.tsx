@@ -13,7 +13,8 @@ import SudokuControls from './SudokuControls';
 import { useEffect } from 'react';
 import { useModalRouter } from '@/context/ModalRouterContext';
 import SudokuStats from './SudokuStats';
-import './Sudoku.css';
+import styles from './Sudoku.module.css';
+import SudokuCellStyles from './SudokuCell.module.css';
 
 /**
  * Main Sudoku UI component
@@ -62,15 +63,19 @@ const Sudoku = () => {
   }, [openModal, game.status]);
 
   return (
-    <div className={`sudoku`} inert={isDisabled} style={{ opacity: isDisabled ? '40%' : '' }}>
+    <div className={styles.root} inert={isDisabled} style={{ opacity: isDisabled ? '40%' : '' }}>
       <DndContext sensors={dndSensors} onDragStart={handleDragStart} onDragEnd={handleDrop}>
         <DragOverlay dropAnimation={null}>
           {game.dragValue ? (
-            <div className='sudoku__cell sudoku__cell--dragging'>{game.dragValue}</div>
+            <div
+              className={`${SudokuCellStyles.cell} ${SudokuCellStyles.cellDragging}`}
+            >
+              {game.dragValue}
+            </div>
           ) : null}
         </DragOverlay>
 
-        <div ref={containerRef} className='sudoku__game'>
+        <div ref={containerRef} className={styles.game}>
           <SudokuStats score={game.score} lives={game.lives} />
 
           {/* Game Board */}

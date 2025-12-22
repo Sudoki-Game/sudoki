@@ -1,20 +1,22 @@
 import { useModalRouter } from '@/context/ModalRouterContext';
 import Modal from './Modal';
-import BugReport from '../BugReport';
+import BugReport from '../form/BugReport';
+import modalStyles from './Modal.module.css';
+import Button from '../ui/Button';
 
 const ReportBugModal = () => {
   const { goBack } = useModalRouter();
 
   return (
     <Modal className='settings-modal'>
-      <div className='modal__content'>
-        <h2>Report a Bug</h2>
+      <div className={modalStyles.content}>
+        <h2 className={modalStyles.title}>Report a Bug</h2>
 
         <BugReport />
 
-        <button className='button button--fill button--lg' type='button' onClick={goBack}>
+        <Button fill size='lg' type='button' onClick={goBack}>
           Go Back
-        </button>
+        </Button>
       </div>
     </Modal>
   );

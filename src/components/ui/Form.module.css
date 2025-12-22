@@ -1,0 +1,26 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 1.5rem;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.formMessage {
+  text-align: center;
+  &.success {
+    color: var(--blue);
+  }
+
+  &.error {
+    color: var(--red);
+  }
+}

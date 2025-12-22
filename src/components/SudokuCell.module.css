@@ -1,4 +1,4 @@
-.sudoku__cell {
+.cell {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -28,14 +28,14 @@
 
   box-shadow: inset 0 -0.35rem 0 var(--shadow);
 
-  &.sudoku__cell--disabled {
+  &.cellDisabled {
     transition: all 1s ease;
     filter: grayscale(100%);
-    opacity: 40%;
+    opacity: 0.4;
   }
 
-  &.sudoku__cell--dragging {
-    opacity: 75%;
+  &.cellDragging {
+    opacity: 0.75;
     transform: scale(1.5);
     padding-bottom: 0;
 
@@ -50,43 +50,43 @@
     }
   }
 
-  &.sudoku__cell--pre-filled {
-    opacity: 50%;
+  &.cellPreFilled {
+    opacity: 0.5;
     background: none;
     box-shadow: none;
     border: none;
     padding: 0;
   }
 
-  &.sudoku__cell--empty {
-    opacity: 30%;
+  &.cellEmpty {
+    opacity: 0.3;
     background: var(--shadow);
     box-shadow: inset 0 0.35rem 0 var(--shadow);
     border: none;
     padding: 0;
   }
 
-  &.sudoku__cell--danger {
+  &.cellDanger {
     color: white;
     background: var(--red-gradient);
   }
 
-  &.sudoku__cell--ok {
+  &.cellOk {
     color: white;
     background: var(--green-gradient);
   }
 
-  &.sudoku__cell--warning {
+  &.cellWarning {
     color: var(--red);
     background: var(--yellow-gradient);
   }
 
-  &.sudoku__cell--highlight {
+  &.cellHighlight {
     color: white;
     background: var(--blue-gradient);
   }
 
-  &.sudoku__cell--no-outline {
+  &.cellNoOutline {
     border: none;
     box-shadow: none;
     padding: 0;

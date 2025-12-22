@@ -1,8 +1,9 @@
 import { useSudoku } from '@/context/SudokuContext';
 import Image from 'next/image';
-import './SudokuControls.css';
+import styles from './SudokuControls.module.css';
 import DraggableCell from './DraggableCell';
 import { playSound } from '@/util/sound';
+import Button from './ui/Button';
 
 const SudokuControls = () => {
   const { game, isReady, isPaused, autoSolve, updateCell } = useSudoku();
@@ -21,8 +22,8 @@ const SudokuControls = () => {
   if (!isReady) return null;
 
   return (
-    <div className={`sudoku__controls}`}>
-      <div className='sudoku__controls-numlist'>
+    <div className={styles.controls}>
+      <div className={styles.numlist}>
         {Array.from({ length: 9 }).map((_, i) => (
           <DraggableCell
             key={i}
@@ -45,14 +46,15 @@ const SudokuControls = () => {
           />
         ))}
 
-        <button
+        <Button
           disabled={disabled}
           title='Auto-Solve (-1 Life)'
-          className='button button--warning'
+          variant='warning'
+          size={'icon'}
           onClick={autoSolve}
         >
           <Image src={'/game/auto-solve.svg'} alt={'Auto-Solve Icon'} height={28} width={28} />
-        </button>
+        </Button>
       </div>
     </div>
   );
