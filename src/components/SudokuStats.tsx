@@ -22,16 +22,16 @@ const SudokuStats = ({ score, lives }: SudokuStatsProps) => {
               key={`heart-${i}`}
               src={'/game/heart.svg'}
               alt={'Heart'}
-              height={24}
-              width={24}
+              height={28}
+              width={28}
             />
           ) : (
             <Image
               key={`heart-${i}`}
               src={'/game/heart-empty.svg'}
               alt={'Empty Heart'}
-              height={24}
-              width={24}
+              height={28}
+              width={28}
             />
           )
         )}

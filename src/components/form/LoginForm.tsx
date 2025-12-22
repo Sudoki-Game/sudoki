@@ -8,6 +8,7 @@ import styles from './LoginForm.module.css';
 import Button from '../ui/Button';
 import Form from '../ui/Form';
 import Input from '../ui/Input';
+import Link from 'next/link';
 
 const initialState: SessionResult = {
   success: false,
@@ -19,8 +20,8 @@ function SubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button type='submit' disabled={pending} variant='warning' fill size='lg'>
-      {pending ? 'Loading...' : 'Sign In'}
+    <Button type='submit' disabled={pending} variant='ok' fill size='lg'>
+      {pending ? 'Loading...' : 'Continue'}
     </Button>
   );
 }
@@ -74,21 +75,34 @@ const LoginForm = () => {
 
   return (
     <div className={styles.wrapper}>
-      <h1>Sign In</h1>
-
       <Form action={formAction}>
-        <Input type='email' name='email' id='email' placeholder='Email' required />
+        <Input type='email' name='email' id='email' placeholder='email@example.com' required />
 
         {errorMessage && <p>{errorMessage}</p>}
 
-        <SubmitButton />
+        {state.success === true ? (
+          <Button type='submit' disabled={true} variant='ok' fill size='lg'>
+            Magic Link has been sent!
+          </Button>
+        ) : (
+          <SubmitButton />
+        )}
       </Form>
 
-      <span style={{ fontSize: '1.25rem' }}>- or -</span>
+      <span className={styles.or}>- or -</span>
 
       <Button type='button' fill size='lg' onClick={handleGoogle}>
         Continue with Google
       </Button>
+
+      <Button type='button' disabled fill size='lg' onClick={handleGoogle}>
+        Continue with GitHub
+      </Button>
+
+      <p className={styles.privacyPolicyText}>
+        By creating an account, you agree to our{' '}
+        <Link href={'/privacy-policy'}>Privacy Policy</Link>.
+      </p>
     </div>
   );
 };

@@ -14,7 +14,7 @@ const SolutionModal = () => {
   return (
     <Modal className={styles.solutionModal}>
       <div className={modalStyles.content}>
-        <h2>Solution</h2>
+        <h2 className={modalStyles.title}>Solution</h2>
 
         <Dynascale defaultScale={0} margin={0}>
           <SudokuGrid game={game} showSolution={true} isReady={isReady} />
@@ -23,19 +23,20 @@ const SolutionModal = () => {
         <section className={styles.key}>
           <div className={styles.keyPair}>
             <span className={`${styles.keyColor} ${styles.keyColorOk}`}></span>
-            <h4>Solved Cell</h4>
+            <span>Solved Cell</span>
           </div>
 
           <div className={styles.keyPair}>
             <span className={`${styles.keyColor} ${styles.keyColorHint}`}></span>
-            <h4>Hint</h4>
+            <span>Hint</span>
           </div>
 
           <div className={styles.keyPair}>
             <span className={styles.keyColor}></span>
-            <h4>Solution</h4>
+            <span>Solution</span>
           </div>
         </section>
+
         <Button fill size='lg' type='button' onClick={goBack}>
           Go Back
         </Button>

@@ -4,8 +4,10 @@
   box-sizing: border-box;
   min-height: 3.25rem;
 
-  font-family: 'Yang Bagus', sans-serif;
-  font-size: 1.25rem;
+  font-family: 'Grandstander', sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  text-align: center;
   text-decoration: none;
 
   border: 2px solid var(--text);
@@ -19,11 +21,6 @@
 
   color: var(--label);
   background: white;
-
-  &:is(:-webkit-autofill, :autofill) {
-    -webkit-text-fill-color: var(--blue);
-    border-color: var(--text) !important;
-  }
 
   /* State */
   &:enabled {

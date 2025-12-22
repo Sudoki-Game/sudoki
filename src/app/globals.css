@@ -1,3 +1,7 @@
+@import '@fontsource/grandstander';
+@import '@fontsource/grandstander/700.css'; /* bold */
+@import '@fontsource/grandstander/900.css'; /* black */
+
 @font-face {
   font-family: 'Yang Bagus';
   src: url(/font/YangBagus.woff);
@@ -63,7 +67,8 @@ body {
   width: 100%;
 
   color: var(--text);
-  font-family: 'Yang Bagus', sans-serif !important;
+  font-family: 'Grandstander', sans-serif !important;
+  font-weight: bold;
   font-optical-sizing: auto;
 
   background-color: var(--background);
@@ -82,13 +87,17 @@ main {
   flex: 1;
 }
 
+a {
+  color: var(--hot-pink);
+}
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-weight: normal;
+  font-weight: 900;
 }
 
 h1 {
@@ -110,12 +119,4 @@ h4 {
 .dynascale {
   width: 100%;
   aspect-ratio: 1/1;
-}
-
-.copyright {
-  margin: auto;
-  margin-bottom: 2.5rem;
-  text-decoration: none;
-  color: var(--shadow);
-  font-size: 0.875rem;
 }

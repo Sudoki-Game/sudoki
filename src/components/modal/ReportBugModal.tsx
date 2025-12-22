@@ -10,7 +10,7 @@ const ReportBugModal = () => {
   return (
     <Modal className='settings-modal'>
       <div className={modalStyles.content}>
-        <h2>Report a Bug</h2>
+        <h2 className={modalStyles.title}>Report a Bug</h2>
 
         <BugReport />
 

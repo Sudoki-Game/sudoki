@@ -50,12 +50,12 @@ const BugReport = () => {
 
       <FormField>
         <Label htmlFor='description'>Bug Description</Label>
-        <Textarea name='description' id='description' rows={5} required />
+        <Textarea name='description' id='description' rows={6} required />
       </FormField>
 
       <FormField>
         <Label htmlFor='steps'>Steps to Reproduce</Label>
-        <Textarea name='steps' id='steps' rows={4} />
+        <Textarea name='steps' id='steps' rows={6} />
       </FormField>
 
       <SubmitButton />

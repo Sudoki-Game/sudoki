@@ -1,5 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
+import Copyright from '@/components/Copyright';
+import headerStyles from '@/components/Header.module.css';
 
 const AuthLayout = ({
   children
@@ -8,27 +10,22 @@ const AuthLayout = ({
 }>) => {
   return (
     <>
-      <header style={{ paddingTop: '2.5rem', margin: 'auto' }}>
+      <header className={headerStyles.header}>
+        <span></span>
         <Image
-          className='header__logo'
+          className={headerStyles.logo}
           src={'/logo.svg'}
           alt='Sudoki! Logo'
           loading='eager'
           height={84}
           width={275}
         />
+        <span></span>
       </header>
 
-      <main style={{ marginBottom: '4rem' }}>{children}</main>
+      <main>{children}</main>
 
-      <a
-        className='copyright'
-        href='https://dylanalmond.net'
-        target='_blank'
-        rel='noopener noreferrer'
-      >
-        @{new Date().getFullYear()} Dylan Almond
-      </a>
+      <Copyright />
     </>
   );
 };

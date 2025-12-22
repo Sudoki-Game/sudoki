@@ -2,14 +2,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 0.5rem 0.25rem 0.5rem;
+  padding: 0 0.5rem 0.125rem 0.5rem;
   height: 3.25rem;
   cursor: pointer;
   flex-shrink: 0;
   box-sizing: border-box;
 
-  font-family: 'Yang Bagus', sans-serif;
   font-size: 1.5rem;
+  font-family: 'Grandstander', sans-serif !important;
+  font-weight: 900;
   text-decoration: none;
 
   transition: all 0.15s, border-width 0s, box-shadow 0s ease-in-out;
@@ -31,7 +32,7 @@
 
 .sizeLg {
   font-size: 1.75rem;
-  padding: 0 1.5rem 0.25rem 1.5rem;
+  padding: 0 1.5rem 0.125rem 1.5rem;
   height: 4rem;
   box-shadow: inset 0 -0.5rem 0 var(--shadow);
 }

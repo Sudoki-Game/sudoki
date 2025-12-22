@@ -1,11 +1,12 @@
 .textarea {
   padding: 0rem 0.5rem;
-  padding-top: 0.5rem;
+  padding-top: 1rem;
   box-sizing: border-box;
   min-height: 3.25rem;
 
-  font-family: 'Yang Bagus', sans-serif;
-  font-size: 1.25rem;
+  font-family: 'Grandstander', sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
   text-decoration: none;
 
   border: 2px solid var(--text);

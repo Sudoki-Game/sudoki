@@ -55,7 +55,7 @@ const GameOverModal = () => {
         </div>
 
         <section className={styles.statContainer}>
-          <h3>Your Score</h3>
+          <span className={styles.stat}>Your Score</span>
           <span className={styles.statNumerical}>{game.score}</span>
         </section>
 
@@ -63,7 +63,13 @@ const GameOverModal = () => {
           Leaderboard
         </button> */}
 
-        <Button disabled={game.status !== 'lose'} fill size='lg' type='button' onClick={() => openModal('solution')}>
+        <Button
+          disabled={game.status !== 'lose'}
+          fill
+          size='lg'
+          type='button'
+          onClick={() => openModal('solution')}
+        >
           View Solution
         </Button>
       </div>

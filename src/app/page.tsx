@@ -1,3 +1,4 @@
+import Copyright from '@/components/Copyright';
 import Header from '@/components/Header';
 import Sudoku from '@/components/Sudoku';
 import ModalHandler from '@/components/modal/ModalRouter';
@@ -14,14 +15,7 @@ export default function Home() {
           <ModalHandler />
         </main>
 
-        <a
-          className='copyright'
-          href='https://dylanalmond.net'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          @{new Date().getFullYear()} Dylan Almond
-        </a>
+        <Copyright />
       </ModalRouterProvider>
     </SudokuProvider>
   );

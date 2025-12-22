@@ -2,6 +2,7 @@
 import { getAuth, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import styles from './page.module.css';
 
 const FinishSignInPage = () => {
   const router = useRouter();
@@ -41,7 +42,15 @@ const FinishSignInPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <p>Handling sign in...</p>;
+  return (
+    <section className={styles.container}>
+      <h1 className={styles.heading}>Setting things up...</h1>
+      <p className={styles.description}>
+        Solve daily Sudoku puzzles, earn points, and compete with friends and other players
+        worldwide.
+      </p>
+    </section>
+  );
 };
 
 export default FinishSignInPage;

@@ -1436,6 +1436,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource/grandstander@npm:^5.2.7":
+  version: 5.2.7
+  resolution: "@fontsource/grandstander@npm:5.2.7"
+  checksum: 10c0/1531758fd2da030ea4b67211f513f4cc88a9c41c9205964a89f3f8f8590d47515b169c55738556785744d70b93478638abdc76d6208da4be08d0168b46f8e3d7
+  languageName: node
+  linkType: hard
+
 "@google-cloud/firestore@npm:^7.11.0":
   version: 7.11.6
   resolution: "@google-cloud/firestore@npm:7.11.6"
@@ -6553,6 +6560,7 @@ __metadata:
   dependencies:
     "@dnd-kit/core": "npm:^6.3.1"
     "@dnd-kit/sortable": "npm:^10.0.0"
+    "@fontsource/grandstander": "npm:^5.2.7"
     "@types/node": "npm:^20"
     "@types/nodemailer": "npm:^7"
     "@types/react": "npm:^19"

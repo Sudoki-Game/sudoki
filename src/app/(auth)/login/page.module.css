@@ -1,0 +1,35 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 520px;
+  padding: 2rem;
+  /* box-sizing: border-box; */
+  margin: auto;
+  height: 100%;
+  gap: 1.5rem;
+
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.heading {
+  font-size: 3rem;
+  font-family: 'Yang Bagus';
+  font-weight: normal;
+  color: var(--hot-pink);
+
+  @media screen and (max-width: 1024px) {
+    font-size: 2rem;
+  }
+}
+
+.description {
+  font-size: 1.25rem;
+  line-height: 140%;
+}

@@ -3,9 +3,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: auto;
-  height: 100%;
-  max-width: min(400px, calc(100% - 2rem));
+  gap: 1rem;
+}
 
-  gap: 1.5rem;
+.or {
+  font-size: 1.25rem;
+  font-family: 'Yang Bagus';
+  font-weight: normal;
+  color: var(--hot-pink);
+}
+
+.privacyPolicyText {
+  margin-top: 0.25rem;
 }

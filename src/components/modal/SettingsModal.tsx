@@ -12,9 +12,9 @@ const SettingsModal = () => {
   const router = useRouter();
 
   return (
-    <Modal className='settings-modal'>
+    <Modal>
       <div className={modalStyles.content}>
-        <h2>Settings</h2>
+        <h2 className={modalStyles.title}>Settings</h2>
 
         {user == null ? (
           <Button fill size='lg' variant='ok' type='button' onClick={() => router.push('/login')}>
@@ -25,8 +25,6 @@ const SettingsModal = () => {
             Sign Out
           </Button>
         )}
-
-        <p>Need to report a bug?</p>
 
         <Button
           fill
