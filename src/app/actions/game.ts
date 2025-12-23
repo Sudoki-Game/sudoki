@@ -2,8 +2,8 @@
 
 import { getSession } from './auth';
 import { serverAuth, serverDb } from '@/lib/firebase/server';
-import { getUserData, type MatchData } from '@/lib/firebase/firestore';
-import type { Board, GameState } from '@/types/sudoku';
+import { getServerUserData } from '@/lib/firebase/firestore';
+import type { Board, GameState, MatchData } from '@/types/sudoku';
 import { FieldValue } from 'firebase-admin/firestore';
 import { SCORE_PER_EMPTY_CELL, SCORE_CONFLICT_PENALTY } from '@/util/constants';
 
@@ -80,15 +80,19 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
     const { board, score, difficulty, autoSolves, status, originalBoard, conflicts } = gameState;
     const gameStatus = status as 'win' | 'lose';
 
-    const { hasPlayedToday } = await checkDailyMatch();
-
-    if (hasPlayedToday) {
-      return {
-        success: true,
-        isValid: false,
-        error: 'User has already played a match today'
-      };
+    // Check if authenticated user already played today
+    const userSession = await getSession();
+    if (userSession) {
+      const alreadyPlayed = await hasPlayedToday();
+      if (alreadyPlayed) {
+        return {
+          success: false,
+          isValid: false,
+          error: 'You have already played today'
+        };
+      }
     }
+    // Note: For unauthenticated users, client-side checks localStorage before calling this
 
     // Only validate the full Sudoku solution for wins
     let isValid = true;
@@ -162,19 +166,38 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
       };
     }
 
-    // Check if user is logged in
-    const session = await getSession();
-    if (!session) {
-      // User is not logged in, just return success
-      return { success: true, isValid: true };
+    // Prepare the match record for client-side storage
+    const matchId = `${userSession ? 'auth' : 'anon'}_${Date.now()}`;
+    const timestamp = Date.now();
+
+    // Create match record
+    const lastMatchData: MatchData = {
+      id: matchId,
+      score: Math.max(score, 0),
+      difficulty,
+      autoSolves: autoSolves.size,
+      autoSolvePositions: JSON.stringify(Array.from(autoSolves)),
+      gameStatus: gameStatus,
+      livesRemaining: gameState.lives,
+      originalBoard: JSON.stringify(gameState.originalBoard),
+      board: JSON.stringify(gameState.board),
+      solution: JSON.stringify(gameState.solution),
+      timestamp,
+      streakBonus: 0
+    };
+
+    // Only proceed with server updates if user is logged in
+    if (!userSession) {
+      // User is not logged in, just return success with match data for client-side storage
+      return { success: true, isValid: true, match: lastMatchData };
     }
 
     // Verify and decode the session
-    const decodedToken = await serverAuth.verifyIdToken(session);
+    const decodedToken = await serverAuth.verifyIdToken(userSession);
     const userId = decodedToken.uid;
 
     // Get current user data
-    const userData = await getUserData(userId);
+    const userData = await getServerUserData(userId);
     if (!userData) {
       return { success: false, isValid: true, error: 'User data not found' };
     }
@@ -187,6 +210,7 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
     let newDailyStreak = userData.dailyStreak || 0;
     let newBestStreak = userData.bestStreak || 0;
     let isKeepingStreak = false;
+    let streakBonus = 0;
 
     if (userData.lastMatchTimestamp) {
       // Check if user played yesterday or earlier
@@ -196,8 +220,16 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
       yesterday.setDate(yesterday.getDate() - 1);
 
       // Compare dates (ignore time)
-      const lastMatchDateOnly = new Date(lastMatchDate.getFullYear(), lastMatchDate.getMonth(), lastMatchDate.getDate());
-      const yesterdayDateOnly = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
+      const lastMatchDateOnly = new Date(
+        lastMatchDate.getFullYear(),
+        lastMatchDate.getMonth(),
+        lastMatchDate.getDate()
+      );
+      const yesterdayDateOnly = new Date(
+        yesterday.getFullYear(),
+        yesterday.getMonth(),
+        yesterday.getDate()
+      );
 
       if (lastMatchDateOnly.getTime() === yesterdayDateOnly.getTime()) {
         // User played yesterday, continue the streak
@@ -207,7 +239,7 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
         // User played more than 1 day ago, reset streak
         newDailyStreak = 1;
       }
-      // If lastMatchDateOnly is today, streak stays the same (already played today check)
+      // If lastMatchDateOnly is today, streak stays the same
     } else {
       // First match ever
       newDailyStreak = 1;
@@ -219,21 +251,18 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
     }
 
     // Give streak bonus on wins when keeping streak
-    let streakBonus = 0;
     if (gameStatus === 'win' && isKeepingStreak) {
       streakBonus = 200;
     }
+
+    // Update the lastMatchData with streak bonus for client-side storage
+    lastMatchData.streakBonus = streakBonus;
 
     // Update personal best score if this score is better
     let newPersonalBestScore = userData.personalBestScore || 0;
     if (adjustedScore > newPersonalBestScore) {
       newPersonalBestScore = adjustedScore;
     }
-
-    // Prepare the match record
-    const matchId = `${userId}_${Date.now()}`;
-    const timestamp = Date.now();
-    const dateStr = new Date(timestamp).toISOString().split('T')[0]; // YYYY-MM-DD
 
     // Calculate final score with streak bonus
     const finalScore = adjustedScore + streakBonus;
@@ -249,28 +278,10 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
       personalBestScore: newPersonalBestScore
     });
 
-    // Create match record
-    const matchRef = serverDb.collection('matches').doc(matchId);
-    const matchDoc: MatchData = {
-      id: matchId,
-      userId,
-      score: adjustedScore,
-      streakBonus: streakBonus,
-      difficulty,
-      autoSolves: autoSolves.size,
-      gameStatus: gameStatus,
-      livesRemaining: gameState.lives,
-      board: JSON.stringify(gameState.board),
-      solution: JSON.stringify(gameState.solution),
-      timestamp,
-      date: dateStr
-    };
-    await matchRef.set(matchDoc);
-
     return {
       success: true,
       isValid: true,
-      match: matchDoc
+      match: lastMatchData
     };
   } catch (error) {
     console.error('[Game] Error completing game:', error);
@@ -295,7 +306,7 @@ export async function fetchUserData() {
     const decodedToken = await serverAuth.verifyIdToken(session);
     const userId = decodedToken.uid;
 
-    return await getUserData(userId);
+    return await getServerUserData(userId);
   } catch (error) {
     console.error('[Game] Error fetching user data:', error);
     return null;
@@ -303,79 +314,38 @@ export async function fetchUserData() {
 }
 
 /**
- * Check if user has already played a match today
+ * Check if authenticated user has already played today based on lastMatchTimestamp
  */
-export async function checkDailyMatch(): Promise<{
-  hasPlayedToday: boolean;
-  match?: MatchData;
-}> {
+export async function hasPlayedToday(): Promise<boolean> {
   try {
     const session = await getSession();
     if (!session) {
-      return { hasPlayedToday: false };
+      // Unauthenticated users should check localStorage client-side
+      return false;
     }
 
     const decodedToken = await serverAuth.verifyIdToken(session);
     const userId = decodedToken.uid;
 
-    // Get today's date in YYYY-MM-DD format
-    const today = new Date().toISOString().split('T')[0];
-
-    // Check if user has a match for today
-    const matchesQuery = serverDb
-      .collection('matches')
-      .where('userId', '==', userId)
-      .where('date', '==', today)
-      .limit(1);
-
-    const snapshot = await matchesQuery.get();
-
-    if (snapshot.empty) {
-      return { hasPlayedToday: false };
+    const userData = await getServerUserData(userId);
+    if (!userData || !userData.lastMatchTimestamp) {
+      return false;
     }
 
-    return {
-      hasPlayedToday: true
-    };
+    // Check if lastMatchTimestamp is from today
+    const lastMatchDate = new Date(userData.lastMatchTimestamp);
+    const today = new Date();
+
+    const lastMatchDateOnly = new Date(
+      lastMatchDate.getFullYear(),
+      lastMatchDate.getMonth(),
+      lastMatchDate.getDate()
+    );
+    const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    return lastMatchDateOnly.getTime() === todayDateOnly.getTime();
   } catch (error) {
-    console.error('[Game] Error checking daily match:', error);
-    return { hasPlayedToday: false };
-  }
-}
-
-/**
- * Get today's match data (for viewing solved board)
- */
-export async function getTodayMatch(): Promise<MatchData | null> {
-  try {
-    const session = await getSession();
-    if (!session) {
-      return null;
-    }
-
-    const decodedToken = await serverAuth.verifyIdToken(session);
-    const userId = decodedToken.uid;
-
-    // Get today's date in YYYY-MM-DD format
-    const today = new Date().toISOString().split('T')[0];
-
-    // Check if user has a match for today
-    const matchesQuery = serverDb
-      .collection('matches')
-      .where('userId', '==', userId)
-      .where('date', '==', today)
-      .limit(1);
-
-    const snapshot = await matchesQuery.get();
-
-    if (snapshot.empty) {
-      return null;
-    }
-
-    const matchDoc = snapshot.docs[0].data() as MatchData;
-    return matchDoc;
-  } catch (error) {
-    console.error('[Game] Error getting today match:', error);
-    return null;
+    console.error('[Game] Error checking if user played today:', error);
+    return false;
   }
 }

@@ -1,4 +1,3 @@
-import { MatchData, UserData } from '@/lib/firebase/firestore';
 import { User } from 'firebase/auth';
 
 export interface AuthUser {
@@ -11,8 +10,7 @@ export interface AuthUser {
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
-  getUserData?: () => Promise<UserData | null>;
-  getDailyMatch?: () => Promise<MatchData | null>;
+  getUserData: () => Promise<UserStats | null>;
 }
 
 export interface SessionResult {
@@ -21,3 +19,21 @@ export interface SessionResult {
   error?: string;
   isNewUser?: boolean;
 }
+
+export interface UserStats {
+  combinedScore: number;
+  dailyStreak: number;
+  bestStreak: number;
+  matchesPlayed: number;
+  personalBestScore: number;
+  lastMatchTimestamp: number | null;
+}
+
+export interface ServerUserData extends UserStats {
+  uid: string;
+  email: string | null;
+  displayName: string;
+  createdAt?: number;
+}
+
+export type LocalUserData = UserStats;

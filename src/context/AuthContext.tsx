@@ -3,14 +3,12 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from 'firebase/auth';
 import { createSession, removeSession } from '@/app/actions/auth';
-import { fetchUserData, getTodayMatch } from '@/app/actions/game';
-import { AuthContextType } from '@/types/auth';
+import { AuthContextType, UserStats } from '@/types/auth';
 import { onAuthStateChanged } from '@/lib/firebase/auth';
+import { getServerUserData } from '@/lib/firebase/firestore';
+import { getLocalUserData } from '@/util/localStorage';
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -38,18 +36,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => unsubscribe();
   }, []);
 
-  const getUserData = async () => {
-    return await fetchUserData();
-  };
-
-  const getDailyMatch = async () => {
-    return await getTodayMatch();
+  const getUserData = async (): Promise<UserStats | null> => {
+    if (user) {
+      const serverData = await getServerUserData(user.uid);
+      return serverData;
+    } else {
+      const localData = getLocalUserData();
+      return localData;
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, getUserData, getDailyMatch }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={{ user, loading, getUserData }}>{children}</AuthContext.Provider>
   );
 }
 

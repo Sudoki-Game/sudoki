@@ -7,36 +7,41 @@ import modalStyles from './Modal.module.css';
 import Button from '../ui/Button';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { getCurrentMatch } from '@/util/localStorage';
 import { useEffect, useState } from 'react';
-import type { UserData } from '@/lib/firebase/firestore';
-import type { MatchData } from '@/lib/firebase/firestore';
+import { UserStats } from '@/types';
 
-const GameOverModal = () => {
-  const { user, getUserData, getDailyMatch } = useAuth();
+interface GameOverModalProps {
+  onClose: () => void;
+}
+
+const GameOverModal = ({ onClose }: GameOverModalProps) => {
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const { user, getUserData } = useAuth();
   const { openModal } = useModalRouter();
   const router = useRouter();
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [dailyMatch, setDailyMatch] = useState<MatchData | null>(null);
 
   useEffect(() => {
-    if (user?.uid && getUserData && getDailyMatch) {
-      Promise.all([getUserData(), getDailyMatch()]).then(([data, match]) => {
-        setUserData(data);
-        setDailyMatch(match);
-      });
-    }
-  }, [user?.uid, getUserData, getDailyMatch]);
+    getUserData().then((res) => {
+      setUserStats(res);
+    });
+  }, [getUserData]);
+
+  const currentMatch = getCurrentMatch();
+
+  if (userStats == null || currentMatch == null) return null;
 
   return (
-    <Modal className={styles.gameoverModal}>
+    <Modal className={styles.gameoverModal} onClose={onClose}>
       <div className={modalStyles.content}>
-        <h2 className={modalStyles.title}>Day {userData?.dailyStreak}</h2>
+        <h2 className={modalStyles.title}>Day {userStats.dailyStreak ?? 0}</h2>
 
-        {dailyMatch?.gameStatus === 'win' ? (
+        {currentMatch?.gameStatus === 'win' ? (
           <Image
             className={styles.stateImage}
             src={'/game/you-win-text.png'}
             alt={'You Win!'}
+            loading={'eager'}
             height={84}
             width={328}
           />
@@ -45,6 +50,7 @@ const GameOverModal = () => {
             className={styles.stateImage}
             src={'/game/game-over-text.png'}
             alt={'Game Over!'}
+            loading={'eager'}
             height={70}
             width={352}
           />
@@ -52,7 +58,7 @@ const GameOverModal = () => {
 
         <div className={styles.livesContainer}>
           {Array.from({ length: MAX_LIVES }).map((_, i) =>
-            i < (dailyMatch?.livesRemaining ?? 0) ? (
+            i < (currentMatch?.livesRemaining ?? 0) ? (
               <Image
                 key={`heart-${i}`}
                 src={'/game/heart.svg'}
@@ -74,20 +80,20 @@ const GameOverModal = () => {
 
         <section className={styles.statContainer}>
           <span className={styles.stat}>Your Score</span>
-          <span className={styles.statNumerical}>{dailyMatch?.score ?? 0}</span>
+          <span className={styles.statNumerical}>{currentMatch?.score ?? 0}</span>
 
-          <span className={styles.stat}>Daily Streak</span>
-          <span className={styles.statNumerical}>{dailyMatch?.streakBonus ?? 0}</span>
+          <span className={styles.stat}>Streak Bonus</span>
+          <span className={styles.statNumerical}>{currentMatch?.streakBonus ?? 0}</span>
 
           <hr />
 
           <span className={styles.stat}>Personal Best</span>
-          <span className={styles.statNumerical}>{userData?.personalBestScore}</span>
+          <span className={styles.statNumerical}>{userStats?.personalBestScore ?? 0}</span>
 
           <hr />
 
           <span className={styles.stat}>Total Score</span>
-          <span className={styles.statNumerical}>{userData?.combinedScore}</span>
+          <span className={styles.statNumerical}>{userStats?.combinedScore ?? 0}</span>
         </section>
 
         {/* <button disabled className='button button--ok button--fill button--lg' type='button'>
@@ -110,7 +116,7 @@ const GameOverModal = () => {
         )}
 
         <Button
-          disabled={dailyMatch?.gameStatus !== 'lose'}
+          disabled={currentMatch?.gameStatus !== 'lose'}
           fill
           size='lg'
           type='button'

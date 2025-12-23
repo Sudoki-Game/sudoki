@@ -10,43 +10,17 @@ import {
   setDoc
 } from 'firebase/firestore';
 import { db } from './client';
-import { Difficulty } from '@/types';
+import type { MatchData, ServerUserData } from '@/types';
 
-export interface UserData {
-  uid: string;
-  email: string | null;
-  displayName: string;
-  combinedScore: number;
-  dailyStreak: number;
-  bestStreak: number;
-  matchesPlayed: number;
-  personalBestScore: number;
-  lastMatchTimestamp: number | null;
-  createdAt?: number;
-}
+export type { ServerUserData, MatchData };
 
-export interface MatchData {
-  id: string;
-  userId: string;
-  score: number;
-  streakBonus: number;
-  difficulty: Difficulty;
-  autoSolves: number;
-  gameStatus: 'win' | 'lose';
-  livesRemaining: number;
-  board: string; // JSON stringified board
-  solution: string; // JSON stringified solution
-  timestamp: number;
-  date: string;
-}
-
-export async function getUserData(userId: string): Promise<UserData | null> {
+export async function getServerUserData(userId: string): Promise<ServerUserData | null> {
   const userRef = doc(db, 'users', userId);
   const userSnap = await getDoc(userRef);
 
   if (!userSnap.exists()) return null;
 
-  return userSnap.data() as UserData;
+  return userSnap.data() as ServerUserData;
 }
 
 export async function userExists(userId: string): Promise<boolean> {
@@ -57,7 +31,7 @@ export async function userExists(userId: string): Promise<boolean> {
 
 export async function createUserEntry(userId: string, email: string | null): Promise<void> {
   const userRef = doc(db, 'users', userId);
-  const userDoc: UserData = {
+  const userDoc: ServerUserData = {
     uid: userId,
     email: email,
     displayName: '',
@@ -79,7 +53,7 @@ export async function updateUserDisplayName(userId: string, displayName: string)
 }
 
 export async function hasUserCompletedOnboarding(userId: string): Promise<boolean> {
-  const userData = await getUserData(userId);
+  const userData = await getServerUserData(userId);
   return userData ? userData.displayName.trim() !== '' : false;
 }
 

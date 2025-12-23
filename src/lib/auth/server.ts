@@ -1,3 +1,4 @@
+'use server';
 import { cookies } from 'next/headers';
 import { serverAuth } from '../firebase/server';
 import { AuthUser } from '@/types';

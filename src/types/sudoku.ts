@@ -3,8 +3,6 @@
  * @license GNU General Public License v3.0
  */
 
-import { MatchData } from '@/lib/firebase/firestore';
-
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'im-too-young-to-die';
 export type GameStatus = 'win' | 'lose' | 'playing' | 'idle';
 export type Board = (number | null)[][];
@@ -80,6 +78,21 @@ export type GameState = {
    */
   difficulty: Difficulty;
 };
+
+export interface MatchData {
+  id: string;
+  score: number;
+  streakBonus: number;
+  difficulty: string;
+  autoSolves: number;
+  autoSolvePositions: string; // JSON stringified Set of "row,col" positions
+  gameStatus: 'win' | 'lose';
+  livesRemaining: number;
+  originalBoard: string;
+  board: string; // JSON stringified board
+  solution: string; // JSON stringified solution
+  timestamp: number;
+}
 
 export type GameAction =
   | { type: 'NEW_GAME'; payload: { board: Board; solution: Board; difficulty: Difficulty } }
