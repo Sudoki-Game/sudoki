@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from 'firebase/auth';
 import { createSession, removeSession } from '@/app/actions/auth';
+import { fetchUserData, getTodayMatch } from '@/app/actions/game';
 import { AuthContextType } from '@/types/auth';
 import { onAuthStateChanged } from '@/lib/firebase/auth';
 
@@ -37,7 +38,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => unsubscribe();
   }, []);
 
-  return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;
+  const getUserData = async () => {
+    return await fetchUserData();
+  };
+
+  const getDailyMatch = async () => {
+    return await getTodayMatch();
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, getUserData, getDailyMatch }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export const useAuth = (): AuthContextType => {

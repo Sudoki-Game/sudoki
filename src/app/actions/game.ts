@@ -283,6 +283,26 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
 }
 
 /**
+ * Fetch current user data
+ */
+export async function fetchUserData() {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return null;
+    }
+
+    const decodedToken = await serverAuth.verifyIdToken(session);
+    const userId = decodedToken.uid;
+
+    return await getUserData(userId);
+  } catch (error) {
+    console.error('[Game] Error fetching user data:', error);
+    return null;
+  }
+}
+
+/**
  * Check if user has already played a match today
  */
 export async function checkDailyMatch(): Promise<{
