@@ -16,8 +16,14 @@ import {
   createEmptyBoard,
   computeHighlights
 } from '../util/util';
-import { MAX_LIVES } from '@/util/constants';
+import {
+  MAX_LIVES,
+  SCORE_CORRECT_CELL,
+  SCORE_CONFLICT_PENALTY,
+  SCORE_REMOVED_VALID_CELL
+} from '@/util/constants';
 import { playSound } from '@/util/sound';
+import { completeGame, checkDailyMatch, getTodayMatch } from '@/app/actions/game';
 
 type SudokuProviderProps = {
   children: React.ReactNode;
@@ -92,7 +98,8 @@ const initialState: GameState = {
   conflicts: new Map(),
   autoSolves: new Set(),
   dragValue: null,
-  showSolution: false
+  showSolution: false,
+  difficulty: 'medium'
 };
 
 /**
@@ -107,6 +114,7 @@ function reducer(state: GameState, action: GameAction): GameState {
         board: action.payload.board,
         originalBoard: action.payload.board,
         solution: action.payload.solution,
+        difficulty: action.payload.difficulty,
         score: 0,
         lives: MAX_LIVES,
         status: 'playing',
@@ -147,6 +155,17 @@ function reducer(state: GameState, action: GameAction): GameState {
       // Auto-Solves cost a life
       const lives = state.lives - 1;
       return { ...state, autoSolves, lives };
+    }
+    case 'LOAD_MATCH_DATA': {
+      const { board, solution, score, gameStatus: status, livesRemaining: lives } = action.match;
+      return {
+        ...state,
+        board: JSON.parse(board),
+        solution: JSON.parse(solution),
+        score,
+        status,
+        lives
+      };
     }
     default:
       return state;
@@ -189,12 +208,11 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
    * Generates board and resets state.
    */
   const newGame = () => {
-    const { puzzle, solution } = generatePuzzledifficulty('medium');
-    // console.log('Solution:', solution);
-
-    dispatch({ type: 'NEW_GAME', payload: { board: puzzle, solution } });
+    const difficulty = 'medium';
+    const { puzzle, solution } = generatePuzzledifficulty(difficulty);
+    dispatch({ type: 'NEW_GAME', payload: { board: puzzle, solution, difficulty } });
     setIsReady(true);
-    setIsPaused(false); // Reset pause state on new game
+    setIsPaused(false);
   };
 
   /**
@@ -205,7 +223,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
 
     // Select sound
     playSound('/game/audio/metronome.mp3', { pitch: 1.8 });
-    
+
     dispatch({ type: 'SELECT_CELL', row, col });
   };
 
@@ -252,7 +270,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     row: number,
     col: number
   ): number => {
-    return conflicts.has(`${row},${col}`) ? 0 : -20;
+    return conflicts.has(`${row},${col}`) ? 0 : -SCORE_REMOVED_VALID_CELL;
   };
 
   /**
@@ -331,7 +349,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     if (sourceValue !== null) {
       // Deduct previously granted score if source is a valid cell
       if (!newConflicts.has(`${sourceRow},${sourceCol}`)) {
-        deltaScore -= 20;
+        deltaScore -= SCORE_REMOVED_VALID_CELL;
       }
 
       newConflicts = removeConflictsForCell(
@@ -374,9 +392,9 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
         newConflicts.set(conflictKey, current + countToAdd);
       }
       newLives -= 1;
-      deltaScore -= 10;
+      deltaScore -= SCORE_CONFLICT_PENALTY;
     } else if (!state.board[targetRow][targetCol]) {
-      deltaScore += 20;
+      deltaScore += SCORE_CORRECT_CELL;
     }
 
     dispatch({ type: 'UPDATE_BOARD', board: newBoard });
@@ -385,6 +403,25 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
     dispatch({ type: 'SELECT_CELL', row: targetRow, col: targetCol });
     dispatch({ type: 'SET_DRAG_VALUE', value: null });
+
+    // Check for game completion
+    if (newLives < 1) {
+      handleGameCompletion('lose', {
+        ...state,
+        board: newBoard,
+        conflicts: newConflicts,
+        lives: newLives,
+        score: Math.max(state.score + deltaScore, 0)
+      });
+    } else if (isGameWon(newBoard, newConflicts)) {
+      handleGameCompletion('win', {
+        ...state,
+        board: newBoard,
+        conflicts: newConflicts,
+        lives: newLives,
+        score: Math.max(state.score + deltaScore, 0)
+      });
+    }
   };
 
   /**
@@ -403,7 +440,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     // Handle missing target
     if (!over) {
       if (sourceIsCell) handleOutOfBounds(sourceRow!, sourceCol!);
-      
+
       dispatch({ type: 'SET_DRAG_VALUE', value: null });
       return;
     }
@@ -473,9 +510,9 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
           newConflicts.set(conflictKey, current + countToAdd);
         }
         newLives -= 1;
-        deltaScore -= 10;
+        deltaScore -= SCORE_CONFLICT_PENALTY;
       } else if (!state.board[row][col]) {
-        deltaScore += 20;
+        deltaScore += SCORE_CORRECT_CELL;
       }
     }
 
@@ -485,6 +522,25 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
     // dispatch({ type: 'SELECT_CELL', row: row, col: col });
     dispatch({ type: 'SET_DRAG_VALUE', value: null });
+
+    // Check for game completion
+    if (newLives < 1) {
+      handleGameCompletion('lose', {
+        ...state,
+        board: newBoard,
+        conflicts: newConflicts,
+        lives: newLives,
+        score: Math.max(state.score + deltaScore, 0)
+      });
+    } else if (isGameWon(newBoard, newConflicts)) {
+      handleGameCompletion('win', {
+        ...state,
+        board: newBoard,
+        conflicts: newConflicts,
+        lives: newLives,
+        score: Math.max(state.score + deltaScore, 0)
+      });
+    }
   };
 
   /**
@@ -505,7 +561,10 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     if (emptyCells.length === 0) return;
 
     // Pick a random cell
-    const { r, c } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    const randomIndex = Math.floor(
+      crypto.getRandomValues(new Uint32Array(1))[0] % emptyCells.length
+    );
+    const { r, c } = emptyCells[randomIndex];
 
     const newBoard = state.board.map((row) => [...row]);
     newBoard[r][c] = state.solution[r][c];
@@ -513,28 +572,73 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
     const newConflicts = new Map(state.conflicts);
     newConflicts.delete(`${r},${c}`);
 
+    // Auto-solve costs a life
+    const newLives = state.lives - 1;
+
     dispatch({ type: 'UPDATE_BOARD', board: newBoard });
     dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
     dispatch({ type: 'SELECT_CELL', row: r, col: c });
     dispatch({ type: 'AUTO_SOLVE', row: r, col: c });
+
+    // Check for game completion
+    if (newLives < 1) {
+      handleGameCompletion('lose', {
+        ...state,
+        board: newBoard,
+        conflicts: newConflicts,
+        lives: newLives
+      });
+    } else if (isGameWon(newBoard, newConflicts)) {
+      handleGameCompletion('win', {
+        ...state,
+        board: newBoard,
+        conflicts: newConflicts,
+        lives: newLives
+      });
+    }
   };
 
-  // Check win/lose conditions
+  /**
+   * Handle game completion (win/lose) and submit to server
+   */
+  const handleGameCompletion = async (newStatus: 'win' | 'lose', completedState: GameState) => {
+    dispatch({ type: 'SET_STATUS', status: newStatus });
+
+    // Submit with the completed state
+    const stateToSubmit = { ...completedState, status: newStatus };
+    try {
+      await completeGame(stateToSubmit);
+    } catch (error) {
+      console.error('[SudokuContext] Failed to submit game completion:', error);
+    }
+  };
+
+  const loadDailyMatch = async () => {
+    const matchData = await getTodayMatch();
+    dispatch({ type: 'LOAD_MATCH_DATA', match: matchData! });
+  };
+
+  /**
+   * Initialize on mount - check if user already played today
+   */
   useEffect(() => {
-    if (state.status !== 'playing' || isPaused) return;
-
-    // Lose
-    if (state.lives < 1) {
-      dispatch({ type: 'SET_STATUS', status: 'lose' });
-      return;
-    }
-
-    // Win
-    if (isGameWon(state.board, state.conflicts)) {
-      dispatch({ type: 'SET_STATUS', status: 'win' });
-      return;
-    }
-  }, [isPaused, state.board, state.conflicts, state.lives, state.status]);
+    checkDailyMatch()
+      .then(async (result) => {
+        if (result.hasPlayedToday) {
+          // User played today - show GameOverModal with message that they can't play again
+          await loadDailyMatch();
+          setIsReady(true);
+        } else {
+          // No match today - create fresh game
+          newGame();
+        }
+      })
+      .catch((error) => {
+        console.error('[SudokuContext] Failed to check daily match:', error);
+        // Fallback to fresh game on error
+        newGame();
+      });
+  }, []);
 
   return (
     <SudokuContext.Provider

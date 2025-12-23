@@ -25,6 +25,7 @@
 .title {
   font-family: 'Yang Bagus';
   font-weight: normal;
+  text-align: center;
   color: var(--hot-pink);
 }
 

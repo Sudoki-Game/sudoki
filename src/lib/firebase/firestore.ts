@@ -10,6 +10,7 @@ import {
   setDoc
 } from 'firebase/firestore';
 import { db } from './client';
+import { Difficulty } from '@/types';
 
 export interface UserData {
   uid: string;
@@ -18,6 +19,7 @@ export interface UserData {
   combinedScore: number;
   dailyStreak: number;
   bestStreak: number;
+  matchesPlayed: number;
   lastMatchTimestamp: number | null;
   createdAt?: number;
 }
@@ -26,6 +28,12 @@ export interface MatchData {
   id: string;
   userId: string;
   score: number;
+  difficulty: Difficulty;
+  autoSolves: number;
+  gameStatus: 'win' | 'lose';
+  livesRemaining: number;
+  board: string; // JSON stringified board
+  solution: string; // JSON stringified solution
   timestamp: number;
   date: string;
 }
@@ -54,6 +62,7 @@ export async function createUserEntry(userId: string, email: string | null): Pro
     combinedScore: 0,
     dailyStreak: 0,
     bestStreak: 0,
+    matchesPlayed: 0,
     lastMatchTimestamp: null,
     createdAt: Date.now()
   };

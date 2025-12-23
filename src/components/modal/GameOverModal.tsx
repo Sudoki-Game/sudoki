@@ -6,10 +6,14 @@ import { MAX_LIVES } from '@/util/constants';
 import styles from './GameOverModal.module.css';
 import modalStyles from './Modal.module.css';
 import Button from '../ui/Button';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const GameOverModal = () => {
+  const { user } = useAuth();
   const { game } = useSudoku();
   const { openModal } = useModalRouter();
+  const router = useRouter();
 
   return (
     <Modal className={styles.gameoverModal}>
@@ -62,6 +66,21 @@ const GameOverModal = () => {
         {/* <button disabled className='button button--ok button--fill button--lg' type='button'>
           Leaderboard
         </button> */}
+
+        {user ? null : (
+          <div className={styles.registerCTA}>
+            <p>Want to see your score on the leaderboard?</p>
+            <Button
+              onClick={() => router.push('/login')}
+              fill
+              size={'lg'}
+              variant={'ok'}
+              type='button'
+            >
+              Create an Account
+            </Button>
+          </div>
+        )}
 
         <Button
           disabled={game.status !== 'lose'}

@@ -3,6 +3,8 @@
  * @license GNU General Public License v3.0
  */
 
+import { MatchData } from '@/lib/firebase/firestore';
+
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'im-too-young-to-die';
 export type GameStatus = 'win' | 'lose' | 'playing' | 'idle';
 export type Board = (number | null)[][];
@@ -72,10 +74,15 @@ export type GameState = {
    * Whether to show the solved grid
    */
   showSolution: boolean;
+
+  /**
+   * The current game difficulty
+   */
+  difficulty: Difficulty;
 };
 
 export type GameAction =
-  | { type: 'NEW_GAME'; payload: { board: Board; solution: Board } }
+  | { type: 'NEW_GAME'; payload: { board: Board; solution: Board; difficulty: Difficulty } }
   | { type: 'SELECT_CELL'; row: number; col: number }
   | { type: 'SET_CONFLICTS'; conflicts: Map<string, number> }
   | { type: 'AUTO_SOLVE'; row: number; col: number }
@@ -85,4 +92,5 @@ export type GameAction =
   | { type: 'SET_LIVES'; lives: number }
   | { type: 'SET_STATUS'; status: GameStatus }
   | { type: 'SHOW_SOLUTION'; show: boolean }
-  | { type: 'RESET_SELECTION' };
+  | { type: 'RESET_SELECTION' }
+  | { type: 'LOAD_MATCH_DATA'; match: MatchData };

@@ -15,31 +15,19 @@ import { useModalRouter } from '@/context/ModalRouterContext';
 import SudokuStats from './SudokuStats';
 import styles from './Sudoku.module.css';
 import SudokuCellStyles from './SudokuCell.module.css';
+import GameOverModal from './modal/GameOverModal';
 
 /**
  * Main Sudoku UI component
  * @returns
  */
 const Sudoku = () => {
-  const {
-    game,
-    isPaused,
-    isReady,
-    togglePause,
-    handleClick,
-    handleDragStart,
-    handleDrop,
-    newGame
-  } = useSudoku();
+  const { game, isPaused, isReady, togglePause, handleClick, handleDragStart, handleDrop } =
+    useSudoku();
   const { dndSensors, boardRef, containerRef } = useSudokuControls();
   const { openModal } = useModalRouter();
 
   const isDisabled = isPaused || game.status !== 'playing';
-
-  /**
-   * Start new game on mount
-   */
-  useEffect(newGame, [newGame]);
 
   const { activeModal } = useModalRouter();
 
@@ -67,9 +55,7 @@ const Sudoku = () => {
       <DndContext sensors={dndSensors} onDragStart={handleDragStart} onDragEnd={handleDrop}>
         <DragOverlay dropAnimation={null}>
           {game.dragValue ? (
-            <div
-              className={`${SudokuCellStyles.cell} ${SudokuCellStyles.cellDragging}`}
-            >
+            <div className={`${SudokuCellStyles.cell} ${SudokuCellStyles.cellDragging}`}>
               {game.dragValue}
             </div>
           ) : null}
@@ -79,7 +65,7 @@ const Sudoku = () => {
           <SudokuStats score={game.score} lives={game.lives} />
 
           {/* Game Board */}
-          <Dynascale defaultScale={0} margin={0}>
+          <Dynascale margin={0}>
             <SudokuGrid
               ref={boardRef}
               game={game}
