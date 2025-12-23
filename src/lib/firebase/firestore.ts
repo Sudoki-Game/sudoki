@@ -20,6 +20,7 @@ export interface UserData {
   dailyStreak: number;
   bestStreak: number;
   matchesPlayed: number;
+  personalBestScore: number;
   lastMatchTimestamp: number | null;
   createdAt?: number;
 }
@@ -28,6 +29,7 @@ export interface MatchData {
   id: string;
   userId: string;
   score: number;
+  streakBonus: number;
   difficulty: Difficulty;
   autoSolves: number;
   gameStatus: 'win' | 'lose';
@@ -63,6 +65,7 @@ export async function createUserEntry(userId: string, email: string | null): Pro
     dailyStreak: 0,
     bestStreak: 0,
     matchesPlayed: 0,
+    personalBestScore: 0,
     lastMatchTimestamp: null,
     createdAt: Date.now()
   };

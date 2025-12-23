@@ -186,6 +186,7 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
     // Calculate streak updates
     let newDailyStreak = userData.dailyStreak || 0;
     let newBestStreak = userData.bestStreak || 0;
+    let isKeepingStreak = false;
 
     if (userData.lastMatchTimestamp) {
       // Check if user played yesterday or earlier
@@ -201,6 +202,7 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
       if (lastMatchDateOnly.getTime() === yesterdayDateOnly.getTime()) {
         // User played yesterday, continue the streak
         newDailyStreak += 1;
+        isKeepingStreak = true;
       } else if (lastMatchDateOnly.getTime() < yesterdayDateOnly.getTime()) {
         // User played more than 1 day ago, reset streak
         newDailyStreak = 1;
@@ -216,19 +218,35 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
       newBestStreak = newDailyStreak;
     }
 
+    // Give streak bonus on wins when keeping streak
+    let streakBonus = 0;
+    if (gameStatus === 'win' && isKeepingStreak) {
+      streakBonus = 200;
+    }
+
+    // Update personal best score if this score is better
+    let newPersonalBestScore = userData.personalBestScore || 0;
+    if (adjustedScore > newPersonalBestScore) {
+      newPersonalBestScore = adjustedScore;
+    }
+
     // Prepare the match record
     const matchId = `${userId}_${Date.now()}`;
     const timestamp = Date.now();
     const dateStr = new Date(timestamp).toISOString().split('T')[0]; // YYYY-MM-DD
 
+    // Calculate final score with streak bonus
+    const finalScore = adjustedScore + streakBonus;
+
     // Update user stats
     const userRef = serverDb.collection('users').doc(userId);
     await userRef.update({
-      combinedScore: FieldValue.increment(adjustedScore),
+      combinedScore: FieldValue.increment(finalScore),
       matchesPlayed: FieldValue.increment(1),
       lastMatchTimestamp: timestamp,
       dailyStreak: newDailyStreak,
-      bestStreak: newBestStreak
+      bestStreak: newBestStreak,
+      personalBestScore: newPersonalBestScore
     });
 
     // Create match record
@@ -237,6 +255,7 @@ export async function completeGame(gameState: GameState): Promise<GameCompletion
       id: matchId,
       userId,
       score: adjustedScore,
+      streakBonus: streakBonus,
       difficulty,
       autoSolves: autoSolves.size,
       gameStatus: gameStatus,
