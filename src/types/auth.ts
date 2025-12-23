@@ -16,4 +16,5 @@ export interface SessionResult {
   success: boolean;
   uid?: string;
   error?: string;
+  isNewUser?: boolean;
 }

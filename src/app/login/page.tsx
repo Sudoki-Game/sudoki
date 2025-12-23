@@ -1,15 +1,7 @@
 import LoginForm from '@/components/form/LoginForm';
-import { getServerUser } from '@/lib/auth/server';
-import { redirect } from 'next/navigation';
 import styles from './page.module.css';
 
 const LoginPage = async () => {
-  const user = await getServerUser();
-
-  if (user) {
-    redirect('/');
-  }
-
   return (
     <section className={styles.container}>
       <header className={styles.header}>

@@ -5,14 +5,14 @@ import headerStyles from '@/components/Header.module.css';
 import { getServerUser } from '@/lib/auth/server';
 import { redirect } from 'next/navigation';
 
-const AuthLayout = async ({
+const LoginLayout = async ({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
   const user = await getServerUser();
 
-  if (!user) {
+  if (user) {
     redirect('/');
   }
 
@@ -38,4 +38,4 @@ const AuthLayout = async ({
   );
 };
 
-export default AuthLayout;
+export default LoginLayout;
