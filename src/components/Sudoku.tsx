@@ -15,7 +15,6 @@ import { useModalRouter } from '@/context/ModalRouterContext';
 import SudokuStats from './SudokuStats';
 import styles from './Sudoku.module.css';
 import SudokuCellStyles from './SudokuCell.module.css';
-import GameOverModal from './modal/GameOverModal';
 
 /**
  * Main Sudoku UI component
