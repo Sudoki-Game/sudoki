@@ -3,7 +3,7 @@
 import { getSession } from './auth';
 import { serverAuth, serverDb } from '@/lib/firebase/server';
 import { getServerUserData } from '@/lib/firebase/firestore';
-import type { Board, GameState, MatchData } from '@/types/sudoku';
+import type { Board, GameState, MatchData } from '@/game/types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { SCORE_PER_EMPTY_CELL, SCORE_CONFLICT_PENALTY } from '@/util/constants';
 

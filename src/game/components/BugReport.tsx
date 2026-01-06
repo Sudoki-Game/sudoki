@@ -3,12 +3,12 @@
 import { useFormStatus } from 'react-dom';
 import { reportBug } from '@/app/actions/reportBug';
 import { useActionState } from 'react';
-import Button from '../ui/Button';
-import Select, { SelectOption } from '../ui/Select';
-import Form, { FormField } from '../ui/Form';
-import Label from '../ui/Label';
-import Textarea from '../ui/Textarea';
-import Input from '../ui/Input';
+import Button from '../../ui/components/Button';
+import Select, { SelectOption } from '../../ui/components/Select';
+import Form, { FormField } from '../../ui/components/Form';
+import Label from '../../ui/components/Label';
+import Textarea from '../../ui/components/Textarea';
+import Input from '../../ui/components/Input';
 
 const initialState = {
   success: false,

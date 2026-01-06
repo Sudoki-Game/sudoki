@@ -6,7 +6,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useReducer, useState } from 'react';
-import type { GameAction, GameState } from '../types/sudoku';
+import type { GameAction, GameState } from '../types';
 import { type DragStartEvent, type DragEndEvent } from '@dnd-kit/core';
 import {
   generatePuzzledifficulty,
@@ -15,7 +15,7 @@ import {
   isGameWon,
   createEmptyBoard,
   computeHighlights
-} from '../util/util';
+} from '../../util/util';
 import {
   MAX_LIVES,
   SCORE_CORRECT_CELL,
@@ -31,13 +31,13 @@ import {
   getLocalUserData,
   saveLocalUserData
 } from '@/util/localStorage';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
-type SudokuProviderProps = {
+type SudokuGameProviderProps = {
   children: React.ReactNode;
 };
 
-export type SudokuProviderState = {
+export type SudokuGameProviderState = {
   /**
    * Core game state
    */
@@ -190,13 +190,13 @@ function reducer(state: GameState, action: GameAction): GameState {
   }
 }
 
-const SudokuContext = createContext<SudokuProviderState | undefined>(undefined);
+const SudokuGameContext = createContext<SudokuGameProviderState | undefined>(undefined);
 
 /**
  * Provides Sudoku game state and logic.
  * @returns
  */
-export function SudokuProvider({ children }: SudokuProviderProps) {
+export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isReady, setIsReady] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -779,7 +779,7 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
   }, [user?.uid]);
 
   return (
-    <SudokuContext.Provider
+    <SudokuGameContext.Provider
       value={{
         game: state,
         isReady,
@@ -795,12 +795,12 @@ export function SudokuProvider({ children }: SudokuProviderProps) {
       }}
     >
       {children}
-    </SudokuContext.Provider>
+    </SudokuGameContext.Provider>
   );
 }
 
-export const useSudoku = () => {
-  const context = useContext(SudokuContext);
-  if (context === undefined) throw new Error('useSudoku must be used within a SudokuProvider');
+export const useSudokuGame = () => {
+  const context = useContext(SudokuGameContext);
+  if (context === undefined) throw new Error('useSudokuGame must be used within a SudokuGameProvider');
   return context;
 };

@@ -28,7 +28,7 @@ export function playSound(src: string, options: PlaySoundOptions = {}): HTMLAudi
   audio.playbackRate = speed * pitch;
 
   // Ensure pitch changes with playbackRate
-  const anyAudio = audio as any;
+  const anyAudio = audio;
   if ('preservesPitch' in audio) {
     audio.preservesPitch = false;
   } else if ('mozPreservesPitch' in anyAudio) {

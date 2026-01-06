@@ -25,13 +25,3 @@ export async function getServerUser(): Promise<AuthUser | null> {
     return null;
   }
 }
-
-export async function requireAuth(): Promise<AuthUser> {
-  const user = await getServerUser();
-
-  if (!user) {
-    throw new Error('Unauthorized');
-  }
-
-  return user;
-}

@@ -6,12 +6,12 @@
 
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import SudokuGrid from './SudokuGrid';
-import { useSudoku } from '@/context/SudokuContext';
+import { useSudokuGame } from '@/game/context/SudokuGameContext';
 import { Dynascale } from 'dynascale';
-import useSudokuControls from '@/hooks/useSudokuControls';
+import useSudokuControls from '@/game/hooks/useSudokuControls';
 import SudokuControls from './SudokuControls';
 import { useEffect } from 'react';
-import { useModalRouter } from '@/context/ModalRouterContext';
+import { useModalRouter } from '@/game/context/ModalRouterContext';
 import SudokuStats from './SudokuStats';
 import styles from './Sudoku.module.css';
 import SudokuCellStyles from './SudokuCell.module.css';
@@ -22,7 +22,7 @@ import SudokuCellStyles from './SudokuCell.module.css';
  */
 const Sudoku = () => {
   const { game, isPaused, isReady, togglePause, handleClick, handleDragStart, handleDrop } =
-    useSudoku();
+    useSudokuGame();
   const { dndSensors, boardRef, containerRef } = useSudokuControls();
   const { openModal } = useModalRouter();
 

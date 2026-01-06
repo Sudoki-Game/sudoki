@@ -3,7 +3,7 @@
  * @license GNU General Public License v3.0
  */
 
-import { useSudoku } from '@/context/SudokuContext';
+import { useSudokuGame } from '@/game/context/SudokuGameContext';
 import { playSound } from '@/util/sound';
 import {
   useSensors,
@@ -41,8 +41,8 @@ interface SudokuControls {
  * This hook centralizes all board-level interaction effects to keep
  * Sudoku view components clean and declarative.
  */
-const useSudokuControls = (): SudokuControls => {
-  const { game, updateCell, dispatch, isPaused } = useSudoku();
+const useSudokuGameControls = (): SudokuControls => {
+  const { game, updateCell, dispatch, isPaused } = useSudokuGame();
   const boardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -144,4 +144,4 @@ const useSudokuControls = (): SudokuControls => {
   return { dndSensors, boardRef, containerRef };
 };
 
-export default useSudokuControls;
+export default useSudokuGameControls;

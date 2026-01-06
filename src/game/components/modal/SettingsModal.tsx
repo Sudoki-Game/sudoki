@@ -1,10 +1,10 @@
-import { useModalRouter } from '@/context/ModalRouterContext';
-import Modal from './Modal';
+import { useModalRouter } from '@/game/context/ModalRouterContext';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { auth } from '@/lib/firebase/client';
 import modalStyles from './Modal.module.css';
-import Button from '../ui/Button';
+import Button from '@/ui/components/Button';
+import Modal from './Modal';
 
 const SettingsModal = () => {
   const { user } = useAuth();

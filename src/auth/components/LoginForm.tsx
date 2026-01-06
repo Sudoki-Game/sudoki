@@ -5,9 +5,9 @@ import { useFormStatus } from 'react-dom';
 import { SessionResult } from '@/types';
 import { mapFirebaseError, sendMagicLink, signInWithGoogle } from '@/lib/firebase/auth';
 import styles from './LoginForm.module.css';
-import Button from '../ui/Button';
-import Form from '../ui/Form';
-import Input from '../ui/Input';
+import Button from '@/ui/components/Button';
+import Form from '@/ui/components/Form';
+import Input from '@/ui/components/Input';
 import Link from 'next/link';
 
 const initialState: SessionResult = {

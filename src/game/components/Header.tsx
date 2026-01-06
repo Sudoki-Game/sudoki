@@ -1,8 +1,8 @@
 'use client';
 import Image from 'next/image';
-import { useModalRouter } from '@/context/ModalRouterContext';
+import { useModalRouter } from '@/game/context/ModalRouterContext';
+import Button from '@/ui/components/Button';
 import styles from './Header.module.css';
-import Button from './ui/Button';
 
 const Header = () => {
   const { openModal } = useModalRouter();

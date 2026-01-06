@@ -1,8 +1,8 @@
-import { useModalRouter } from '@/context/ModalRouterContext';
-import Modal from './Modal';
-import BugReport from '../form/BugReport';
+import { useModalRouter } from '@/game/context/ModalRouterContext';
 import modalStyles from './Modal.module.css';
-import Button from '../ui/Button';
+import BugReport from '../BugReport';
+import Button from '@/ui/components/Button';
+import Modal from './Modal';
 
 const ReportBugModal = () => {
   const { goBack } = useModalRouter();

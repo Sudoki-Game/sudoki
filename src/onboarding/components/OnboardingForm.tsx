@@ -4,9 +4,9 @@ import { useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { completeOnboarding, OnboardingResult } from '@/app/actions/auth';
-import Button from '../ui/Button';
-import Form from '../ui/Form';
-import Input from '../ui/Input';
+import Button from '@/ui/components/Button';
+import Form from '@/ui/components/Form';
+import Input from '@/ui/components/Input';
 import styles from './OnboardingForm.module.css';
 
 const initialState: OnboardingResult = {

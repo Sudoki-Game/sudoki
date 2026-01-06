@@ -1,15 +1,15 @@
-import { useModalRouter } from '@/context/ModalRouterContext';
-import Modal from './Modal';
+import { useModalRouter } from '@/game/context/ModalRouterContext';
 import Image from 'next/image';
 import { MAX_LIVES } from '@/util/constants';
 import styles from './GameOverModal.module.css';
 import modalStyles from './Modal.module.css';
-import Button from '../ui/Button';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getCurrentMatch } from '@/util/localStorage';
 import { useEffect, useState } from 'react';
 import { UserStats } from '@/types';
+import Button from '@/ui/components/Button';
+import Modal from './Modal';
 
 interface GameOverModalProps {
   onClose: () => void;

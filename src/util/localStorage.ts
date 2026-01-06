@@ -2,7 +2,7 @@
  * Local storage utilities for managing last match data and user stats
  */
 
-import type { MatchData } from '@/types/sudoku';
+import type { MatchData } from '@/game/types';
 import type { LocalUserData } from '@/types/auth';
 
 const LAST_MATCH_KEY = 'sudoku_last_match';

@@ -1,14 +1,14 @@
-import { useModalRouter } from '@/context/ModalRouterContext';
+import { useModalRouter } from '@/game/context/ModalRouterContext';
 import Modal from './Modal';
-import { useSudoku } from '@/context/SudokuContext';
 import { Dynascale } from 'dynascale';
 import SudokuGrid from '../SudokuGrid';
 import styles from './SolutionModal.module.css';
 import modalStyles from './Modal.module.css';
-import Button from '../ui/Button';
+import Button from '../../../ui/components/Button';
+import { useSudokuGame } from '@/game/context/SudokuGameContext';
 
 const SolutionModal = () => {
-  const { game, isReady } = useSudoku();
+  const { game, isReady } = useSudokuGame();
   const { goBack } = useModalRouter();
 
   return (

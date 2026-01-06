@@ -1,5 +1,5 @@
 'use client';
-import { useModalRouter } from '@/context/ModalRouterContext';
+import { useModalRouter } from '@/game/context/ModalRouterContext';
 import SettingsModal from './SettingsModal';
 import GameOverModal from './GameOverModal';
 import SolutionModal from './SolutionModal';
@@ -11,7 +11,7 @@ const ModalRouter = () => {
   if (activeModal === null) return null;
 
   if (activeModal === 'settings') return <SettingsModal />;
-  if (activeModal === 'gameover') return <GameOverModal />;
+  if (activeModal === 'gameover') return <GameOverModal onClose={() => {}} />;
   if (activeModal === 'solution') return <SolutionModal />;
   if (activeModal === 'bug-report') return <ReportBugModal />;
 };
