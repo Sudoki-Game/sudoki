@@ -1,13 +1,11 @@
 import { useModalRouter } from '@/game/context/ModalRouterContext';
+import { useSudokuGame } from '@/game/context/SudokuGameContext';
 import Image from 'next/image';
 import { MAX_LIVES } from '@/util/constants';
 import styles from './GameOverModal.module.css';
 import modalStyles from './Modal.module.css';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { getCurrentMatch } from '@/util/localStorage';
-import { useEffect, useState } from 'react';
-import { UserStats } from '@/types';
 import Button from '@/ui/components/Button';
 import Modal from './Modal';
 
@@ -16,27 +14,22 @@ interface GameOverModalProps {
 }
 
 const GameOverModal = ({ onClose }: GameOverModalProps) => {
-  const [userStats, setUserStats] = useState<UserStats | null>(null);
-  const { user, getUserData } = useAuth();
+  const { game } = useSudokuGame();
+  const { user } = useAuth();
   const { openModal } = useModalRouter();
   const router = useRouter();
 
-  useEffect(() => {
-    getUserData().then((res) => {
-      setUserStats(res);
-    });
-  }, [getUserData]);
+  const isWin = game.status === 'win';
+  const isLose = game.status === 'lose';
 
-  const currentMatch = getCurrentMatch();
-
-  if (userStats == null || currentMatch == null) return null;
+  if (game.status !== 'win' && game.status !== 'lose') return null;
 
   return (
     <Modal className={styles.gameoverModal} onClose={onClose}>
       <div className={modalStyles.content}>
-        <h2 className={modalStyles.title}>Day {userStats.dailyStreak ?? 0}</h2>
+        <h2 className={modalStyles.title}>Game Over</h2>
 
-        {currentMatch?.gameStatus === 'win' ? (
+        {isWin ? (
           <Image
             className={styles.stateImage}
             src={'/game/you-win-text.png'}
@@ -58,7 +51,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
 
         <div className={styles.livesContainer}>
           {Array.from({ length: MAX_LIVES }).map((_, i) =>
-            i < (currentMatch?.livesRemaining ?? 0) ? (
+            i < game.lives ? (
               <Image
                 key={`heart-${i}`}
                 src={'/game/heart.svg'}
@@ -80,25 +73,8 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
 
         <section className={styles.statContainer}>
           <span className={styles.stat}>Your Score</span>
-          <span className={styles.statNumerical}>{currentMatch?.score ?? 0}</span>
-
-          <span className={styles.stat}>Streak Bonus</span>
-          <span className={styles.statNumerical}>{currentMatch?.streakBonus ?? 0}</span>
-
-          <hr />
-
-          <span className={styles.stat}>Personal Best</span>
-          <span className={styles.statNumerical}>{userStats?.personalBestScore ?? 0}</span>
-
-          <hr />
-
-          <span className={styles.stat}>Total Score</span>
-          <span className={styles.statNumerical}>{userStats?.combinedScore ?? 0}</span>
+          <span className={styles.statNumerical}>{game.score}</span>
         </section>
-
-        {/* <button disabled className='button button--ok button--fill button--lg' type='button'>
-          Leaderboard
-        </button> */}
 
         {user ? null : (
           <div className={styles.registerCTA}>
@@ -116,7 +92,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
         )}
 
         <Button
-          disabled={currentMatch?.gameStatus !== 'lose'}
+          disabled={!isLose}
           fill
           size='lg'
           type='button'

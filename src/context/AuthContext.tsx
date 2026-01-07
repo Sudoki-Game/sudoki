@@ -6,7 +6,6 @@ import { createSession, removeSession } from '@/app/actions/auth';
 import { AuthContextType, UserStats } from '@/types/auth';
 import { onAuthStateChanged } from '@/lib/firebase/auth';
 import { getServerUserData } from '@/lib/firebase/firestore';
-import { getLocalUserData } from '@/util/localStorage';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -40,10 +39,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (user) {
       const serverData = await getServerUserData(user.uid);
       return serverData;
-    } else {
-      const localData = getLocalUserData();
-      return localData;
     }
+    return null;
   };
 
   return (

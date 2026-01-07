@@ -23,15 +23,6 @@ import {
   SCORE_REMOVED_VALID_CELL
 } from '@/util/constants';
 import { playSound } from '@/util/sound';
-import { completeGame, hasPlayedToday } from '@/app/actions/game';
-import {
-  saveLastMatch,
-  getCurrentMatch,
-  isLastMatchFromToday,
-  getLocalUserData,
-  saveLocalUserData
-} from '@/util/localStorage';
-import { useAuth } from '../../context/AuthContext';
 
 type SudokuGameProviderProps = {
   children: React.ReactNode;
@@ -164,27 +155,6 @@ function reducer(state: GameState, action: GameAction): GameState {
       const lives = state.lives - 1;
       return { ...state, autoSolves, lives };
     }
-    case 'LOAD_MATCH_DATA': {
-      const {
-        originalBoard,
-        board,
-        solution,
-        score,
-        autoSolvePositions,
-        gameStatus: status,
-        livesRemaining: lives
-      } = action.match;
-      return {
-        ...state,
-        originalBoard: JSON.parse(originalBoard),
-        board: JSON.parse(board),
-        solution: JSON.parse(solution),
-        autoSolves: new Set(JSON.parse(autoSolvePositions)),
-        score,
-        status,
-        lives
-      };
-    }
     default:
       return state;
   }
@@ -200,7 +170,6 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isReady, setIsReady] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
-  const { user } = useAuth();
 
   /**
    * Grid of all fixed cells
@@ -618,165 +587,18 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   };
 
   /**
-   * Handle game completion (win/lose) and submit to server
+   * Handle game completion (win/lose)
    */
-  const handleGameCompletion = async (newStatus: 'win' | 'lose', completedState: GameState) => {
-    // For unauthenticated users, check localStorage to prevent multiple plays per day
-    if (!user?.uid) {
-      const lastMatch = getCurrentMatch();
-      if (lastMatch && isLastMatchFromToday(lastMatch.timestamp)) {
-        console.warn('[SudokuContext] User already played today');
-        return;
-      }
-
-      // Calculate and update local stats for unauthenticated users
-      const localStats = getLocalUserData();
-      const timestamp = Date.now();
-      const gameStatus = newStatus;
-      const score = completedState.score;
-
-      // Calculate streak updates
-      let newDailyStreak = localStats.dailyStreak || 0;
-      let newBestStreak = localStats.bestStreak || 0;
-      let isKeepingStreak = false;
-      let streakBonus = 0;
-
-      if (localStats.lastMatchTimestamp) {
-        const lastMatchDate = new Date(localStats.lastMatchTimestamp);
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        const lastMatchDateOnly = new Date(
-          lastMatchDate.getFullYear(),
-          lastMatchDate.getMonth(),
-          lastMatchDate.getDate()
-        );
-        const yesterdayDateOnly = new Date(
-          yesterday.getFullYear(),
-          yesterday.getMonth(),
-          yesterday.getDate()
-        );
-
-        if (lastMatchDateOnly.getTime() === yesterdayDateOnly.getTime()) {
-          // User played yesterday, continue the streak
-          newDailyStreak += 1;
-          isKeepingStreak = true;
-        } else if (lastMatchDateOnly.getTime() < yesterdayDateOnly.getTime()) {
-          // User played more than 1 day ago, reset streak
-          newDailyStreak = 1;
-        }
-      } else {
-        // First match ever
-        newDailyStreak = 1;
-      }
-
-      // Update best streak if current streak is better
-      if (newDailyStreak > newBestStreak) {
-        newBestStreak = newDailyStreak;
-      }
-
-      // Give streak bonus on wins when keeping streak
-      if (gameStatus === 'win' && isKeepingStreak) {
-        streakBonus = 200;
-      }
-
-      // Update personal best score
-      let newPersonalBestScore = localStats.personalBestScore || 0;
-      if (score > newPersonalBestScore) {
-        newPersonalBestScore = score;
-      }
-
-      // Calculate final score with streak bonus
-      const finalScore = score + streakBonus;
-
-      // Update and save local stats
-      const updatedStats = {
-        combinedScore: localStats.combinedScore + finalScore,
-        dailyStreak: newDailyStreak,
-        bestStreak: newBestStreak,
-        matchesPlayed: localStats.matchesPlayed + 1,
-        personalBestScore: newPersonalBestScore,
-        lastMatchTimestamp: timestamp
-      };
-      saveLocalUserData(updatedStats);
-
-      // Save match with streak bonus
-      saveLastMatch({
-        id: `anon_${timestamp}`,
-        score,
-        streakBonus,
-        difficulty: completedState.difficulty,
-        autoSolves: completedState.autoSolves.size,
-        autoSolvePositions: JSON.stringify(Array.from(completedState.autoSolves)),
-        gameStatus,
-        livesRemaining: completedState.lives,
-        originalBoard: JSON.stringify(completedState.originalBoard),
-        board: JSON.stringify(completedState.board),
-        solution: JSON.stringify(completedState.solution),
-        timestamp
-      });
-
-      dispatch({ type: 'SET_STATUS', status: newStatus });
-      return;
-    }
-
-    // For authenticated users, submit to server
-    const stateToSubmit = { ...completedState, status: newStatus };
-    try {
-      const result = await completeGame(stateToSubmit);
-
-      if (!result.success) {
-        console.error('[SudokuContext] Game completion rejected:', result.error);
-        return;
-      }
-
-      // Save last match to localStorage for authenticated users too
-      if (result.match) {
-        saveLastMatch(result.match);
-      }
-    } catch (error) {
-      console.error('[SudokuContext] Failed to submit game completion:', error);
-    }
-
+  const handleGameCompletion = (newStatus: 'win' | 'lose', _completedState: GameState) => {
     dispatch({ type: 'SET_STATUS', status: newStatus });
   };
 
   /**
-   * Initialize on mount - check if user already played today
-   * For unauthenticated: check localStorage
-   * For authenticated: check both localStorage and server
+   * Initialize on mount - start a new game
    */
   useEffect(() => {
-    const initializeGame = async () => {
-      const lastMatch = getCurrentMatch();
-      const hasLocalMatch = lastMatch && isLastMatchFromToday(lastMatch.timestamp);
-
-      // For authenticated users, also check server
-      if (user?.uid) {
-        const hasServerMatch = await hasPlayedToday();
-
-        if (hasServerMatch || hasLocalMatch) {
-          // User already played today - load the match data
-          if (lastMatch) {
-            dispatch({ type: 'LOAD_MATCH_DATA', match: lastMatch });
-          }
-          queueMicrotask(() => setIsReady(true));
-          return;
-        }
-      } else if (hasLocalMatch) {
-        // Unauthenticated user already played today
-        dispatch({ type: 'LOAD_MATCH_DATA', match: lastMatch });
-        queueMicrotask(() => setIsReady(true));
-        return;
-      }
-
-      // No match today - create fresh game
-      queueMicrotask(() => newGame());
-    };
-
-    initializeGame();
-  }, [user?.uid]);
+    queueMicrotask(() => newGame());
+  }, []);
 
   return (
     <SudokuGameContext.Provider

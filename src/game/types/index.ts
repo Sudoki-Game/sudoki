@@ -105,5 +105,4 @@ export type GameAction =
   | { type: 'SET_LIVES'; lives: number }
   | { type: 'SET_STATUS'; status: GameStatus }
   | { type: 'SHOW_SOLUTION'; show: boolean }
-  | { type: 'RESET_SELECTION' }
-  | { type: 'LOAD_MATCH_DATA'; match: MatchData };
+  | { type: 'RESET_SELECTION' };
