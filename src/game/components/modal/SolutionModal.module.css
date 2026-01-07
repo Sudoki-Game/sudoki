@@ -15,8 +15,10 @@
 }
 
 .keyColor {
+  flex-shrink: none;
   height: 2rem;
   width: 2rem;
+  aspect-ratio: 1;
   border-radius: 0.75rem;
   outline: 0.15rem solid var(--text);
   box-shadow: inset 0 -0.3rem 0 var(--shadow);
