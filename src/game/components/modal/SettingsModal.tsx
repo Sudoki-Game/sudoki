@@ -1,15 +1,14 @@
 import { useModalRouter } from '@/game/context/ModalRouterContext';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
 import { auth } from '@/lib/firebase/client';
 import modalStyles from './Modal.module.css';
 import Button from '@/ui/components/Button';
 import Modal from './Modal';
 
 const SettingsModal = () => {
-  const { user } = useAuth();
   const { openModal, goBack } = useModalRouter();
   const router = useRouter();
+  const user = auth.currentUser;
 
   return (
     <Modal>

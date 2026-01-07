@@ -1,33 +1,90 @@
 import { useModalRouter } from '@/game/context/ModalRouterContext';
-import { useSudokuGame } from '@/game/context/SudokuGameContext';
 import Image from 'next/image';
 import { MAX_LIVES } from '@/util/constants';
 import styles from './GameOverModal.module.css';
 import modalStyles from './Modal.module.css';
-import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Button from '@/ui/components/Button';
 import Modal from './Modal';
+import { auth } from '@/lib/firebase/client';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useState, useEffect } from 'react';
+import {
+  getMatchHistory as getMatchHistoryLocal,
+  getTodaysMatch as getTodaysMatchLocal
+} from '@/match/lib/client';
+import {
+  getMatchHistory as getMatchHistoryServer,
+  getTodaysMatch as getTodaysMatchServer
+} from '@/app/actions/match';
+import { calculateStatsFromMatches } from '@/user/lib/stats';
+import type { BaseUserStats } from '@/user/types';
+import type { ClientMatch } from '@/match/types';
 
 interface GameOverModalProps {
   onClose: () => void;
 }
 
 const GameOverModal = ({ onClose }: GameOverModalProps) => {
-  const { game } = useSudokuGame();
-  const { user } = useAuth();
   const { openModal } = useModalRouter();
   const router = useRouter();
+  const [userStats, setUserStats] = useState<BaseUserStats | null>(null);
+  const [match, setMatch] = useState<ClientMatch | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
-  const isWin = game.status === 'win';
-  const isLose = game.status === 'lose';
+  // Load match data and user stats
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      let history;
+      let todaysMatch: ClientMatch | null = null;
 
-  if (game.status !== 'win' && game.status !== 'lose') return null;
+      if (user) {
+        setIsLoggedIn(true);
+        // Use server data for logged-in users
+        history = await getMatchHistoryServer(user.uid);
+        const serverMatch = await getTodaysMatchServer(user.uid);
+        if (serverMatch) {
+          todaysMatch = {
+            id: serverMatch.id,
+            isWon: serverMatch.isWon,
+            score: serverMatch.score,
+            streakBonus: serverMatch.streakBonus,
+            autoSolvesCount: serverMatch.autoSolvesCount,
+            autoSolves: serverMatch.autoSolves,
+            livesRemaining: serverMatch.livesRemaining,
+            board: serverMatch.board,
+            originalBoard: serverMatch.originalBoard,
+            solution: serverMatch.solution,
+            timestamp: serverMatch.timestamp
+          };
+        }
+      } else {
+        setIsLoggedIn(false);
+        // Use localStorage for anonymous users
+        history = await getMatchHistoryLocal();
+        todaysMatch = await getTodaysMatchLocal();
+      }
+
+      const stats = calculateStatsFromMatches(history);
+      setUserStats(stats);
+      setMatch(todaysMatch);
+      setIsReady(true);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Don't render until data is ready or if no match exists
+  if (!isReady || !match) return null;
+
+  const isWin = match.isWon;
 
   return (
     <Modal className={styles.gameoverModal} onClose={onClose}>
       <div className={modalStyles.content}>
-        <h2 className={modalStyles.title}>Game Over</h2>
+        {/* Streak day - minimum of 1 since user played today */}
+        <h2 className={modalStyles.title}>Day {Math.max(1, userStats?.dailyStreak ?? 1)}</h2>
 
         {isWin ? (
           <Image
@@ -51,7 +108,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
 
         <div className={styles.livesContainer}>
           {Array.from({ length: MAX_LIVES }).map((_, i) =>
-            i < game.lives ? (
+            i < match.livesRemaining ? (
               <Image
                 key={`heart-${i}`}
                 src={'/game/heart.svg'}
@@ -73,10 +130,23 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
 
         <section className={styles.statContainer}>
           <span className={styles.stat}>Your Score</span>
-          <span className={styles.statNumerical}>{game.score}</span>
+          <span className={styles.statNumerical}>{match.score}</span>
+
+          <span className={styles.stat}>Streak Bonus</span>
+          <span className={styles.statNumerical}>+{match.streakBonus}</span>
+
+          <hr />
+
+          <span className={styles.stat}>Personal Best</span>
+          <span className={styles.statNumerical}>{userStats?.personalBestScore ?? 0}</span>
+
+          <hr />
+
+          <span className={styles.stat}>Total Score</span>
+          <span className={styles.statNumerical}>{userStats?.combinedScore ?? 0}</span>
         </section>
 
-        {user ? null : (
+        {!isLoggedIn && (
           <div className={styles.registerCTA}>
             <p>Want to see your score on the leaderboard?</p>
             <Button
@@ -91,13 +161,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
           </div>
         )}
 
-        <Button
-          disabled={!isLose}
-          fill
-          size='lg'
-          type='button'
-          onClick={() => openModal('solution')}
-        >
+        <Button disabled={isWin} fill size='lg' type='button' onClick={() => openModal('solution')}>
           View Solution
         </Button>
       </div>

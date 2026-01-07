@@ -1,16 +1,20 @@
-import { User } from 'firebase/auth';
+// Re-export user types for convenience
+export type {
+  BaseUserStats,
+  LocalUserData,
+  ServerUserData
+} from '@/user/types';
+export {
+  createDefaultLocalUserData,
+  createInitialServerUserData,
+  hasCompletedOnboarding
+} from '@/user/types';
 
 export interface AuthUser {
   uid: string;
   email: string | null;
   emailVerified: boolean;
   displayName: string | null;
-}
-
-export interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  getUserData: () => Promise<UserStats | null>;
 }
 
 export interface SessionResult {
@@ -20,20 +24,13 @@ export interface SessionResult {
   isNewUser?: boolean;
 }
 
-export interface UserStats {
-  combinedScore: number;
-  dailyStreak: number;
-  bestStreak: number;
-  matchesPlayed: number;
-  personalBestScore: number;
-  lastMatchTimestamp: number | null;
-}
+/**
+ * Alias for backward compatibility
+ * @deprecated Use BaseUserStats instead
+ */
+export type UserStats = import('@/user/types').BaseUserStats;
 
-export interface ServerUserData extends UserStats {
-  uid: string;
-  email: string | null;
-  displayName: string;
-  createdAt?: number;
+export interface AuthContextType {
+  loading: boolean;
+  getUserData: () => Promise<import('@/user/types').BaseUserStats | null>;
 }
-
-export type LocalUserData = UserStats;

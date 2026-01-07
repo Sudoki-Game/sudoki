@@ -21,8 +21,17 @@ import SudokuCellStyles from './SudokuCell.module.css';
  * @returns
  */
 const Sudoku = () => {
-  const { game, isPaused, isReady, togglePause, handleClick, handleDragStart, handleDrop } =
-    useSudokuGame();
+  const {
+    game,
+    isPaused,
+    isReady,
+    togglePause,
+    handleClick,
+    handleDragStart,
+    handleDrop,
+    hasPlayedToday,
+    todaysMatch
+  } = useSudokuGame();
   const { dndSensors, boardRef, containerRef } = useSudokuControls();
   const { openModal } = useModalRouter();
 
@@ -48,6 +57,15 @@ const Sudoku = () => {
         break;
     }
   }, [openModal, game.status]);
+
+  // Show game over modal if user has already played today (on page load)
+  useEffect(() => {
+    console.log('[Sudoku] Checking hasPlayedToday:', { hasPlayedToday, todaysMatch: !!todaysMatch, status: game.status });
+    if (hasPlayedToday && todaysMatch && game.status === 'idle') {
+      console.log('[Sudoku] Opening gameover modal for previous match');
+      openModal('gameover');
+    }
+  }, [hasPlayedToday, todaysMatch, game.status, openModal]);
 
   return (
     <div className={styles.root} inert={isDisabled} style={{ opacity: isDisabled ? '40%' : '' }}>

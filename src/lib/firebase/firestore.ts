@@ -10,9 +10,11 @@ import {
   setDoc
 } from 'firebase/firestore';
 import { db } from './client';
-import type { MatchData, ServerUserData } from '@/types';
+import type { ServerUserData } from '@/user/types';
+import type { ServerMatch } from '@/match/types';
 
-export type { ServerUserData, MatchData };
+export type { ServerUserData };
+export type { ServerMatch };
 
 export async function getServerUserData(userId: string): Promise<ServerUserData | null> {
   const userRef = doc(db, 'users', userId);
@@ -31,17 +33,20 @@ export async function userExists(userId: string): Promise<boolean> {
 
 export async function createUserEntry(userId: string, email: string | null): Promise<void> {
   const userRef = doc(db, 'users', userId);
+  const now = Date.now();
   const userDoc: ServerUserData = {
     uid: userId,
     email: email,
     displayName: '',
+    isActive: true,
+    createdAt: now,
+    lastActive: now,
     combinedScore: 0,
     dailyStreak: 0,
     bestStreak: 0,
     matchesPlayed: 0,
     personalBestScore: 0,
-    lastMatchTimestamp: null,
-    createdAt: Date.now()
+    lastMatchTimestamp: null
   };
 
   await setDoc(userRef, userDoc);
@@ -80,17 +85,14 @@ export async function isDisplayNameTaken(
   return true;
 }
 
-export async function getUserMatches(userId: string, limitCount = 10): Promise<MatchData[]> {
+export async function getUserMatches(userId: string, limitCount = 10): Promise<ServerMatch[]> {
   const matchesQuery = query(
     collection(db, 'matches'),
-    where('userId', '==', userId),
+    where('userPlayed', '==', userId),
     orderBy('timestamp', 'desc'),
     limit(limitCount)
   );
 
   const querySnapshot = await getDocs(matchesQuery);
-  return querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data()
-  })) as MatchData[];
+  return querySnapshot.docs.map((doc) => doc.data()) as ServerMatch[];
 }
