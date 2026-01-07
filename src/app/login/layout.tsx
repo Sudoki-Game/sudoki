@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Copyright from '@/components/Copyright';
-import headerStyles from '@/components/Header.module.css';
+import headerStyles from '@/game/components/Header.module.css';
 import { getServerUser } from '@/lib/auth/server';
 import { redirect } from 'next/navigation';
 

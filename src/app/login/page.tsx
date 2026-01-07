@@ -1,4 +1,4 @@
-import LoginForm from '@/components/form/LoginForm';
+import LoginForm from '@/auth/components/LoginForm';
 import styles from './page.module.css';
 
 const LoginPage = async () => {

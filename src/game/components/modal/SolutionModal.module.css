@@ -1,0 +1,35 @@
+.solutionModal {
+  max-width: 520px;
+}
+
+.key {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.keyPair {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  gap: 0.5rem;
+}
+
+.keyColor {
+  flex-shrink: none;
+  height: 2rem;
+  width: 2rem;
+  aspect-ratio: 1;
+  border-radius: 0.75rem;
+  outline: 0.15rem solid var(--text);
+  box-shadow: inset 0 -0.3rem 0 var(--shadow);
+
+  background: var(--grey-gradient);
+}
+
+.keyColorOk {
+  background: var(--green-gradient);
+}
+
+.keyColorHint {
+  background: var(--yellow-gradient);
+}

@@ -1,35 +1,33 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User } from 'firebase/auth';
 import { createSession, removeSession } from '@/app/actions/auth';
-import { AuthContextType } from '@/types/auth';
+import { UserStats } from '@/types/auth';
 import { onAuthStateChanged } from '@/lib/firebase/auth';
+import { getServerUserData } from '@/lib/firebase/firestore';
+import { auth } from '@/lib/firebase/client';
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true
-});
+export interface AuthContextType {
+  loading: boolean;
+  getUserData: () => Promise<UserStats | null>;
+}
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(async (user) => {
-      if (user) {
-        console.log(user);
-
-        const idToken = await user.getIdToken();
+    const unsubscribe = onAuthStateChanged(async (currentUser) => {
+      if (currentUser) {
+        const idToken = await currentUser.getIdToken();
         await createSession(idToken);
-        setUser(user);
       } else {
         await removeSession();
-        setUser(null);
       }
       setLoading(false);
     });
@@ -37,7 +35,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => unsubscribe();
   }, []);
 
-  return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;
+  const getUserData = async (): Promise<UserStats | null> => {
+    if (auth.currentUser) {
+      const serverData = await getServerUserData(auth.currentUser.uid);
+      return serverData;
+    }
+    return null;
+  };
+
+  return <AuthContext.Provider value={{ loading, getUserData }}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = (): AuthContextType => {

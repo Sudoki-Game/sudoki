@@ -1,3 +1,4 @@
+'use server';
 import { cookies } from 'next/headers';
 import { serverAuth } from '../firebase/server';
 import { AuthUser } from '@/types';
@@ -23,14 +24,4 @@ export async function getServerUser(): Promise<AuthUser | null> {
     console.error('Token verification failed:', error);
     return null;
   }
-}
-
-export async function requireAuth(): Promise<AuthUser> {
-  const user = await getServerUser();
-
-  if (!user) {
-    throw new Error('Unauthorized');
-  }
-
-  return user;
 }

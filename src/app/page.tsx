@@ -1,12 +1,12 @@
 import Copyright from '@/components/Copyright';
-import Header from '@/components/Header';
-import Sudoku from '@/components/Sudoku';
-import ModalHandler from '@/components/modal/ModalRouter';
-import { ModalRouterProvider } from '@/context/ModalRouterContext';
-import { SudokuProvider } from '@/context/SudokuContext';
+import Header from '@/game/components/Header';
+import { ModalRouterProvider } from '@/game/context/ModalRouterContext';
+import Sudoku from '@/game/components/Sudoku';
+import { SudokuGameProvider } from '@/game/context/SudokuGameContext';
 import { getServerUser } from '@/lib/auth/server';
 import { hasUserCompletedOnboarding } from '@/lib/firebase/firestore';
 import { redirect } from 'next/navigation';
+import ModalRouter from '@/game/components/modal/ModalRouter';
 
 export default async function Home() {
   const user = await getServerUser();
@@ -22,16 +22,16 @@ export default async function Home() {
   }
 
   return (
-    <SudokuProvider>
-      <ModalRouterProvider>
-        <Header />
-        <main>
+    <ModalRouterProvider>
+      <Header />
+      <main>
+        <SudokuGameProvider>
           <Sudoku />
-          <ModalHandler />
-        </main>
+          <ModalRouter />
+        </SudokuGameProvider>
+      </main>
 
-        <Copyright />
-      </ModalRouterProvider>
-    </SudokuProvider>
+      <Copyright />
+    </ModalRouterProvider>
   );
 }

@@ -1,2 +1,2 @@
 export * from './auth';
-export * from './sudoku';
+export * from '../game/types';
