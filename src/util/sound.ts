@@ -5,6 +5,15 @@ type PlaySoundOptions = {
   pitch?: number; // affects playbackRate
 };
 
+/**
+ * Extended HTMLAudioElement interface that includes vendor-prefixed preservesPitch properties.
+ * These properties are used to control whether pitch is preserved when changing playbackRate.
+ */
+interface ExtendedHTMLAudioElement extends HTMLAudioElement {
+  mozPreservesPitch?: boolean;
+  webkitPreservesPitch?: boolean;
+}
+
 const audioCache: Record<string, HTMLAudioElement> = {};
 
 /**
@@ -28,13 +37,16 @@ export function playSound(src: string, options: PlaySoundOptions = {}): HTMLAudi
   audio.playbackRate = speed * pitch;
 
   // Ensure pitch changes with playbackRate
-  const anyAudio = audio;
+  // Try standard property first, then fall back to vendor-prefixed versions
   if ('preservesPitch' in audio) {
     audio.preservesPitch = false;
-  } else if ('mozPreservesPitch' in anyAudio) {
-    anyAudio.mozPreservesPitch = false;
-  } else if ('webkitPreservesPitch' in anyAudio) {
-    anyAudio.webkitPreservesPitch = false;
+  } else {
+    const extendedAudio = audio as ExtendedHTMLAudioElement;
+    if ('mozPreservesPitch' in extendedAudio) {
+      extendedAudio.mozPreservesPitch = false;
+    } else if ('webkitPreservesPitch' in extendedAudio) {
+      extendedAudio.webkitPreservesPitch = false;
+    }
   }
 
   audio.currentTime = 0; // replay from start
