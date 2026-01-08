@@ -1,5 +1,9 @@
 /**
  * Tests for Match Client (localStorage operations)
+ * 
+ * This file includes:
+ * 1. Shared tests (run against both localStorage and Firestore)
+ * 2. localStorage-specific tests (tamper detection, caching)
  */
 
 import {
@@ -15,6 +19,7 @@ import {
   MATCH_HISTORY_KEY
 } from '../client';
 import type { ClientMatch } from '@/match/types';
+import { runSharedMatchTests, type MatchStorageAdapter } from './shared-tests';
 
 // Mock the HMAC secret
 const mockHmacSecret = 'test-hmac-secret-key-12345';
@@ -55,6 +60,22 @@ function createMatchFromDate(date: Date, overrides: Partial<ClientMatch> = {}): 
   });
 }
 
+/**
+ * localStorage adapter for shared tests
+ */
+function createLocalStorageAdapter(): MatchStorageAdapter<ClientMatch> {
+  return {
+    saveMatch: async (match: ClientMatch) => saveMatch(match),
+    getMatchHistory: async () => getMatchHistory(),
+    getTodaysMatch: async () => getTodaysMatch(),
+    hasPlayedToday: async () => hasPlayedToday(),
+    clearAll: () => {
+      clearMatchHistory();
+    },
+    createMatch: (date: Date, overrides?: Partial<ClientMatch>) => createMatchFromDate(date, overrides)
+  };
+}
+
 beforeEach(() => {
   process.env = { ...originalEnv, NEXT_PUBLIC_HMAC_SECRET: mockHmacSecret };
   localStorage.clear();
@@ -64,44 +85,16 @@ afterAll(() => {
   process.env = originalEnv;
 });
 
-describe('saveMatch', () => {
-  it('should save a match to localStorage', async () => {
-    const match = createTestMatch();
-    const result = await saveMatch(match);
+// ============================================
+// Run shared tests against localStorage
+// ============================================
+runSharedMatchTests('localStorage', createLocalStorageAdapter);
 
-    expect(result.success).toBe(true);
-    expect(localStorage.getItem(MATCH_HISTORY_KEY)).not.toBeNull();
-  });
+// ============================================
+// localStorage-specific tests
+// ============================================
 
-  it('should return error if localStorage throws', async () => {
-    const match = createTestMatch();
-
-    // Mock localStorage.setItem to throw
-    const originalSetItem = localStorage.setItem;
-    localStorage.setItem = jest.fn(() => {
-      throw new Error('Storage full');
-    });
-
-    const result = await saveMatch(match);
-    expect(result.success).toBe(false);
-    expect(result.error).toContain('Storage full');
-
-    localStorage.setItem = originalSetItem;
-  });
-
-  it('should add match to existing history', async () => {
-    const match1 = createTestMatch({ id: 'match_1', score: 100 });
-    const match2 = createTestMatch({ id: 'match_2', score: 200 });
-
-    await saveMatch(match1);
-    await saveMatch(match2);
-
-    const history = await getMatchHistory();
-    expect(history).toHaveLength(2);
-  });
-});
-
-describe('getMatch', () => {
+describe('[localStorage] getMatch by ID', () => {
   it('should retrieve a saved match by id', async () => {
     const match = createTestMatch({ id: 'specific_id', score: 777 });
     await saveMatch(match);
@@ -123,107 +116,25 @@ describe('getMatch', () => {
   });
 });
 
-describe('getTodaysMatch', () => {
-  it('should return match from today', async () => {
-    const todayMatch = createTestMatch({ id: 'today_match' });
-    await saveMatch(todayMatch);
+describe('[localStorage] Storage error handling', () => {
+  it('should return error if localStorage throws on save', async () => {
+    const match = createTestMatch();
 
-    const retrieved = await getTodaysMatch();
-    expect(retrieved).not.toBeNull();
-    expect(retrieved?.id).toBe('today_match');
-  });
+    // Mock localStorage.setItem to throw
+    const originalSetItem = localStorage.setItem;
+    localStorage.setItem = jest.fn(() => {
+      throw new Error('Storage full');
+    });
 
-  it('should return null if only old matches exist', async () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const oldMatch = createMatchFromDate(yesterday);
-    await saveMatch(oldMatch);
+    const result = await saveMatch(match);
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('Storage full');
 
-    const retrieved = await getTodaysMatch();
-    expect(retrieved).toBeNull();
-  });
-
-  it('should return null if no matches exist', async () => {
-    const retrieved = await getTodaysMatch();
-    expect(retrieved).toBeNull();
-  });
-
-  it('should return the most recent match from today if multiple exist', async () => {
-    // This is an edge case - shouldn't normally happen but we should handle it
-    const today = new Date();
-
-    // Create match earlier today
-    const earlierToday = new Date(today);
-    earlierToday.setHours(today.getHours() - 2);
-    const earlierMatch = createMatchFromDate(earlierToday, { id: 'earlier', score: 100 });
-
-    // Create match later today
-    const laterMatch = createTestMatch({ id: 'later', score: 200 });
-
-    await saveMatch(earlierMatch);
-    await saveMatch(laterMatch);
-
-    const retrieved = await getTodaysMatch();
-    expect(retrieved?.id).toBe('later');
-    expect(retrieved?.score).toBe(200);
+    localStorage.setItem = originalSetItem;
   });
 });
 
-describe('hasPlayedToday', () => {
-  it('should return true if match from today exists', async () => {
-    const todayMatch = createTestMatch();
-    await saveMatch(todayMatch);
-
-    const hasPlayed = await hasPlayedToday();
-    expect(hasPlayed).toBe(true);
-  });
-
-  it('should return false if no matches exist', async () => {
-    const hasPlayed = await hasPlayedToday();
-    expect(hasPlayed).toBe(false);
-  });
-
-  it('should return false if only old matches exist', async () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const oldMatch = createMatchFromDate(yesterday);
-    await saveMatch(oldMatch);
-
-    const hasPlayed = await hasPlayedToday();
-    expect(hasPlayed).toBe(false);
-  });
-});
-
-describe('getMatchHistory', () => {
-  it('should return empty array if no matches', async () => {
-    const history = await getMatchHistory();
-    expect(history).toEqual([]);
-  });
-
-  it('should return all matches in chronological order', async () => {
-    const threeAgo = new Date();
-    threeAgo.setDate(threeAgo.getDate() - 3);
-
-    const twoAgo = new Date();
-    twoAgo.setDate(twoAgo.getDate() - 2);
-
-    const match1 = createMatchFromDate(threeAgo, { id: 'oldest' });
-    const match2 = createMatchFromDate(twoAgo, { id: 'middle' });
-    const match3 = createTestMatch({ id: 'newest' });
-
-    // Save in random order
-    await saveMatch(match2);
-    await saveMatch(match1);
-    await saveMatch(match3);
-
-    const history = await getMatchHistory();
-    expect(history).toHaveLength(3);
-    // Should be sorted by timestamp ascending
-    expect(history[0].id).toBe('oldest');
-    expect(history[1].id).toBe('middle');
-    expect(history[2].id).toBe('newest');
-  });
-
+describe('[localStorage] Tamper detection', () => {
   it('should return empty array if data is tampered', async () => {
     // Save a valid match first
     const match = createTestMatch();
@@ -241,26 +152,7 @@ describe('getMatchHistory', () => {
     const history = await getMatchHistory();
     expect(history).toEqual([]);
   });
-});
 
-describe('clearMatchHistory', () => {
-  it('should remove all matches from localStorage', async () => {
-    const match = createTestMatch();
-    await saveMatch(match);
-
-    expect(localStorage.getItem(MATCH_HISTORY_KEY)).not.toBeNull();
-
-    clearMatchHistory();
-
-    expect(localStorage.getItem(MATCH_HISTORY_KEY)).toBeNull();
-  });
-
-  it('should not throw if no matches exist', () => {
-    expect(() => clearMatchHistory()).not.toThrow();
-  });
-});
-
-describe('tamper detection', () => {
   it('should detect score tampering', async () => {
     const match = createTestMatch({ score: 500 });
     await saveMatch(match);
@@ -302,7 +194,7 @@ describe('tamper detection', () => {
   });
 });
 
-describe('cache functionality', () => {
+describe('[localStorage] Cache functionality', () => {
   it('should save a match with isCached flag when specified', async () => {
     const match = createTestMatch({ id: 'cached_match' });
     await saveMatch(match, { isCached: true });
@@ -397,5 +289,22 @@ describe('cache functionality', () => {
       const cached = await getCachedMatches();
       expect(cached).toHaveLength(1);
     });
+  });
+});
+
+describe('[localStorage] clearMatchHistory', () => {
+  it('should remove all matches from localStorage', async () => {
+    const match = createTestMatch();
+    await saveMatch(match);
+
+    expect(localStorage.getItem(MATCH_HISTORY_KEY)).not.toBeNull();
+
+    clearMatchHistory();
+
+    expect(localStorage.getItem(MATCH_HISTORY_KEY)).toBeNull();
+  });
+
+  it('should not throw if no matches exist', () => {
+    expect(() => clearMatchHistory()).not.toThrow();
   });
 });

@@ -9,6 +9,7 @@ import { serverDb } from '@/lib/firebase/server';
 import type { ServerMatch, SaveMatchResult } from '@/match/types';
 import { isMatchFromToday } from '@/match/types';
 import { FieldValue } from 'firebase-admin/firestore';
+import { calculateStreakFromMatches } from '@/user/lib/stats';
 
 /** Firestore collection name for matches */
 export const MATCHES_COLLECTION = 'matches';
@@ -224,6 +225,13 @@ export async function saveMatchBatch(
 /**
  * Update user stats based on a new match
  * This should be called after successfully saving a match
+ * 
+ * Updates:
+ * - combinedScore: incremented by score + streakBonus
+ * - matchesPlayed: incremented by 1
+ * - lastMatchTimestamp: set to match timestamp
+ * - dailyStreak: calculated from match history (current consecutive days)
+ * - bestStreak: max of current bestStreak and new dailyStreak
  */
 export async function updateUserStatsFromMatch(
   userId: string,
@@ -234,10 +242,20 @@ export async function updateUserStatsFromMatch(
     const userRef = serverDb.collection('users').doc(userId);
     const finalScore = match.score + streakBonus;
 
+    // Fetch match history to calculate updated streak values
+    const matchHistory = await getMatchHistory(userId);
+    const { currentStreak, bestStreak } = calculateStreakFromMatches(matchHistory);
+
+    // Get current user data to preserve bestStreak if it's higher
+    const userDoc = await userRef.get();
+    const currentBestStreak = userDoc.exists ? (userDoc.data()?.bestStreak ?? 0) : 0;
+
     await userRef.update({
       combinedScore: FieldValue.increment(finalScore),
       matchesPlayed: FieldValue.increment(1),
-      lastMatchTimestamp: match.timestamp
+      lastMatchTimestamp: match.timestamp,
+      dailyStreak: currentStreak,
+      bestStreak: Math.max(currentBestStreak, bestStreak, currentStreak)
     });
   } catch (error) {
     console.error('[MatchServer] Error updating user stats:', error);

@@ -30,7 +30,9 @@ const Sudoku = () => {
     handleDragStart,
     handleDrop,
     hasPlayedToday,
-    todaysMatch
+    todaysMatch,
+    gameOverReady,
+    clearGameOverReady
   } = useSudokuGame();
   const { dndSensors, boardRef, containerRef } = useSudokuControls();
   const { openModal } = useModalRouter();
@@ -44,28 +46,22 @@ const Sudoku = () => {
     togglePause(!!activeModal);
   }, [activeModal, togglePause]);
 
-  // Win/Lost modals
+  // Win/Lost modals - only show after save is complete (gameOverReady)
   useEffect(() => {
-    switch (game.status) {
-      case 'win':
-      case 'lose':
-        openModal('gameover');
-        break;
-      case 'playing':
-      case 'idle':
-      default:
-        break;
+    if (gameOverReady) {
+      openModal('gameover');
+      clearGameOverReady(); // Clear the flag so it doesn't re-trigger
     }
-  }, [openModal, game.status]);
+  }, [gameOverReady, openModal, clearGameOverReady]);
 
   // Show game over modal if user has already played today (on page load)
   useEffect(() => {
-    console.log('[Sudoku] Checking hasPlayedToday:', { hasPlayedToday, todaysMatch: !!todaysMatch, status: game.status });
-    if (hasPlayedToday && todaysMatch && game.status === 'idle') {
+    console.log('[Sudoku] Checking hasPlayedToday:', { hasPlayedToday, todaysMatch: !!todaysMatch, status: game.status, isReady });
+    if (isReady && hasPlayedToday && todaysMatch && game.status === 'idle') {
       console.log('[Sudoku] Opening gameover modal for previous match');
       openModal('gameover');
     }
-  }, [hasPlayedToday, todaysMatch, game.status, openModal]);
+  }, [isReady, hasPlayedToday, todaysMatch, game.status, openModal]);
 
   return (
     <div className={styles.root} inert={isDisabled} style={{ opacity: isDisabled ? '40%' : '' }}>

@@ -35,7 +35,8 @@ import { auth } from '@/lib/firebase/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
   saveMatch as saveMatchToServer,
-  getTodaysMatch as getTodaysMatchServer
+  getTodaysMatch as getTodaysMatchServer,
+  getMatchHistory as getMatchHistoryServer
 } from '@/app/actions/match';
 import { uploadAllLocalMatches } from '@/match/lib/sync';
 
@@ -123,6 +124,16 @@ export type SudokuGameProviderState = {
    * Toggle game pause
    */
   togglePause: (override?: boolean) => void;
+
+  /**
+   * Flag indicating game over modal is ready to be shown (save completed)
+   */
+  gameOverReady: boolean;
+
+  /**
+   * Clear the gameOverReady flag (called when modal opens)
+   */
+  clearGameOverReady: () => void;
 };
 
 const initialState: GameState = {
@@ -213,6 +224,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [playedToday, setPlayedToday] = useState<boolean>(false);
   const [todaysMatch, setTodaysMatch] = useState<ClientMatch | null>(null);
+  const [gameOverReady, setGameOverReady] = useState(false);
   const [lastMatch, setLastMatch] = useState<ClientMatch | null>(null);
 
   /**
@@ -292,9 +304,11 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         const { puzzle, solution } = generatePuzzledifficulty(difficulty);
         dispatch({ type: 'NEW_GAME', payload: { board: puzzle, solution, difficulty } });
         setElapsedTime(0);
-        setIsReady(true);
         setIsPaused(false);
       }
+
+      // Mark context as ready after initialization completes
+      setIsReady(true);
     };
 
     // Wait for Firebase Auth to initialize before checking game state
@@ -732,12 +746,17 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     // Only count as a completed match if the game was won
     const isWon = newStatus === 'win';
 
-    // Get match history for streak calculation
-    const matchHistory = await getMatchHistory();
+    // Get match history for streak calculation from the correct source:
+    // - Server for logged-in users (localStorage may be empty after sync)
+    // - localStorage for anonymous users
+    const isLoggedIn = !!auth.currentUser;
+    const matchHistory = isLoggedIn && auth.currentUser
+      ? await getMatchHistoryServer(auth.currentUser.uid)
+      : await getMatchHistory();
     const { currentStreak } = calculateStreakFromMatches(matchHistory);
 
-    // Calculate streak bonus (if continuing a streak)
-    const streakBonus = isWon ? calculateStreakBonus(currentStreak + 1) : 0;
+    // Calculate streak bonus for playing on consecutive days (awarded regardless of win/loss)
+    const streakBonus = calculateStreakBonus(currentStreak + 1);
 
     // Create match data matching the BaseMatch interface
     const match: ClientMatch = {
@@ -759,6 +778,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
       setPlayedToday(true);
       setTodaysMatch(match);
       setLastMatch(match);
+      setGameOverReady(true); // Signal that modal can now be shown
     };
 
     if (auth.currentUser) {
@@ -788,6 +808,10 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     }
   };
 
+  const clearGameOverReady = () => {
+    setGameOverReady(false);
+  };
+
   return (
     <SudokuGameContext.Provider
       value={{
@@ -806,7 +830,9 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         handleClick,
         newGame,
         dispatch,
-        togglePause
+        togglePause,
+        gameOverReady,
+        clearGameOverReady
       }}
     >
       {children}
