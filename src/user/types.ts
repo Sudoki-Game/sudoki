@@ -78,7 +78,7 @@ export function createDefaultLocalUserData(): LocalUserData {
     bestStreak: 0,
     matchesPlayed: 0,
     personalBestScore: 0,
-    lastMatchTimestamp: null
+    lastMatchTimestamp: null,
   };
 }
 
@@ -88,7 +88,7 @@ export function createDefaultLocalUserData(): LocalUserData {
 export function createInitialServerUserData(
   uid: string,
   email: string | null,
-  displayName: string
+  displayName: string,
 ): ServerUserData {
   const now = Date.now();
   return {
@@ -103,7 +103,7 @@ export function createInitialServerUserData(
     bestStreak: 0,
     matchesPlayed: 0,
     personalBestScore: 0,
-    lastMatchTimestamp: null
+    lastMatchTimestamp: null,
   };
 }
 
@@ -126,6 +126,6 @@ export function createDefaultBaseUserStats(): BaseUserStats {
     bestStreak: 0,
     matchesPlayed: 0,
     personalBestScore: 0,
-    lastMatchTimestamp: null
+    lastMatchTimestamp: null,
   };
 }

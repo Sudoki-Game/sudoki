@@ -57,13 +57,14 @@ function isYesterday(timestamp: number): boolean {
 
 /**
  * Calculate streak information from match history
- * 
+ *
  * @param matches - Array of matches sorted by timestamp ascending
  * @returns Current streak and best streak values
  */
-export function calculateStreakFromMatches(
-  matches: BaseMatch[]
-): { currentStreak: number; bestStreak: number } {
+export function calculateStreakFromMatches(matches: BaseMatch[]): {
+  currentStreak: number;
+  bestStreak: number;
+} {
   if (matches.length === 0) {
     return { currentStreak: 0, bestStreak: 0 };
   }
@@ -82,8 +83,9 @@ export function calculateStreakFromMatches(
   }
 
   // Convert to array sorted by date
-  const uniqueDayMatches = Array.from(matchesByDate.values())
-    .sort((a, b) => a.timestamp - b.timestamp);
+  const uniqueDayMatches = Array.from(matchesByDate.values()).sort(
+    (a, b) => a.timestamp - b.timestamp,
+  );
 
   if (uniqueDayMatches.length === 0) {
     return { currentStreak: 0, bestStreak: 0 };
@@ -94,7 +96,12 @@ export function calculateStreakFromMatches(
 
   // Calculate best streak
   for (let i = 1; i < uniqueDayMatches.length; i++) {
-    if (areConsecutiveDays(uniqueDayMatches[i - 1].timestamp, uniqueDayMatches[i].timestamp)) {
+    if (
+      areConsecutiveDays(
+        uniqueDayMatches[i - 1].timestamp,
+        uniqueDayMatches[i].timestamp,
+      )
+    ) {
       tempStreak++;
       bestStreak = Math.max(bestStreak, tempStreak);
     } else {
@@ -105,7 +112,9 @@ export function calculateStreakFromMatches(
   // Calculate current streak
   // Current streak is valid if the most recent match was today or yesterday
   const mostRecentMatch = uniqueDayMatches[uniqueDayMatches.length - 1];
-  const mostRecentIsRecent = isToday(mostRecentMatch.timestamp) || isYesterday(mostRecentMatch.timestamp);
+  const mostRecentIsRecent =
+    isToday(mostRecentMatch.timestamp) ||
+    isYesterday(mostRecentMatch.timestamp);
 
   if (!mostRecentIsRecent) {
     return { currentStreak: 0, bestStreak };
@@ -114,7 +123,12 @@ export function calculateStreakFromMatches(
   // Count backwards from the most recent match
   let currentStreak = 1;
   for (let i = uniqueDayMatches.length - 2; i >= 0; i--) {
-    if (areConsecutiveDays(uniqueDayMatches[i].timestamp, uniqueDayMatches[i + 1].timestamp)) {
+    if (
+      areConsecutiveDays(
+        uniqueDayMatches[i].timestamp,
+        uniqueDayMatches[i + 1].timestamp,
+      )
+    ) {
       currentStreak++;
     } else {
       break;
@@ -135,7 +149,7 @@ export function calculateStatsFromMatches(matches: BaseMatch[]): BaseUserStats {
       bestStreak: 0,
       matchesPlayed: 0,
       personalBestScore: 0,
-      lastMatchTimestamp: null
+      lastMatchTimestamp: null,
     };
   }
 
@@ -145,7 +159,7 @@ export function calculateStatsFromMatches(matches: BaseMatch[]): BaseUserStats {
   }, 0);
 
   // Calculate personal best score
-  const personalBestScore = Math.max(...matches.map(m => m.score));
+  const personalBestScore = Math.max(...matches.map((m) => m.score));
 
   // Find the most recent match
   const sortedByTime = [...matches].sort((a, b) => b.timestamp - a.timestamp);
@@ -160,21 +174,21 @@ export function calculateStatsFromMatches(matches: BaseMatch[]): BaseUserStats {
     bestStreak,
     matchesPlayed: matches.length,
     personalBestScore,
-    lastMatchTimestamp
+    lastMatchTimestamp,
   };
 }
 
 /**
  * Merge local and server match histories
  * Server data takes precedence when there's a conflict for the same day
- * 
+ *
  * @param localMatches - Matches from localStorage
  * @param serverMatches - Matches from Firestore
  * @returns Merged match array sorted by timestamp
  */
 export function mergeMatchHistories<T extends BaseMatch>(
   localMatches: T[],
-  serverMatches: T[]
+  serverMatches: T[],
 ): T[] {
   if (localMatches.length === 0) return [...serverMatches];
   if (serverMatches.length === 0) return [...localMatches];
@@ -218,7 +232,9 @@ export function calculateStreakBonus(streakLength: number): number {
 /**
  * Determine if a new match would continue a streak
  */
-export function wouldContinueStreak(lastMatchTimestamp: number | null): boolean {
+export function wouldContinueStreak(
+  lastMatchTimestamp: number | null,
+): boolean {
   if (!lastMatchTimestamp) return false;
   return isYesterday(lastMatchTimestamp);
 }

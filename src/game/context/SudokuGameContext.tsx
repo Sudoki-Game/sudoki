@@ -5,7 +5,13 @@
 
 'use client';
 
-import { createContext, useContext, useReducer, useState, useEffect } from 'react';
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useState,
+  useEffect,
+} from 'react';
 import type { GameAction, GameState, ClientMatch } from '../types';
 import { generateMatchId } from '../types';
 import { type DragStartEvent, type DragEndEvent } from '@dnd-kit/core';
@@ -15,29 +21,32 @@ import {
   getConflicts,
   isGameWon,
   createEmptyBoard,
-  computeHighlights
+  computeHighlights,
 } from '../../util/util';
 import {
   MAX_LIVES,
   SCORE_CORRECT_CELL,
   SCORE_CONFLICT_PENALTY,
-  SCORE_REMOVED_VALID_CELL
+  SCORE_REMOVED_VALID_CELL,
 } from '@/util/constants';
 import { playSound } from '@/util/sound';
 import {
   saveMatch,
   hasPlayedToday as hasPlayedTodayLocal,
   getTodaysMatch as getTodaysMatchLocal,
-  getMatchHistory
+  getMatchHistory,
 } from '@/match/lib/client';
-import { calculateStreakFromMatches, calculateStreakBonus } from '@/user/lib/stats';
+import {
+  calculateStreakFromMatches,
+  calculateStreakBonus,
+} from '@/user/lib/stats';
 import { updateUserStatsFromMatch as updateUserStatsLocal } from '@/user/lib/client';
 import { auth } from '@/lib/firebase/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
   saveMatch as saveMatchToServer,
   getTodaysMatch as getTodaysMatchServer,
-  getMatchHistory as getMatchHistoryServer
+  getMatchHistory as getMatchHistoryServer,
 } from '@/app/actions/match';
 import { uploadAllLocalMatches } from '@/match/lib/sync';
 
@@ -150,7 +159,7 @@ const initialState: GameState = {
   autoSolves: new Set(),
   dragValue: null,
   showSolution: false,
-  difficulty: 'medium'
+  difficulty: 'medium',
 };
 
 /**
@@ -174,7 +183,7 @@ function reducer(state: GameState, action: GameAction): GameState {
         conflicts: new Map(),
         autoSolves: new Set(),
         dragValue: null,
-        showSolution: false
+        showSolution: false,
       };
     case 'SELECT_CELL': {
       const highlights: Set<string> =
@@ -182,10 +191,18 @@ function reducer(state: GameState, action: GameAction): GameState {
           ? computeHighlights(action.row, action.col, state.board)
           : new Set();
 
-      return { ...state, selected: { row: action.row, col: action.col }, highlights: highlights };
+      return {
+        ...state,
+        selected: { row: action.row, col: action.col },
+        highlights: highlights,
+      };
     }
     case 'RESET_SELECTION':
-      return { ...state, selected: { row: null, col: null }, highlights: new Set() };
+      return {
+        ...state,
+        selected: { row: null, col: null },
+        highlights: new Set(),
+      };
     case 'SET_CONFLICTS':
       return { ...state, conflicts: action.conflicts };
     case 'SET_DRAG_VALUE':
@@ -212,7 +229,9 @@ function reducer(state: GameState, action: GameAction): GameState {
   }
 }
 
-const SudokuGameContext = createContext<SudokuGameProviderState | undefined>(undefined);
+const SudokuGameContext = createContext<SudokuGameProviderState | undefined>(
+  undefined,
+);
 
 /**
  * Provides Sudoku game state and logic.
@@ -236,7 +255,9 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
    * Uses onAuthStateChanged to wait for Firebase Auth to initialize before checking
    */
   useEffect(() => {
-    const initializeGameState = async (user: import('firebase/auth').User | null) => {
+    const initializeGameState = async (
+      user: import('firebase/auth').User | null,
+    ) => {
       let hasPlayed = false;
 
       if (user) {
@@ -252,7 +273,10 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         // 2. Check server for today's match
         console.log("[SudokuGame] Checking server for today's match...");
         const serverTodaysMatch = await getTodaysMatchServer(user.uid);
-        console.log('[SudokuGame] Server result:', serverTodaysMatch?.id ?? 'no match');
+        console.log(
+          '[SudokuGame] Server result:',
+          serverTodaysMatch?.id ?? 'no match',
+        );
         if (serverTodaysMatch) {
           hasPlayed = true;
           setPlayedToday(true);
@@ -268,7 +292,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
             board: serverTodaysMatch.board,
             originalBoard: serverTodaysMatch.originalBoard,
             solution: serverTodaysMatch.solution,
-            timestamp: serverTodaysMatch.timestamp
+            timestamp: serverTodaysMatch.timestamp,
           };
           setTodaysMatch(clientMatch);
           setLastMatch(clientMatch);
@@ -291,7 +315,12 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         if (played) {
           hasPlayed = true;
           const match = await getTodaysMatchLocal();
-          console.log('[SudokuGame] Found today match:', match?.id, 'isWon:', match?.isWon);
+          console.log(
+            '[SudokuGame] Found today match:',
+            match?.id,
+            'isWon:',
+            match?.isWon,
+          );
           setPlayedToday(true);
           setTodaysMatch(match);
           setLastMatch(match);
@@ -300,10 +329,15 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
 
       // Auto-start new game if user hasn't played today
       if (!hasPlayed) {
-        console.log('[SudokuGame] User has not played today, starting new game...');
+        console.log(
+          '[SudokuGame] User has not played today, starting new game...',
+        );
         const difficulty = 'medium';
         const { puzzle, solution } = generatePuzzledifficulty(difficulty);
-        dispatch({ type: 'NEW_GAME', payload: { board: puzzle, solution, difficulty } });
+        dispatch({
+          type: 'NEW_GAME',
+          payload: { board: puzzle, solution, difficulty },
+        });
         setElapsedTime(0);
         setIsPaused(false);
 
@@ -329,7 +363,9 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   /**
    * Grid of all fixed cells
    */
-  const fixedCells = state.originalBoard.map((row) => row.map((val) => val !== null));
+  const fixedCells = state.originalBoard.map((row) =>
+    row.map((val) => val !== null),
+  );
 
   /**
    * Toggle pause state - only works during active gameplay
@@ -354,7 +390,10 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     setElapsedTime(0);
     const difficulty = 'medium';
     const { puzzle, solution } = generatePuzzledifficulty(difficulty);
-    dispatch({ type: 'NEW_GAME', payload: { board: puzzle, solution, difficulty } });
+    dispatch({
+      type: 'NEW_GAME',
+      payload: { board: puzzle, solution, difficulty },
+    });
     setIsReady(true);
     setIsPaused(false);
   };
@@ -400,7 +439,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     sourceRow: number | undefined,
     sourceCol: number | undefined,
     targetRow: number,
-    targetCol: number
+    targetCol: number,
   ) =>
     !state.dragValue ||
     fixedCells[targetRow][targetCol] ||
@@ -412,7 +451,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   const deductScoreForValidCell = (
     conflicts: Map<string, number>,
     row: number,
-    col: number
+    col: number,
   ): number => {
     return conflicts.has(`${row},${col}`) ? 0 : -SCORE_REMOVED_VALID_CELL;
   };
@@ -444,7 +483,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         newConflicts,
         sourceRow,
         sourceCol,
-        sourceValue
+        sourceValue,
       );
     }
 
@@ -455,7 +494,10 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     playSound('/game/audio/metronome.mp3', { pitch: 0.9 });
 
     dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
-    dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
+    dispatch({
+      type: 'SET_SCORE',
+      score: Math.max(state.score + deltaScore, 0),
+    });
     dispatch({ type: 'SET_DRAG_VALUE', value: null });
     dispatch({ type: 'RESET_SELECTION' });
   };
@@ -468,7 +510,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     sourceRow: number | undefined,
     sourceCol: number | undefined,
     targetRow: number,
-    targetCol: number
+    targetCol: number,
   ) => {
     if (isPaused || state.status !== 'playing') return;
 
@@ -501,7 +543,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         newConflicts,
         sourceRow,
         sourceCol,
-        sourceValue
+        sourceValue,
       );
     }
 
@@ -518,7 +560,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         newConflicts,
         targetRow,
         targetCol,
-        currentTargetValue
+        currentTargetValue,
       );
     }
 
@@ -544,7 +586,10 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     dispatch({ type: 'UPDATE_BOARD', board: newBoard });
     dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
     dispatch({ type: 'SET_LIVES', lives: newLives });
-    dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
+    dispatch({
+      type: 'SET_SCORE',
+      score: Math.max(state.score + deltaScore, 0),
+    });
     dispatch({ type: 'SELECT_CELL', row: targetRow, col: targetCol });
     dispatch({ type: 'SET_DRAG_VALUE', value: null });
 
@@ -555,7 +600,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         board: newBoard,
         conflicts: newConflicts,
         lives: newLives,
-        score: Math.max(state.score + deltaScore, 0)
+        score: Math.max(state.score + deltaScore, 0),
       });
     } else if (isGameWon(newBoard, newConflicts)) {
       handleGameCompletion('win', {
@@ -563,7 +608,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         board: newBoard,
         conflicts: newConflicts,
         lives: newLives,
-        score: Math.max(state.score + deltaScore, 0)
+        score: Math.max(state.score + deltaScore, 0),
       });
     }
   };
@@ -634,7 +679,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         newConflicts,
         row,
         col,
-        currentTargetValue
+        currentTargetValue,
       );
     }
 
@@ -663,7 +708,10 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     dispatch({ type: 'UPDATE_BOARD', board: newBoard });
     dispatch({ type: 'SET_CONFLICTS', conflicts: newConflicts });
     dispatch({ type: 'SET_LIVES', lives: newLives });
-    dispatch({ type: 'SET_SCORE', score: Math.max(state.score + deltaScore, 0) });
+    dispatch({
+      type: 'SET_SCORE',
+      score: Math.max(state.score + deltaScore, 0),
+    });
     // dispatch({ type: 'SELECT_CELL', row: row, col: col });
     dispatch({ type: 'SET_DRAG_VALUE', value: null });
 
@@ -674,7 +722,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         board: newBoard,
         conflicts: newConflicts,
         lives: newLives,
-        score: Math.max(state.score + deltaScore, 0)
+        score: Math.max(state.score + deltaScore, 0),
       });
     } else if (isGameWon(newBoard, newConflicts)) {
       handleGameCompletion('win', {
@@ -682,7 +730,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         board: newBoard,
         conflicts: newConflicts,
         lives: newLives,
-        score: Math.max(state.score + deltaScore, 0)
+        score: Math.max(state.score + deltaScore, 0),
       });
     }
   };
@@ -706,7 +754,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
 
     // Pick a random cell
     const randomIndex = Math.floor(
-      crypto.getRandomValues(new Uint32Array(1))[0] % emptyCells.length
+      crypto.getRandomValues(new Uint32Array(1))[0] % emptyCells.length,
     );
     const { r, c } = emptyCells[randomIndex];
 
@@ -730,14 +778,14 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         ...state,
         board: newBoard,
         conflicts: newConflicts,
-        lives: newLives
+        lives: newLives,
       });
     } else if (isGameWon(newBoard, newConflicts)) {
       handleGameCompletion('win', {
         ...state,
         board: newBoard,
         conflicts: newConflicts,
-        lives: newLives
+        lives: newLives,
       });
     }
   };
@@ -747,7 +795,10 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
    * For logged-in users: saves to server first, caches locally only on failure
    * For anonymous users: saves to localStorage only
    */
-  const handleGameCompletion = async (newStatus: 'win' | 'lose', completedState: GameState) => {
+  const handleGameCompletion = async (
+    newStatus: 'win' | 'lose',
+    completedState: GameState,
+  ) => {
     dispatch({ type: 'SET_STATUS', status: newStatus });
 
     // Only count as a completed match if the game was won
@@ -778,7 +829,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
       board: JSON.stringify(completedState.board),
       originalBoard: JSON.stringify(completedState.originalBoard),
       solution: JSON.stringify(completedState.solution),
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     // Update local state regardless of save method
@@ -794,13 +845,16 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
       try {
         const serverMatch = {
           ...match,
-          userPlayed: auth.currentUser.uid
+          userPlayed: auth.currentUser.uid,
         };
         await saveMatchToServer(auth.currentUser.uid, serverMatch);
         // Server save succeeded - update local state (no localStorage save needed)
         updateLocalState();
       } catch (error) {
-        console.warn('[SudokuGame] Server save failed, caching locally:', error);
+        console.warn(
+          '[SudokuGame] Server save failed, caching locally:',
+          error,
+        );
         // Server save failed - cache to localStorage for later sync
         const result = await saveMatch(match, { isCached: true });
         if (result.success) {
@@ -844,7 +898,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         dispatch,
         togglePause,
         gameOverReady,
-        clearGameOverReady
+        clearGameOverReady,
       }}
     >
       {children}

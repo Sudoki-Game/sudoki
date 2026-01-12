@@ -16,7 +16,7 @@ export async function getServerUser(): Promise<AuthUser | null> {
       uid: decodedToken.uid,
       email: decodedToken.email || null,
       emailVerified: decodedToken.email_verified || false,
-      displayName: decodedToken.name || null
+      displayName: decodedToken.name || null,
     };
 
     return authUser;

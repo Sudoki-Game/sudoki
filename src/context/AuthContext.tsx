@@ -1,6 +1,12 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react';
 import { createSession, removeSession } from '@/app/actions/auth';
 import { UserStats } from '@/types/auth';
 import { onAuthStateChanged } from '@/lib/firebase/auth';
@@ -43,7 +49,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return null;
   };
 
-  return <AuthContext.Provider value={{ loading, getUserData }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ loading, getUserData }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export const useAuth = (): AuthContextType => {

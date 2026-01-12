@@ -12,7 +12,7 @@ import { ClientMatch } from '@/match/types';
 import {
   prepareTransferData,
   mergeWithServerData,
-  clearLocalDataAfterTransfer
+  clearLocalDataAfterTransfer,
 } from '../sync';
 
 /**
@@ -31,7 +31,7 @@ function createTestMatch(overrides: Partial<ClientMatch> = {}): ClientMatch {
     originalBoard: '[]',
     solution: '[]',
     timestamp: Date.now(),
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -41,14 +41,14 @@ describe('prepareTransferData', () => {
       id: 'match-1',
       score: 200,
       timestamp: Date.now() - 86400000 * 2,
-      streakBonus: 0
+      streakBonus: 0,
     }),
     createTestMatch({
       id: 'match-2',
       score: 300,
       timestamp: Date.now() - 86400000,
-      streakBonus: 200
-    })
+      streakBonus: 200,
+    }),
   ];
 
   it('should prepare transfer data with matches and recalculated stats', () => {
@@ -70,7 +70,7 @@ describe('prepareTransferData', () => {
   it('should sort matches by timestamp', () => {
     const unsortedMatches: ClientMatch[] = [
       createTestMatch({ id: 'match-later', timestamp: 3000 }),
-      createTestMatch({ id: 'match-earlier', timestamp: 1000 })
+      createTestMatch({ id: 'match-earlier', timestamp: 1000 }),
     ];
 
     const result = prepareTransferData(unsortedMatches);
@@ -86,14 +86,14 @@ describe('mergeWithServerData', () => {
       id: 'local-1',
       score: 100,
       timestamp: Date.now() - 86400000 * 3, // 3 days ago
-      streakBonus: 0
+      streakBonus: 0,
     }),
     createTestMatch({
       id: 'local-2',
       score: 200,
       timestamp: Date.now() - 86400000, // Yesterday
-      streakBonus: 0
-    })
+      streakBonus: 0,
+    }),
   ];
 
   const serverMatches: ClientMatch[] = [
@@ -101,8 +101,8 @@ describe('mergeWithServerData', () => {
       id: 'server-1',
       score: 250,
       timestamp: Date.now() - 86400000, // Yesterday (conflict with local-2)
-      streakBonus: 200
-    })
+      streakBonus: 200,
+    }),
   ];
 
   it('should merge local and server matches', () => {
@@ -117,13 +117,13 @@ describe('mergeWithServerData', () => {
 
     // The match from yesterday should be the server match
     const yesterdayMatch = result.mergedMatches.find(
-      (m: ClientMatch) => m.id === 'server-1'
+      (m: ClientMatch) => m.id === 'server-1',
     );
     expect(yesterdayMatch).toBeDefined();
 
     // Local-2 should not be included
     const localYesterdayMatch = result.mergedMatches.find(
-      (m: ClientMatch) => m.id === 'local-2'
+      (m: ClientMatch) => m.id === 'local-2',
     );
     expect(localYesterdayMatch).toBeUndefined();
   });
@@ -142,8 +142,8 @@ describe('mergeWithServerData', () => {
     expect(result.mergedMatches).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'local-1' }),
-        expect.objectContaining({ id: 'local-2' })
-      ])
+        expect.objectContaining({ id: 'local-2' }),
+      ]),
     );
   });
 

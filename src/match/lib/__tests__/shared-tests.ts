@@ -1,16 +1,19 @@
 /**
  * Shared Match Tests
- * 
+ *
  * These tests are run against both localStorage (client) and Firestore (server)
  * to ensure consistent behavior across both storage backends.
- * 
+ *
  * Test categories:
  * 1. Match history operations (save, retrieve, ordering)
  * 2. Streak calculation compatibility
  * 3. Score and bonus preservation
  */
 
-import { calculateStreakFromMatches, calculateStreakBonus } from '@/user/lib/stats';
+import {
+  calculateStreakFromMatches,
+  calculateStreakBonus,
+} from '@/user/lib/stats';
 import type { BaseMatch } from '@/match/types';
 
 /**
@@ -28,7 +31,7 @@ export function daysAgo(n: number): Date {
  */
 export function createBaseMatchForDate(
   date: Date,
-  overrides: Partial<BaseMatch> = {}
+  overrides: Partial<BaseMatch> = {},
 ): BaseMatch {
   const timestamp = date.getTime();
   return {
@@ -43,7 +46,7 @@ export function createBaseMatchForDate(
     originalBoard: '[]',
     solution: '[]',
     timestamp,
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -64,7 +67,7 @@ export interface MatchStorageAdapter<T extends BaseMatch> {
  */
 export function runSharedMatchTests<T extends BaseMatch>(
   adapterName: string,
-  getAdapter: () => MatchStorageAdapter<T>
+  getAdapter: () => MatchStorageAdapter<T>,
 ) {
   describe(`[${adapterName}] Match History Operations`, () => {
     let adapter: MatchStorageAdapter<T>;
@@ -120,7 +123,9 @@ export function runSharedMatchTests<T extends BaseMatch>(
 
     describe('getTodaysMatch', () => {
       it('should return match from today', async () => {
-        const todayMatch = adapter.createMatch(new Date(), { id: 'today_match' });
+        const todayMatch = adapter.createMatch(new Date(), {
+          id: 'today_match',
+        });
         await adapter.saveMatch(todayMatch);
 
         const retrieved = await adapter.getTodaysMatch();
@@ -175,7 +180,9 @@ export function runSharedMatchTests<T extends BaseMatch>(
     });
 
     it('should return matches with timestamps for streak calculation', async () => {
-      const yesterdayMatch = adapter.createMatch(daysAgo(1), { id: 'yesterday' });
+      const yesterdayMatch = adapter.createMatch(daysAgo(1), {
+        id: 'yesterday',
+      });
       const todayMatch = adapter.createMatch(new Date(), { id: 'today' });
 
       await adapter.saveMatch(yesterdayMatch);
@@ -185,7 +192,7 @@ export function runSharedMatchTests<T extends BaseMatch>(
 
       // History should have all matches needed for streak calculation
       expect(history).toHaveLength(2);
-      expect(history.every(m => typeof m.timestamp === 'number')).toBe(true);
+      expect(history.every((m) => typeof m.timestamp === 'number')).toBe(true);
 
       // Should be sorted by timestamp (oldest first) for streak algorithms
       expect(history[0].id).toBe('yesterday');
@@ -196,7 +203,7 @@ export function runSharedMatchTests<T extends BaseMatch>(
       const match = adapter.createMatch(new Date(), {
         id: 'with_bonus',
         score: 500,
-        streakBonus: 200
+        streakBonus: 200,
       });
       await adapter.saveMatch(match);
 
@@ -217,7 +224,7 @@ export function runSharedMatchTests<T extends BaseMatch>(
       expect(history).toHaveLength(3);
 
       // Verify dates are on different days
-      const dates = history.map(m => new Date(m.timestamp).toDateString());
+      const dates = history.map((m) => new Date(m.timestamp).toDateString());
       const uniqueDates = new Set(dates);
       expect(uniqueDates.size).toBe(3);
     });
@@ -235,8 +242,8 @@ export function runSharedMatchTests<T extends BaseMatch>(
 
       history = await adapter.getMatchHistory();
       expect(history).toHaveLength(2);
-      expect(history.map(m => m.id)).toContain('old');
-      expect(history.map(m => m.id)).toContain('new');
+      expect(history.map((m) => m.id)).toContain('old');
+      expect(history.map((m) => m.id)).toContain('new');
     });
 
     it('should calculate correct streak bonus from history', async () => {
@@ -294,7 +301,9 @@ export function runSharedMatchTests<T extends BaseMatch>(
     it('should preserve bestStreak when current streak is lower', async () => {
       // Old 5-day streak (broken)
       for (let i = 0; i < 5; i++) {
-        await adapter.saveMatch(adapter.createMatch(daysAgo(10 - i), { id: `old_${i}` }));
+        await adapter.saveMatch(
+          adapter.createMatch(daysAgo(10 - i), { id: `old_${i}` }),
+        );
       }
       // Gap, then new streak starting yesterday
       await adapter.saveMatch(adapter.createMatch(daysAgo(1), { id: 'new_1' }));

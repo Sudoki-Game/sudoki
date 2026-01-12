@@ -19,7 +19,10 @@ const audioCache: Record<string, HTMLAudioElement> = {};
 /**
  * Plays a sound and returns the cached HTMLAudioElement instance.
  */
-export function playSound(src: string, options: PlaySoundOptions = {}): HTMLAudioElement | null {
+export function playSound(
+  src: string,
+  options: PlaySoundOptions = {},
+): HTMLAudioElement | null {
   if (typeof window === 'undefined') return null; // SSR guard
 
   let audio = audioCache[src];

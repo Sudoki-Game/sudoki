@@ -6,7 +6,10 @@
   font-family: 'Bear Days';
   font-size: 1.5rem;
 
-  transition: all 0.15s, border-width 0s, box-shadow 0s ease-in-out;
+  transition:
+    all 0.15s,
+    border-width 0s,
+    box-shadow 0s ease-in-out;
 
   width: 3.25rem;
   height: 3.25rem;
@@ -39,7 +42,9 @@
     transform: scale(1.5);
     padding-bottom: 0;
 
-    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.25);
+    box-shadow:
+      2px 4px 10px rgba(0, 0, 0, 0.15),
+      0 1px 2px rgba(0, 0, 0, 0.25);
 
     @media (max-height: 480px) {
       transform: scale(0.5);

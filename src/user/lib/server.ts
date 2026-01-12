@@ -6,7 +6,10 @@
 
 import { serverDb } from '@/lib/firebase/server';
 import type { ServerUserData } from '@/user/types';
-import { createInitialServerUserData, hasCompletedOnboarding } from '@/user/types';
+import {
+  createInitialServerUserData,
+  hasCompletedOnboarding,
+} from '@/user/types';
 
 /** Firestore collection name for users */
 export const USERS_COLLECTION = 'users';
@@ -14,7 +17,9 @@ export const USERS_COLLECTION = 'users';
 /**
  * Get user data from Firestore
  */
-export async function getUserData(userId: string): Promise<ServerUserData | null> {
+export async function getUserData(
+  userId: string,
+): Promise<ServerUserData | null> {
   try {
     const userRef = serverDb.collection(USERS_COLLECTION).doc(userId);
     const userDoc = await userRef.get();
@@ -50,7 +55,7 @@ export async function userExists(userId: string): Promise<boolean> {
 export async function createUser(
   userId: string,
   email: string | null,
-  displayName: string = ''
+  displayName: string = '',
 ): Promise<ServerUserData> {
   const userData = createInitialServerUserData(userId, email, displayName);
 
@@ -65,13 +70,13 @@ export async function createUser(
  */
 export async function updateUser(
   userId: string,
-  updates: Partial<ServerUserData>
+  updates: Partial<ServerUserData>,
 ): Promise<boolean> {
   try {
     const userRef = serverDb.collection(USERS_COLLECTION).doc(userId);
     await userRef.update({
       ...updates,
-      lastActive: Date.now()
+      lastActive: Date.now(),
     });
     return true;
   } catch (error) {
@@ -83,14 +88,19 @@ export async function updateUser(
 /**
  * Update user display name
  */
-export async function updateDisplayName(userId: string, displayName: string): Promise<boolean> {
+export async function updateDisplayName(
+  userId: string,
+  displayName: string,
+): Promise<boolean> {
   return updateUser(userId, { displayName: displayName.trim() });
 }
 
 /**
  * Check if user has completed onboarding (server version)
  */
-export async function checkOnboardingComplete(userId: string): Promise<boolean> {
+export async function checkOnboardingComplete(
+  userId: string,
+): Promise<boolean> {
   const userData = await getUserData(userId);
   return hasCompletedOnboarding(userData);
 }
@@ -100,7 +110,7 @@ export async function checkOnboardingComplete(userId: string): Promise<boolean> 
  */
 export async function isDisplayNameTaken(
   displayName: string,
-  excludeUserId?: string
+  excludeUserId?: string,
 ): Promise<boolean> {
   try {
     const usersRef = serverDb
@@ -131,7 +141,7 @@ export async function isDisplayNameTaken(
  */
 export async function getOrCreateUser(
   userId: string,
-  email: string | null
+  email: string | null,
 ): Promise<ServerUserData> {
   const existingUser = await getUserData(userId);
 

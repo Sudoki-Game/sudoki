@@ -3,13 +3,21 @@
  *
  * Handles uploading cached matches to the server.
  * Cached matches are created when a logged-in user's server save fails.
- * 
+ *
  * This is a client-side module that uses server actions for server operations.
  */
 
 import type { ClientMatch, ServerMatch } from '@/match/types';
-import { getCachedMatches, clearCacheFlags, getMatchHistory, clearMatchHistory } from './client';
-import { hasMatchForDate, saveMatch as saveMatchToServer } from '@/app/actions/match';
+import {
+  getCachedMatches,
+  clearCacheFlags,
+  getMatchHistory,
+  clearMatchHistory,
+} from './client';
+import {
+  hasMatchForDate,
+  saveMatch as saveMatchToServer,
+} from '@/app/actions/match';
 
 /**
  * Result of cache upload operation
@@ -30,12 +38,14 @@ export interface CacheUploadResult {
  * @param userId - The authenticated user's ID
  * @returns Upload result with counts
  */
-export async function uploadAllLocalMatches(userId: string): Promise<CacheUploadResult> {
+export async function uploadAllLocalMatches(
+  userId: string,
+): Promise<CacheUploadResult> {
   const result: CacheUploadResult = {
     success: true,
     uploaded: 0,
     skipped: 0,
-    failed: 0
+    failed: 0,
   };
 
   try {
@@ -47,7 +57,9 @@ export async function uploadAllLocalMatches(userId: string): Promise<CacheUpload
       return result;
     }
 
-    console.log(`[MatchSync] Found ${localMatches.length} local matches to upload`);
+    console.log(
+      `[MatchSync] Found ${localMatches.length} local matches to upload`,
+    );
 
     for (const match of localMatches) {
       try {
@@ -55,7 +67,9 @@ export async function uploadAllLocalMatches(userId: string): Promise<CacheUpload
         const alreadyExists = await hasMatchForDate(userId, match.timestamp);
 
         if (alreadyExists) {
-          console.log(`[MatchSync] Match ${match.id} skipped - server already has match for this date`);
+          console.log(
+            `[MatchSync] Match ${match.id} skipped - server already has match for this date`,
+          );
           result.skipped++;
           continue;
         }
@@ -70,7 +84,9 @@ export async function uploadAllLocalMatches(userId: string): Promise<CacheUpload
           console.log(`[MatchSync] Match ${match.id} uploaded successfully`);
           result.uploaded++;
         } else {
-          console.warn(`[MatchSync] Match ${match.id} failed to upload: ${saveResult.error}`);
+          console.warn(
+            `[MatchSync] Match ${match.id} failed to upload: ${saveResult.error}`,
+          );
           result.failed++;
         }
       } catch (error) {
@@ -82,21 +98,24 @@ export async function uploadAllLocalMatches(userId: string): Promise<CacheUpload
     // If all matches were uploaded successfully, clear localStorage
     // to avoid duplicate data (server is now source of truth)
     if (result.failed === 0) {
-      console.log('[MatchSync] All local matches synced, clearing localStorage');
+      console.log(
+        '[MatchSync] All local matches synced, clearing localStorage',
+      );
       clearMatchHistory();
     }
 
     result.success = result.failed === 0;
     return result;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     console.error('[MatchSync] Error during local match upload:', errorMessage);
     return {
       success: false,
       uploaded: result.uploaded,
       skipped: result.skipped,
       failed: result.failed,
-      error: errorMessage
+      error: errorMessage,
     };
   }
 }
@@ -108,12 +127,14 @@ export async function uploadAllLocalMatches(userId: string): Promise<CacheUpload
  * @param userId - The authenticated user's ID
  * @returns Upload result with counts
  */
-export async function uploadCachedMatches(userId: string): Promise<CacheUploadResult> {
+export async function uploadCachedMatches(
+  userId: string,
+): Promise<CacheUploadResult> {
   const result: CacheUploadResult = {
     success: true,
     uploaded: 0,
     skipped: 0,
-    failed: 0
+    failed: 0,
   };
 
   try {
@@ -124,7 +145,9 @@ export async function uploadCachedMatches(userId: string): Promise<CacheUploadRe
       return result;
     }
 
-    console.log(`[MatchSync] Found ${cachedMatches.length} cached matches to upload`);
+    console.log(
+      `[MatchSync] Found ${cachedMatches.length} cached matches to upload`,
+    );
 
     const successfullyUploaded: string[] = [];
 
@@ -134,7 +157,9 @@ export async function uploadCachedMatches(userId: string): Promise<CacheUploadRe
         const alreadyExists = await hasMatchForDate(userId, match.timestamp);
 
         if (alreadyExists) {
-          console.log(`[MatchSync] Match ${match.id} skipped - server already has match for this date`);
+          console.log(
+            `[MatchSync] Match ${match.id} skipped - server already has match for this date`,
+          );
           result.skipped++;
           // Still clear the cache flag since we don't need to retry
           successfullyUploaded.push(match.id);
@@ -144,7 +169,7 @@ export async function uploadCachedMatches(userId: string): Promise<CacheUploadRe
         // Convert to ServerMatch
         const serverMatch: ServerMatch = {
           ...match,
-          userPlayed: userId
+          userPlayed: userId,
         };
         // Remove client-only isCached property
         delete (serverMatch as ClientMatch).isCached;
@@ -157,7 +182,9 @@ export async function uploadCachedMatches(userId: string): Promise<CacheUploadRe
           result.uploaded++;
           successfullyUploaded.push(match.id);
         } else {
-          console.warn(`[MatchSync] Match ${match.id} failed to upload: ${saveResult.error}`);
+          console.warn(
+            `[MatchSync] Match ${match.id} failed to upload: ${saveResult.error}`,
+          );
           result.failed++;
         }
       } catch (error) {
@@ -174,14 +201,15 @@ export async function uploadCachedMatches(userId: string): Promise<CacheUploadRe
     result.success = result.failed === 0;
     return result;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     console.error('[MatchSync] Error during cache upload:', errorMessage);
     return {
       success: false,
       uploaded: result.uploaded,
       skipped: result.skipped,
       failed: result.failed,
-      error: errorMessage
+      error: errorMessage,
     };
   }
 }
@@ -195,6 +223,6 @@ export function toServerMatch(match: ClientMatch, userId: string): ServerMatch {
   const { isCached: _isCached, ...baseMatch } = match;
   return {
     ...baseMatch,
-    userPlayed: userId
+    userPlayed: userId,
   };
 }

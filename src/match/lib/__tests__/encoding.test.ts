@@ -9,7 +9,7 @@ import {
   verifyData,
   createSignedPayload,
   extractVerifiedPayload,
-  getHmacKey
+  getHmacKey,
 } from '../encoding';
 
 // Mock the HMAC secret
@@ -138,7 +138,8 @@ describe('extractVerifiedPayload', () => {
   it('should extract and verify a valid payload', async () => {
     const originalData = { id: 'test-123', score: 500 };
     const payload = await createSignedPayload(originalData);
-    const extracted = await extractVerifiedPayload<typeof originalData>(payload);
+    const extracted =
+      await extractVerifiedPayload<typeof originalData>(payload);
 
     expect(extracted).toEqual(originalData);
   });
@@ -150,7 +151,7 @@ describe('extractVerifiedPayload', () => {
     // Tamper with the data
     const tamperedPayload = {
       ...payload,
-      data: base64Encode(JSON.stringify({ id: 'test-123', score: 9999 }))
+      data: base64Encode(JSON.stringify({ id: 'test-123', score: 9999 })),
     };
 
     const extracted = await extractVerifiedPayload(tamperedPayload);
@@ -163,7 +164,7 @@ describe('extractVerifiedPayload', () => {
 
     const invalidPayload = {
       ...payload,
-      sig: 'completely-invalid-signature'
+      sig: 'completely-invalid-signature',
     };
 
     const extracted = await extractVerifiedPayload(invalidPayload);

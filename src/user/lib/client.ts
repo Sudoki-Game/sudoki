@@ -6,7 +6,11 @@
 
 import type { LocalUserData } from '@/user/types';
 import { createDefaultLocalUserData } from '@/user/types';
-import { createSignedPayload, extractVerifiedPayload, SignedPayload } from '@/match/lib/encoding';
+import {
+  createSignedPayload,
+  extractVerifiedPayload,
+  SignedPayload,
+} from '@/match/lib/encoding';
 import type { ClientMatch } from '@/match/types';
 
 /** localStorage key for user data */
@@ -23,13 +27,16 @@ export interface SaveResult {
 /**
  * Save user data to localStorage
  */
-export async function saveUserData(userData: LocalUserData): Promise<SaveResult> {
+export async function saveUserData(
+  userData: LocalUserData,
+): Promise<SaveResult> {
   try {
     const signedPayload = await createSignedPayload(userData);
     localStorage.setItem(USER_DATA_KEY, JSON.stringify(signedPayload));
     return { success: true };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     console.error('[UserClient] Error saving user data:', errorMessage);
     return { success: false, error: errorMessage };
   }
@@ -71,7 +78,7 @@ export function clearUserData(): void {
 /**
  * Update user stats based on a new match (client-side)
  * This should be called after successfully saving a match to localStorage
- * 
+ *
  * Updates incrementally (does not recalculate from match history):
  * - combinedScore: incremented by score + streakBonus
  * - matchesPlayed: incremented by 1
@@ -80,11 +87,13 @@ export function clearUserData(): void {
  * - bestStreak: max of current bestStreak and new dailyStreak
  * - personalBestScore: max of current and new match score
  */
-export async function updateUserStatsFromMatch(match: ClientMatch): Promise<SaveResult> {
+export async function updateUserStatsFromMatch(
+  match: ClientMatch,
+): Promise<SaveResult> {
   try {
     // Get current user data
     const userData = await getUserData();
-    
+
     const finalScore = match.score + (match.streakBonus ?? 0);
     const lastMatchTimestamp = userData.lastMatchTimestamp;
     const currentDailyStreak = userData.dailyStreak;
@@ -97,14 +106,14 @@ export async function updateUserStatsFromMatch(match: ClientMatch): Promise<Save
     } else {
       const lastMatchDate = new Date(lastMatchTimestamp);
       const todayDate = new Date(match.timestamp);
-      
+
       // Normalize to start of day for comparison
       lastMatchDate.setHours(0, 0, 0, 0);
       todayDate.setHours(0, 0, 0, 0);
-      
+
       const diffMs = todayDate.getTime() - lastMatchDate.getTime();
       const diffDays = diffMs / (1000 * 60 * 60 * 24);
-      
+
       if (diffDays === 0) {
         // Same day - keep current streak
         newDailyStreak = currentDailyStreak;
@@ -124,12 +133,13 @@ export async function updateUserStatsFromMatch(match: ClientMatch): Promise<Save
       lastMatchTimestamp: match.timestamp,
       dailyStreak: newDailyStreak,
       bestStreak: Math.max(userData.bestStreak, newDailyStreak),
-      personalBestScore: Math.max(userData.personalBestScore, match.score)
+      personalBestScore: Math.max(userData.personalBestScore, match.score),
     };
 
     return await saveUserData(updatedData);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     console.error('[UserClient] Error updating user stats:', errorMessage);
     return { success: false, error: errorMessage };
   }

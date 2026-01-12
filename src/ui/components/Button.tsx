@@ -9,25 +9,25 @@ const buttonVariants = cva(styles.button, {
       default: '',
       warning: styles.variantWarning,
       ok: styles.variantOk,
-      danger: styles.variantDanger
+      danger: styles.variantDanger,
     },
     size: {
       sm: styles.sizeSm,
       md: '',
       lg: styles.sizeLg,
-      icon: styles.icon
+      icon: styles.icon,
     },
     fill: {
-      true: styles.fill
+      true: styles.fill,
     },
     disabled: {
-      true: styles.disabled
-    }
+      true: styles.disabled,
+    },
   },
   defaultVariants: {
     variant: 'default',
-    size: 'md'
-  }
+    size: 'md',
+  },
 });
 
 export type ButtonProps = React.ComponentPropsWithRef<'button'> &
@@ -46,7 +46,10 @@ const Button = ({
   return (
     <button
       ref={ref}
-      className={clsx(buttonVariants({ variant, size, fill, disabled }), className)}
+      className={clsx(
+        buttonVariants({ variant, size, fill, disabled }),
+        className,
+      )}
       disabled={disabled}
       {...props}
     >

@@ -8,7 +8,7 @@ export type { BaseMatch, ClientMatch, ServerMatch } from '@/match/types';
 export {
   isMatchFromDate,
   isMatchFromToday,
-  generateMatchId
+  generateMatchId,
 } from '@/match/types';
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'im-too-young-to-die';
@@ -88,7 +88,10 @@ export type GameState = {
 };
 
 export type GameAction =
-  | { type: 'NEW_GAME'; payload: { board: Board; solution: Board; difficulty: Difficulty } }
+  | {
+      type: 'NEW_GAME';
+      payload: { board: Board; solution: Board; difficulty: Difficulty };
+    }
   | { type: 'SELECT_CELL'; row: number; col: number }
   | { type: 'SET_CONFLICTS'; conflicts: Map<string, number> }
   | { type: 'AUTO_SOLVE'; row: number; col: number }

@@ -11,7 +11,7 @@ import styles from './OnboardingForm.module.css';
 
 const initialState: OnboardingResult = {
   success: false,
-  error: undefined
+  error: undefined,
 };
 
 function SubmitButton() {
@@ -52,7 +52,9 @@ const OnboardingForm = () => {
         <SubmitButton />
       </Form>
 
-      <p className={styles.infoText}>You can change this later in your settings.</p>
+      <p className={styles.infoText}>
+        You can change this later in your settings.
+      </p>
     </div>
   );
 };

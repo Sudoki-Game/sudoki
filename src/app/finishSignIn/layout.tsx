@@ -4,7 +4,7 @@ import Copyright from '@/components/Copyright';
 import headerStyles from '@/game/components/Header.module.css';
 
 const FinishSignInLayout = async ({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {

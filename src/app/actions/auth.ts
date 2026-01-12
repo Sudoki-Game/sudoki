@@ -8,7 +8,7 @@ import {
   createUserEntry,
   updateUserDisplayName,
   isDisplayNameTaken,
-  hasUserCompletedOnboarding as checkOnboarding
+  hasUserCompletedOnboarding as checkOnboarding,
 } from '@/lib/firebase/firestore';
 
 export async function createSession(idToken: string): Promise<SessionResult> {
@@ -31,14 +31,14 @@ export async function createSession(idToken: string): Promise<SessionResult> {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 5, // 5 days
-      path: '/'
+      path: '/',
     });
 
     return { success: true, uid, isNewUser };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
@@ -61,7 +61,7 @@ export interface OnboardingResult {
 
 export async function completeOnboarding(
   _prevState: OnboardingResult,
-  formData: FormData
+  formData: FormData,
 ): Promise<OnboardingResult> {
   try {
     const displayName = formData.get('displayName');
@@ -77,11 +77,17 @@ export async function completeOnboarding(
     }
 
     if (trimmedName.length < 2) {
-      return { success: false, error: 'Display name must be at least 2 characters' };
+      return {
+        success: false,
+        error: 'Display name must be at least 2 characters',
+      };
     }
 
     if (trimmedName.length > 30) {
-      return { success: false, error: 'Display name cannot exceed 30 characters' };
+      return {
+        success: false,
+        error: 'Display name cannot exceed 30 characters',
+      };
     }
 
     // Check if display name is already taken
@@ -102,7 +108,8 @@ export async function completeOnboarding(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to save display name'
+      error:
+        error instanceof Error ? error.message : 'Failed to save display name',
     };
   }
 }
@@ -111,7 +118,10 @@ export async function completeOnboarding(
  * checkUserOnboarding: Server-side check for middleware to determine if user has completed onboarding.
  * Used by middleware to route authenticated users appropriately.
  */
-export async function checkUserOnboarding(): Promise<{ hasCompleted: boolean; uid?: string }> {
+export async function checkUserOnboarding(): Promise<{
+  hasCompleted: boolean;
+  uid?: string;
+}> {
   try {
     const session = await getSession();
     if (!session) {

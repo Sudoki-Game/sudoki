@@ -6,7 +6,7 @@ import {
   saveUserData,
   getUserData,
   clearUserData,
-  USER_DATA_KEY
+  USER_DATA_KEY,
 } from '../client';
 import type { LocalUserData } from '@/user/types';
 import { createDefaultLocalUserData } from '@/user/types';
@@ -20,7 +20,9 @@ const originalEnv = process.env;
 /**
  * Create test user data
  */
-function createTestUserData(overrides: Partial<LocalUserData> = {}): LocalUserData {
+function createTestUserData(
+  overrides: Partial<LocalUserData> = {},
+): LocalUserData {
   return {
     ...createDefaultLocalUserData(),
     combinedScore: 1000,
@@ -29,7 +31,7 @@ function createTestUserData(overrides: Partial<LocalUserData> = {}): LocalUserDa
     matchesPlayed: 20,
     personalBestScore: 500,
     lastMatchTimestamp: Date.now(),
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -106,7 +108,9 @@ describe('getUserData', () => {
     if (storedData) {
       const parsed = JSON.parse(storedData);
       // Change the data but keep the old signature
-      parsed.data = Buffer.from(JSON.stringify({ combinedScore: 99999 })).toString('base64');
+      parsed.data = Buffer.from(
+        JSON.stringify({ combinedScore: 99999 }),
+      ).toString('base64');
       localStorage.setItem(USER_DATA_KEY, JSON.stringify(parsed));
     }
 

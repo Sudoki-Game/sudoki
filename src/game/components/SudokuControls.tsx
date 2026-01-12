@@ -41,7 +41,7 @@ const SudokuControls = () => {
               isFixed: false,
               isAutoSolved: false,
               isOver: false,
-              onClick: () => handleClick(i + 1)
+              onClick: () => handleClick(i + 1),
             }}
           />
         ))}
@@ -53,7 +53,12 @@ const SudokuControls = () => {
           size={'icon'}
           onClick={autoSolve}
         >
-          <Image src={'/game/auto-solve.svg'} alt={'Auto-Solve Icon'} height={28} width={28} />
+          <Image
+            src={'/game/auto-solve.svg'}
+            alt={'Auto-Solve Icon'}
+            height={28}
+            width={28}
+          />
         </Button>
       </div>
     </div>

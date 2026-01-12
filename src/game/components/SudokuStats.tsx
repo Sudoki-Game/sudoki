@@ -12,7 +12,9 @@ const SudokuStats = ({ score, lives }: SudokuStatsProps) => {
     <div className={styles.stats}>
       <div className={styles.statContainer}>
         <span className={styles.stat}>Score</span>
-        <span className={`${styles.stat} ${styles.statNumerical}`}>{score}</span>
+        <span className={`${styles.stat} ${styles.statNumerical}`}>
+          {score}
+        </span>
       </div>
 
       <div className={styles.livesContainer}>
@@ -33,7 +35,7 @@ const SudokuStats = ({ score, lives }: SudokuStatsProps) => {
               height={28}
               width={28}
             />
-          )
+          ),
         )}
       </div>
     </div>

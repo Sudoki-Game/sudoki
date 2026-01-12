@@ -9,9 +9,11 @@
  * Detect if we're running in Node.js (including Jest tests)
  */
 function isNodeEnvironment(): boolean {
-  return typeof process !== 'undefined' && 
-         typeof process.versions !== 'undefined' && 
-         typeof process.versions.node !== 'undefined';
+  return (
+    typeof process !== 'undefined' &&
+    typeof process.versions !== 'undefined' &&
+    typeof process.versions.node !== 'undefined'
+  );
 }
 
 /**
@@ -21,7 +23,9 @@ function isNodeEnvironment(): boolean {
 export function getHmacKey(): string {
   const secret = process.env.NEXT_PUBLIC_HMAC_SECRET;
   if (!secret) {
-    throw new Error('HMAC secret not configured. Set NEXT_PUBLIC_HMAC_SECRET environment variable.');
+    throw new Error(
+      'HMAC secret not configured. Set NEXT_PUBLIC_HMAC_SECRET environment variable.',
+    );
   }
   return secret;
 }
@@ -35,9 +39,11 @@ export function base64Encode(str: string): string {
     return Buffer.from(str, 'utf-8').toString('base64');
   } else {
     // Browser environment
-    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
-      String.fromCharCode(parseInt(p1, 16))
-    ));
+    return btoa(
+      encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
+        String.fromCharCode(parseInt(p1, 16)),
+      ),
+    );
   }
 }
 
@@ -54,7 +60,7 @@ export function base64Decode(str: string): string {
       atob(str)
         .split('')
         .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
+        .join(''),
     );
   }
 }
@@ -97,10 +103,14 @@ async function hmacSha256Browser(key: string, data: string): Promise<string> {
     keyData.buffer as ArrayBuffer,
     { name: 'HMAC', hash: 'SHA-256' },
     false,
-    ['sign']
+    ['sign'],
   );
 
-  const signature = await crypto.subtle.sign('HMAC', cryptoKey, dataBytes.buffer as ArrayBuffer);
+  const signature = await crypto.subtle.sign(
+    'HMAC',
+    cryptoKey,
+    dataBytes.buffer as ArrayBuffer,
+  );
   return arrayBufferToHex(signature);
 }
 
@@ -128,12 +138,20 @@ export async function signData(data: string): Promise<string> {
  * Verify data against an HMAC signature
  * @returns true if signature is valid
  */
-export async function verifyData(data: string, signature: string): Promise<boolean> {
+export async function verifyData(
+  data: string,
+  signature: string,
+): Promise<boolean> {
   try {
     const expectedSignature = await signData(data);
     // Constant-time comparison to prevent timing attacks
     if (expectedSignature.length !== signature.length) {
-      console.warn('[Encoding] Signature length mismatch:', expectedSignature.length, 'vs', signature.length);
+      console.warn(
+        '[Encoding] Signature length mismatch:',
+        expectedSignature.length,
+        'vs',
+        signature.length,
+      );
       return false;
     }
     let result = 0;
@@ -141,7 +159,9 @@ export async function verifyData(data: string, signature: string): Promise<boole
       result |= expectedSignature.charCodeAt(i) ^ signature.charCodeAt(i);
     }
     if (result !== 0) {
-      console.warn('[Encoding] Signature mismatch - data may have been signed with different key');
+      console.warn(
+        '[Encoding] Signature mismatch - data may have been signed with different key',
+      );
     }
     return result === 0;
   } catch (error) {
@@ -170,7 +190,7 @@ export async function createSignedPayload<T>(data: T): Promise<SignedPayload> {
 
   return {
     data: encodedData,
-    sig: signature
+    sig: signature,
   };
 }
 
@@ -179,14 +199,18 @@ export async function createSignedPayload<T>(data: T): Promise<SignedPayload> {
  * @param payload Signed payload object
  * @returns Decoded data if valid, null if tampered or invalid
  */
-export async function extractVerifiedPayload<T>(payload: SignedPayload): Promise<T | null> {
+export async function extractVerifiedPayload<T>(
+  payload: SignedPayload,
+): Promise<T | null> {
   try {
     const { data, sig } = payload;
 
     // Verify signature
     const isValid = await verifyData(data, sig);
     if (!isValid) {
-      console.warn('[Encoding] Invalid signature detected - possible tampering');
+      console.warn(
+        '[Encoding] Invalid signature detected - possible tampering',
+      );
       return null;
     }
 

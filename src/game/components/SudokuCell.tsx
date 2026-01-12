@@ -18,8 +18,8 @@ const sudokuCellVariants = cva(styles.cell, {
     autoSolved: { true: styles.cellWarning },
     danger: { true: styles.cellDanger },
     highlight: { true: styles.cellHighlight },
-    noOutline: { true: styles.cellNoOutline }
-  }
+    noOutline: { true: styles.cellNoOutline },
+  },
 });
 
 export type SudokuCellProps = {
@@ -52,9 +52,9 @@ const SudokuCell = ({
       autoSolved: !isSelected && isAutoSolved,
       danger: !isSelected && isConflicting,
       highlight: !isConflicting && !isSelected && (isRelated || isOver),
-      noOutline: isRelated && !isSelected
+      noOutline: isRelated && !isSelected,
     }),
-    className
+    className,
   );
 
   return (

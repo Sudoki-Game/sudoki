@@ -9,7 +9,7 @@ export type BugReportState = {
 
 export async function reportBug(
   _prevState: BugReportState,
-  formData: FormData
+  formData: FormData,
 ): Promise<BugReportState> {
   try {
     const email = formData.get('email') as string | null;
@@ -20,7 +20,7 @@ export async function reportBug(
     if (!category || !description) {
       return {
         success: false,
-        message: 'Category and description are required.'
+        message: 'Category and description are required.',
       };
     }
 
@@ -30,8 +30,8 @@ export async function reportBug(
       secure: false,
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
+        pass: process.env.EMAIL_PASS,
+      },
     });
 
     await transporter.sendMail({
@@ -50,18 +50,18 @@ ${description}
 
 <h3>Steps to Reproduce:</h3>
 ${steps || 'Not provided'}
-      `
+      `,
     });
 
     return {
       success: true,
-      message: 'Bug report sent successfully. Thank you!'
+      message: 'Bug report sent successfully. Thank you!',
     };
   } catch (error) {
     console.error(error);
     return {
       success: false,
-      message: 'Failed to send bug report. Please try again later.'
+      message: 'Failed to send bug report. Please try again later.',
     };
   }
 }

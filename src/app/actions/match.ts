@@ -7,33 +7,41 @@
  * These are called from client components via RPC.
  */
 
-import { 
-  hasMatchForDate as hasMatchForDateServer, 
+import {
+  hasMatchForDate as hasMatchForDateServer,
   saveMatch as saveMatchServer,
   getTodaysMatch as getTodaysMatchServer,
   hasPlayedToday as hasPlayedTodayServer,
-  getMatchHistory as getMatchHistoryServer
+  getMatchHistory as getMatchHistoryServer,
 } from '@/match/lib/server';
 import type { ServerMatch } from '@/match/types';
 
 /**
  * Check if user has a match for a specific date
  */
-export async function hasMatchForDate(userId: string, timestamp: number): Promise<boolean> {
+export async function hasMatchForDate(
+  userId: string,
+  timestamp: number,
+): Promise<boolean> {
   return hasMatchForDateServer(userId, timestamp);
 }
 
 /**
  * Save a match to the server
  */
-export async function saveMatch(userId: string, match: ServerMatch): Promise<{ success: boolean; error?: string }> {
+export async function saveMatch(
+  userId: string,
+  match: ServerMatch,
+): Promise<{ success: boolean; error?: string }> {
   return saveMatchServer(userId, match);
 }
 
 /**
  * Get today's match for a user from the server
  */
-export async function getTodaysMatch(userId: string): Promise<ServerMatch | null> {
+export async function getTodaysMatch(
+  userId: string,
+): Promise<ServerMatch | null> {
   return getTodaysMatchServer(userId);
 }
 

@@ -35,7 +35,13 @@ interface CellConfig {
  * @param showSolution - If true, displays the solution grid; otherwise, displays the current game board.
  * @returns The rendered Sudoku grid as a set of blocks and cells.
  */
-const SudokuGrid = ({ game, isReady, showSolution, handleClick, ref }: SudokuGridProps) => {
+const SudokuGrid = ({
+  game,
+  isReady,
+  showSolution,
+  handleClick,
+  ref,
+}: SudokuGridProps) => {
   /**
    * Check if a given cell is selected.
    */
@@ -56,7 +62,7 @@ const SudokuGrid = ({ game, isReady, showSolution, handleClick, ref }: SudokuGri
         blockRow,
         blockCol,
         row: blockRow * 3 + Math.floor(cellIdx / 3),
-        col: blockCol * 3 + (cellIdx % 3)
+        col: blockCol * 3 + (cellIdx % 3),
       });
     }
   }
@@ -87,7 +93,11 @@ const SudokuGrid = ({ game, isReady, showSolution, handleClick, ref }: SudokuGri
           key={`${blockIdx}-${cellIdx}`}
           cellValue={game.solution[row][col]}
           disabled={true}
-          isSelected={!isAutoSolved && !isFixed && game.board[row][col] === game.solution[row][col]}
+          isSelected={
+            !isAutoSolved &&
+            !isFixed &&
+            game.board[row][col] === game.solution[row][col]
+          }
           isRelated={false}
           isConflicting={false}
           isFixed={isFixed}
@@ -97,7 +107,8 @@ const SudokuGrid = ({ game, isReady, showSolution, handleClick, ref }: SudokuGri
       );
     }
 
-    const { cellKey, isAutoSolved, isFixed, isImmutable } = getCellPropsLive(config);
+    const { cellKey, isAutoSolved, isFixed, isImmutable } =
+      getCellPropsLive(config);
 
     // Immutable cells
     if (isImmutable) {
@@ -171,10 +182,15 @@ const SudokuGrid = ({ game, isReady, showSolution, handleClick, ref }: SudokuGri
   }
 
   return (
-    <div ref={ref} className={`${styles.grid} ${showSolution ? styles.gridShowSolution : ''}`}>
+    <div
+      ref={ref}
+      className={`${styles.grid} ${showSolution ? styles.gridShowSolution : ''}`}
+    >
       {Array.from({ length: 9 }).map((_, blockIdx) => (
         <div key={`block-${blockIdx}`} className={styles.block}>
-          {cellConfigs.filter((c) => c.blockIdx === blockIdx).map((config) => renderCell(config))}
+          {cellConfigs
+            .filter((c) => c.blockIdx === blockIdx)
+            .map((config) => renderCell(config))}
         </div>
       ))}
     </div>

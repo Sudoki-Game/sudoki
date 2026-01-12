@@ -3,7 +3,11 @@
 import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { SessionResult } from '@/types';
-import { mapFirebaseError, sendMagicLink, signInWithGoogle } from '@/lib/firebase/auth';
+import {
+  mapFirebaseError,
+  sendMagicLink,
+  signInWithGoogle,
+} from '@/lib/firebase/auth';
 import styles from './LoginForm.module.css';
 import Button from '@/ui/components/Button';
 import Form from '@/ui/components/Form';
@@ -13,7 +17,7 @@ import Link from 'next/link';
 const initialState: SessionResult = {
   success: false,
   uid: undefined,
-  error: undefined
+  error: undefined,
 };
 
 function SubmitButton() {
@@ -31,7 +35,7 @@ const LoginForm = () => {
 
   async function handleSubmit(
     _prevState: SessionResult,
-    formData: FormData
+    formData: FormData,
   ): Promise<SessionResult> {
     setGoogleError(null);
 
@@ -52,7 +56,7 @@ const LoginForm = () => {
     } catch (error) {
       return {
         success: false,
-        error: mapFirebaseError(error)
+        error: mapFirebaseError(error),
       };
     }
 
@@ -76,7 +80,13 @@ const LoginForm = () => {
   return (
     <div className={styles.wrapper}>
       <Form action={formAction}>
-        <Input type='email' name='email' id='email' placeholder='email@example.com' required />
+        <Input
+          type='email'
+          name='email'
+          id='email'
+          placeholder='email@example.com'
+          required
+        />
 
         {errorMessage && <p>{errorMessage}</p>}
 

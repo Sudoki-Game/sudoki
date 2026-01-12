@@ -42,7 +42,13 @@ const SettingsModal = () => {
               Sign Out
             </Button>
           ) : (
-            <Button fill size='lg' variant='ok' type='button' onClick={() => router.push('/login')}>
+            <Button
+              fill
+              size='lg'
+              variant='ok'
+              type='button'
+              onClick={() => router.push('/login')}
+            >
               Sign In
             </Button>
           ))}

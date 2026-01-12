@@ -7,7 +7,11 @@
 
 import type { ClientMatch, SaveMatchResult } from '@/match/types';
 import { isMatchFromToday } from '@/match/types';
-import { createSignedPayload, extractVerifiedPayload, SignedPayload } from './encoding';
+import {
+  createSignedPayload,
+  extractVerifiedPayload,
+  SignedPayload,
+} from './encoding';
 
 /** localStorage key for match history */
 export const MATCH_HISTORY_KEY = 'sudoku_match_history';
@@ -26,7 +30,7 @@ export interface SaveMatchOptions {
  */
 export async function saveMatch(
   match: ClientMatch,
-  options?: SaveMatchOptions
+  options?: SaveMatchOptions,
 ): Promise<SaveMatchResult> {
   try {
     // Get existing history
@@ -49,7 +53,8 @@ export async function saveMatch(
 
     return { success: true };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     console.error('[MatchClient] Error saving match:', errorMessage);
     return { success: false, error: errorMessage };
   }
@@ -71,7 +76,9 @@ export async function getTodaysMatch(): Promise<ClientMatch | null> {
   const history = await getMatchHistory();
 
   // Filter to today's matches and get the most recent
-  const todaysMatches = history.filter((match) => isMatchFromToday(match.timestamp));
+  const todaysMatches = history.filter((match) =>
+    isMatchFromToday(match.timestamp),
+  );
 
   if (todaysMatches.length === 0) {
     return null;
@@ -139,7 +146,7 @@ export async function getCachedMatches(): Promise<ClientMatch[]> {
 export async function clearCacheFlag(matchId: string): Promise<void> {
   const history = await getMatchHistory();
   const updatedHistory = history.map((match) =>
-    match.id === matchId ? { ...match, isCached: undefined } : match
+    match.id === matchId ? { ...match, isCached: undefined } : match,
   );
 
   // Re-sign and save
@@ -154,7 +161,7 @@ export async function clearCacheFlags(matchIds: string[]): Promise<void> {
   const history = await getMatchHistory();
   const idSet = new Set(matchIds);
   const updatedHistory = history.map((match) =>
-    idSet.has(match.id) ? { ...match, isCached: undefined } : match
+    idSet.has(match.id) ? { ...match, isCached: undefined } : match,
   );
 
   // Re-sign and save

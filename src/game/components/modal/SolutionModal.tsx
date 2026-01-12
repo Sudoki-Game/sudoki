@@ -35,7 +35,7 @@ function createGameStateFromMatch(match: ClientMatch): GameState {
     highlights: new Set<string>(),
     dragValue: null,
     showSolution: true,
-    difficulty: 'medium'
+    difficulty: 'medium',
   };
 }
 
@@ -64,7 +64,7 @@ const SolutionModal = () => {
             board: serverMatch.board,
             originalBoard: serverMatch.originalBoard,
             solution: serverMatch.solution,
-            timestamp: serverMatch.timestamp
+            timestamp: serverMatch.timestamp,
           };
         }
       } else {
@@ -91,7 +91,11 @@ const SolutionModal = () => {
         <h2 className={modalStyles.title}>Solution</h2>
 
         <Dynascale defaultScale={0} margin={0}>
-          <SudokuGrid game={displayGame} showSolution={true} isReady={isReady} />
+          <SudokuGrid
+            game={displayGame}
+            showSolution={true}
+            isReady={isReady}
+          />
         </Dynascale>
 
         <section className={styles.key}>
@@ -101,7 +105,9 @@ const SolutionModal = () => {
           </div>
 
           <div className={styles.keyPair}>
-            <span className={`${styles.keyColor} ${styles.keyColorHint}`}></span>
+            <span
+              className={`${styles.keyColor} ${styles.keyColorHint}`}
+            ></span>
             <span>Auto Solve</span>
           </div>
 

@@ -19,7 +19,10 @@ export function createEmptyBoard(): Board {
  * @param conflicts - Map of cell keys to their conflicting cell keys.
  * @returns True if the board is complete and valid, false otherwise.
  */
-export function isGameWon(board: Board, conflicts: Map<string, number>): boolean {
+export function isGameWon(
+  board: Board,
+  conflicts: Map<string, number>,
+): boolean {
   // Check for any empty cells
   for (let row = 0; row < 9; row++) {
     for (let col = 0; col < 9; col++) {
@@ -38,7 +41,11 @@ export function isGameWon(board: Board, conflicts: Map<string, number>): boolean
  * @param grid - The current Sudoku board.
  * @returns Set of highlighted cell keys ("row,col").
  */
-export function computeHighlights(row: number, col: number, grid: Board): Set<string> {
+export function computeHighlights(
+  row: number,
+  col: number,
+  grid: Board,
+): Set<string> {
   const set: Set<string> = new Set();
 
   // Row and column peers
@@ -82,7 +89,7 @@ export function getConflicts(
   board: Board,
   row: number,
   col: number,
-  val: number
+  val: number,
 ): Map<string, number> {
   const conflicts = new Map<string, number>();
 
@@ -107,7 +114,10 @@ export function getConflicts(
         c = boxCol + j;
       if ((r !== row || c !== col) && board[r][c] === val) {
         conflicts.set(`${r},${c}`, (conflicts.get(`${r},${c}`) ?? 0) + 1);
-        conflicts.set(`${row},${col}`, (conflicts.get(`${row},${col}`) ?? 0) + 1);
+        conflicts.set(
+          `${row},${col}`,
+          (conflicts.get(`${row},${col}`) ?? 0) + 1,
+        );
       }
     }
   }
@@ -133,7 +143,7 @@ export function removeConflictsForCell(
   conflicts: Map<string, number>,
   row: number,
   col: number,
-  value: number
+  value: number,
 ): Map<string, number> {
   const targetConflicts = getConflicts(board, row, col, value);
   const newConflicts = new Map(conflicts);

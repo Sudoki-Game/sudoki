@@ -17,12 +17,12 @@ const localStorageMock = (() => {
     get length() {
       return Object.keys(store).length;
     },
-    key: (index: number) => Object.keys(store)[index] || null
+    key: (index: number) => Object.keys(store)[index] || null,
   };
 })();
 
 Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock
+  value: localStorageMock,
 });
 
 // Mock crypto for HMAC operations
@@ -30,15 +30,15 @@ Object.defineProperty(global, 'crypto', {
   value: {
     subtle: {
       importKey: jest.fn(),
-      sign: jest.fn()
+      sign: jest.fn(),
     },
     getRandomValues: (arr: Uint8Array) => {
       for (let i = 0; i < arr.length; i++) {
         arr[i] = Math.floor(Math.random() * 256);
       }
       return arr;
-    }
-  }
+    },
+  },
 });
 
 // Reset localStorage before each test

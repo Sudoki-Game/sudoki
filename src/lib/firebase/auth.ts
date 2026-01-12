@@ -5,14 +5,17 @@ import {
   onAuthStateChanged as _onAuthStateChanged,
   NextOrObserver,
   User,
-  sendSignInLinkToEmail
+  sendSignInLinkToEmail,
 } from 'firebase/auth';
 import { auth } from './client';
 import { FirebaseError } from 'firebase/app';
 
 const actionCodeSettings = {
-  url: process.env.NODE_ENV === 'development' ? 'http://localhost:3000/finishSignIn' : 'https://sudoki.uk/finishSignIn',
-  handleCodeInApp: true
+  url:
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3000/finishSignIn'
+      : 'https://sudoki.uk/finishSignIn',
+  handleCodeInApp: true,
 };
 
 export function onAuthStateChanged(cb: NextOrObserver<User>) {

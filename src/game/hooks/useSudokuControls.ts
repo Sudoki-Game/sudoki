@@ -11,7 +11,7 @@ import {
   PointerSensor,
   KeyboardSensor,
   SensorDescriptor,
-  SensorOptions
+  SensorOptions,
 } from '@dnd-kit/core';
 import { useEffect, useRef } from 'react';
 
@@ -53,10 +53,10 @@ const useSudokuGameControls = (): SudokuControls => {
     useSensor(PointerSensor, {
       activationConstraint: {
         delay: 100,
-        tolerance: 150
-      }
+        tolerance: 150,
+      },
     }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   /**
@@ -105,7 +105,8 @@ const useSudokuGameControls = (): SudokuControls => {
       // Handle number input + deletion
       if (row !== null && col !== null) {
         const isNumber = /^[1-9]$/.test(e.key);
-        const isDeleteOrBackspace = e.key === '0' || e.key === 'Delete' || e.key === 'Backspace';
+        const isDeleteOrBackspace =
+          e.key === '0' || e.key === 'Delete' || e.key === 'Backspace';
 
         if (isNumber) {
           updateCell(row, col, Number(e.key));
@@ -131,7 +132,10 @@ const useSudokuGameControls = (): SudokuControls => {
       if (isPaused || game.status !== 'playing') return;
 
       // Reset selection if clicked outside of the container or the container itself
-      if (!containerRef.current?.contains(e.target as Node) || containerRef.current === e.target) {
+      if (
+        !containerRef.current?.contains(e.target as Node) ||
+        containerRef.current === e.target
+      ) {
         if (game.selected.row != null || game.selected.col != null) {
           dispatch({ type: 'RESET_SELECTION' });
         }

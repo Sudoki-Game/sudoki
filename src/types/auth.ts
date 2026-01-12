@@ -2,12 +2,12 @@
 export type {
   BaseUserStats,
   LocalUserData,
-  ServerUserData
+  ServerUserData,
 } from '@/user/types';
 export {
   createDefaultLocalUserData,
   createInitialServerUserData,
-  hasCompletedOnboarding
+  hasCompletedOnboarding,
 } from '@/user/types';
 
 export interface AuthUser {

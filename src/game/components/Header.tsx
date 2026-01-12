@@ -10,7 +10,12 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <Button size='icon' type='button' onClick={() => openModal('settings')}>
-        <Image src={'/game/gear.svg'} alt='Settings Icon' height={32} width={32} />
+        <Image
+          src={'/game/gear.svg'}
+          alt='Settings Icon'
+          height={32}
+          width={32}
+        />
       </Button>
 
       <Image
@@ -29,7 +34,12 @@ const Header = () => {
         type='button'
         onClick={() => openModal('leaderboard')}
       >
-        <Image src={'/game/crown.svg'} alt='Leaderboard Icon' height={32} width={32} />
+        <Image
+          src={'/game/crown.svg'}
+          alt='Leaderboard Icon'
+          height={32}
+          width={32}
+        />
       </Button>
     </header>
   );

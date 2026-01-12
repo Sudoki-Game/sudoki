@@ -11,13 +11,14 @@ import {
   getNearbyPlayers,
   type LeaderboardPlayer,
   type TopPlayersResult,
-  type NearbyPlayersResult
+  type NearbyPlayersResult,
 } from '@/app/actions/user';
 
 const LeaderboardModal = () => {
   const { goBack } = useModalRouter();
   const [topPlayers, setTopPlayers] = useState<TopPlayersResult | null>(null);
-  const [nearbyPlayers, setNearbyPlayers] = useState<NearbyPlayersResult | null>(null);
+  const [nearbyPlayers, setNearbyPlayers] =
+    useState<NearbyPlayersResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const LeaderboardModal = () => {
 
       const [top, nearby] = await Promise.all([
         getTopPlayers(),
-        user ? getNearbyPlayers(user.uid) : Promise.resolve(null)
+        user ? getNearbyPlayers(user.uid) : Promise.resolve(null),
       ]);
 
       setTopPlayers(top);
@@ -40,11 +41,32 @@ const LeaderboardModal = () => {
   const renderStarIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return <Image src='/game/leaderboard/gold-star.svg' alt='1st' width={20} height={20} />;
+        return (
+          <Image
+            src='/game/leaderboard/gold-star.svg'
+            alt='1st'
+            width={20}
+            height={20}
+          />
+        );
       case 2:
-        return <Image src='/game/leaderboard/silver-star.svg' alt='2nd' width={20} height={20} />;
+        return (
+          <Image
+            src='/game/leaderboard/silver-star.svg'
+            alt='2nd'
+            width={20}
+            height={20}
+          />
+        );
       case 3:
-        return <Image src='/game/leaderboard/bronze-star.svg' alt='3rd' width={20} height={20} />;
+        return (
+          <Image
+            src='/game/leaderboard/bronze-star.svg'
+            alt='3rd'
+            width={20}
+            height={20}
+          />
+        );
       default:
         return <span className={styles.rank}>{rank + `)`}</span>;
     }
@@ -53,7 +75,7 @@ const LeaderboardModal = () => {
   const renderPlayerRow = (
     player: LeaderboardPlayer,
     isCurrentUser: boolean = false,
-    showStars: boolean = false
+    showStars: boolean = false,
   ) => (
     <tr
       key={`${player.rank}-${player.displayName}`}
@@ -66,7 +88,9 @@ const LeaderboardModal = () => {
           <span className={styles.rank}>{player.rank + `)`}</span>
         )}
       </td>
-      <td className={styles.nameCell}>{isCurrentUser ? 'You' : player.displayName}</td>
+      <td className={styles.nameCell}>
+        {isCurrentUser ? 'You' : player.displayName}
+      </td>
       <td className={styles.statCell}>{player.combinedScore}</td>
       <td className={styles.statCell}>{player.matchesPlayed}</td>
       <td className={styles.statCell}>{player.dailyStreak}</td>
@@ -94,7 +118,9 @@ const LeaderboardModal = () => {
               </thead>
               <tbody>
                 {/* Top 3 players - show stars */}
-                {topPlayers?.players.map((player) => renderPlayerRow(player, false, true))}
+                {topPlayers?.players.map((player) =>
+                  renderPlayerRow(player, false, true),
+                )}
 
                 {/* Separator */}
                 {nearbyPlayers && nearbyPlayers.current && (
@@ -106,9 +132,14 @@ const LeaderboardModal = () => {
                 )}
 
                 {/* Nearby players - show numbers */}
-                {nearbyPlayers?.above.map((player) => renderPlayerRow(player, false, false))}
-                {nearbyPlayers?.current && renderPlayerRow(nearbyPlayers.current, true, false)}
-                {nearbyPlayers?.below.map((player) => renderPlayerRow(player, false, false))}
+                {nearbyPlayers?.above.map((player) =>
+                  renderPlayerRow(player, false, false),
+                )}
+                {nearbyPlayers?.current &&
+                  renderPlayerRow(nearbyPlayers.current, true, false)}
+                {nearbyPlayers?.below.map((player) =>
+                  renderPlayerRow(player, false, false),
+                )}
               </tbody>
             </table>
           )}

@@ -12,7 +12,7 @@ import Input from '../../ui/components/Input';
 
 const initialState = {
   success: false,
-  message: ''
+  message: '',
 };
 
 function SubmitButton() {
@@ -32,7 +32,12 @@ const BugReport = () => {
     <Form action={formAction}>
       <FormField>
         <Label htmlFor='email'>Email (SelectOptional)</Label>
-        <Input type='email' name='email' id='email' placeholder='you@example.com' />
+        <Input
+          type='email'
+          name='email'
+          id='email'
+          placeholder='you@example.com'
+        />
       </FormField>
 
       <FormField>
@@ -41,8 +46,12 @@ const BugReport = () => {
           <SelectOption value=''>Select a category</SelectOption>
           <SelectOption value='gameplay'>Gameplay issue</SelectOption>
           <SelectOption value='ui'>UI / visual bug</SelectOption>
-          <SelectOption value='logic'>Sudoku logic / incorrect solution</SelectOption>
-          <SelectOption value='performance'>Performance / freezing</SelectOption>
+          <SelectOption value='logic'>
+            Sudoku logic / incorrect solution
+          </SelectOption>
+          <SelectOption value='performance'>
+            Performance / freezing
+          </SelectOption>
           <SelectOption value='crash'>Crash or error</SelectOption>
           <SelectOption value='other'>Other</SelectOption>
         </Select>

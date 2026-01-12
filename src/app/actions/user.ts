@@ -61,7 +61,7 @@ export async function getUserStats(userId: string): Promise<BaseUserStats> {
       bestStreak: data.bestStreak,
       matchesPlayed: data.matchesPlayed,
       personalBestScore: data.personalBestScore,
-      lastMatchTimestamp: data.lastMatchTimestamp
+      lastMatchTimestamp: data.lastMatchTimestamp,
     };
   } catch (error) {
     console.error('[UserActions] Error getting user stats:', error);
@@ -74,11 +74,14 @@ export async function getUserStats(userId: string): Promise<BaseUserStats> {
  */
 export async function getTopPlayers(): Promise<TopPlayersResult> {
   try {
-    const usersRef = serverDb.collection('users').orderBy('combinedScore', 'desc').limit(3);
+    const usersRef = serverDb
+      .collection('users')
+      .orderBy('combinedScore', 'desc')
+      .limit(3);
 
     const [snapshot, totalSnapshot] = await Promise.all([
       usersRef.get(),
-      serverDb.collection('users').count().get()
+      serverDb.collection('users').count().get(),
     ]);
 
     const players = snapshot.docs.map((doc, index) => {
@@ -88,13 +91,13 @@ export async function getTopPlayers(): Promise<TopPlayersResult> {
         displayName: data.displayName,
         combinedScore: data.combinedScore,
         matchesPlayed: data.matchesPlayed,
-        dailyStreak: data.dailyStreak
+        dailyStreak: data.dailyStreak,
       };
     });
 
     return {
       players,
-      totalPlayers: totalSnapshot.data().count
+      totalPlayers: totalSnapshot.data().count,
     };
   } catch (error) {
     console.error('[UserActions] Error getting top players:', error);
@@ -105,7 +108,9 @@ export async function getTopPlayers(): Promise<TopPlayersResult> {
 /**
  * Get players around the current user (3 above and 3 below)
  */
-export async function getNearbyPlayers(userId: string): Promise<NearbyPlayersResult> {
+export async function getNearbyPlayers(
+  userId: string,
+): Promise<NearbyPlayersResult> {
   try {
     // First, get the current user's score
     const userRef = serverDb.collection('users').doc(userId);
@@ -136,8 +141,12 @@ export async function getNearbyPlayers(userId: string): Promise<NearbyPlayersRes
 
     // Count how many players are above the current user for rank calculation
     const [rankSnapshot, totalSnapshot] = await Promise.all([
-      serverDb.collection('users').where('combinedScore', '>', userScore).count().get(),
-      serverDb.collection('users').count().get()
+      serverDb
+        .collection('users')
+        .where('combinedScore', '>', userScore)
+        .count()
+        .get(),
+      serverDb.collection('users').count().get(),
     ]);
 
     const currentRank = rankSnapshot.data().count + 1;
@@ -157,7 +166,7 @@ export async function getNearbyPlayers(userId: string): Promise<NearbyPlayersRes
           displayName: data.displayName,
           combinedScore: data.combinedScore,
           matchesPlayed: data.matchesPlayed,
-          dailyStreak: data.dailyStreak
+          dailyStreak: data.dailyStreak,
         };
       })
       .sort((a, b) => a.rank - b.rank); // Sort by rank ascending (1, 2, 3...)
@@ -168,7 +177,7 @@ export async function getNearbyPlayers(userId: string): Promise<NearbyPlayersRes
       displayName: userData.displayName,
       combinedScore: userData.combinedScore,
       matchesPlayed: userData.matchesPlayed,
-      dailyStreak: userData.dailyStreak
+      dailyStreak: userData.dailyStreak,
     };
 
     // Build below list
@@ -179,7 +188,7 @@ export async function getNearbyPlayers(userId: string): Promise<NearbyPlayersRes
         displayName: data.displayName,
         combinedScore: data.combinedScore,
         matchesPlayed: data.matchesPlayed,
-        dailyStreak: data.dailyStreak
+        dailyStreak: data.dailyStreak,
       };
     });
 

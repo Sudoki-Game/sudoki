@@ -5,7 +5,7 @@ import { AuthUser } from '@/types';
 import { hasUserCompletedOnboarding } from '@/lib/firebase/firestore';
 
 const OnboardingLayout = async ({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {

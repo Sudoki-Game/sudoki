@@ -6,7 +6,7 @@ import { getServerUser } from '@/lib/auth/server';
 import { redirect } from 'next/navigation';
 
 const LoginLayout = async ({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {

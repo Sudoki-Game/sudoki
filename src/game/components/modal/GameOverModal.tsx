@@ -47,7 +47,9 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
       const fetchStats = async () => {
         const user = auth.currentUser;
         setIsLoggedIn(!!user);
-        const stats = user ? await getUserStatsServer(user.uid) : await getUserDataLocal();
+        const stats = user
+          ? await getUserStatsServer(user.uid)
+          : await getUserDataLocal();
         setUserStats(stats);
         setIsReady(true);
       };
@@ -80,7 +82,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
             board: serverMatch.board,
             originalBoard: serverMatch.originalBoard,
             solution: serverMatch.solution,
-            timestamp: serverMatch.timestamp
+            timestamp: serverMatch.timestamp,
           };
         }
       } else {
@@ -107,7 +109,9 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
     <Modal className={styles.gameoverModal} onClose={onClose}>
       <div className={modalStyles.content}>
         {/* Streak day - minimum of 1 since user played today */}
-        <h2 className={modalStyles.title}>Day {Math.max(1, userStats?.dailyStreak ?? 1)}</h2>
+        <h2 className={modalStyles.title}>
+          Day {Math.max(1, userStats?.dailyStreak ?? 1)}
+        </h2>
 
         {isWin ? (
           <Image
@@ -147,7 +151,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
                 height={48}
                 width={48}
               />
-            )
+            ),
           )}
         </div>
 
@@ -161,12 +165,16 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
           <hr />
 
           <span className={styles.stat}>Personal Best</span>
-          <span className={styles.statNumerical}>{userStats?.personalBestScore ?? 0}</span>
+          <span className={styles.statNumerical}>
+            {userStats?.personalBestScore ?? 0}
+          </span>
 
           <hr />
 
           <span className={styles.stat}>Total Score</span>
-          <span className={styles.statNumerical}>{userStats?.combinedScore ?? 0}</span>
+          <span className={styles.statNumerical}>
+            {userStats?.combinedScore ?? 0}
+          </span>
         </section>
 
         {!isLoggedIn ? (
@@ -194,7 +202,13 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
           </Button>
         )}
 
-        <Button disabled={isWin} fill size='lg' type='button' onClick={() => openModal('solution')}>
+        <Button
+          disabled={isWin}
+          fill
+          size='lg'
+          type='button'
+          onClick={() => openModal('solution')}
+        >
           View Solution
         </Button>
       </div>

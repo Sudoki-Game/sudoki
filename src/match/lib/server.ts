@@ -31,7 +31,10 @@ export function validateMatch(_match: ServerMatch): boolean {
  * @param match - The match data to save
  * @returns Save result indicating success or failure
  */
-export async function saveMatch(userId: string, match: ServerMatch): Promise<SaveMatchResult> {
+export async function saveMatch(
+  userId: string,
+  match: ServerMatch,
+): Promise<SaveMatchResult> {
   try {
     // Validate match data
     if (!validateMatch(match)) {
@@ -76,7 +79,8 @@ export async function saveMatch(userId: string, match: ServerMatch): Promise<Sav
 
     return { success: true };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     console.error('[MatchServer] Error saving match:', errorMessage);
     return { success: false, error: errorMessage };
   }
@@ -104,7 +108,9 @@ export async function getMatch(matchId: string): Promise<ServerMatch | null> {
 /**
  * Get today's match for a user
  */
-export async function getTodaysMatch(userId: string): Promise<ServerMatch | null> {
+export async function getTodaysMatch(
+  userId: string,
+): Promise<ServerMatch | null> {
   try {
     const userMatchesRef = serverDb
       .collection(MATCHES_COLLECTION)
@@ -123,7 +129,7 @@ export async function getTodaysMatch(userId: string): Promise<ServerMatch | null
 
     return null;
   } catch (error) {
-    console.error('[MatchServer] Error getting today\'s match:', error);
+    console.error("[MatchServer] Error getting today's match:", error);
     return null;
   }
 }
@@ -140,7 +146,10 @@ export async function hasPlayedToday(userId: string): Promise<boolean> {
  * Check if user has a match for a specific date
  * Used to verify cached matches before uploading
  */
-export async function hasMatchForDate(userId: string, timestamp: number): Promise<boolean> {
+export async function hasMatchForDate(
+  userId: string,
+  timestamp: number,
+): Promise<boolean> {
   try {
     const matchDate = new Date(timestamp);
     const userMatchesRef = serverDb
@@ -197,7 +206,7 @@ export async function getMatchHistory(userId: string): Promise<ServerMatch[]> {
  */
 export async function saveMatchBatch(
   userId: string,
-  matches: ServerMatch[]
+  matches: ServerMatch[],
 ): Promise<SaveMatchResult> {
   try {
     const batch = serverDb.batch();
@@ -215,7 +224,8 @@ export async function saveMatchBatch(
     await batch.commit();
     return { success: true };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     console.error('[MatchServer] Error saving match batch:', errorMessage);
     return { success: false, error: errorMessage };
   }
@@ -224,7 +234,7 @@ export async function saveMatchBatch(
 /**
  * Update user stats based on a new match
  * This should be called after successfully saving a match
- * 
+ *
  * Updates incrementally (does not recalculate from match history):
  * - combinedScore: incremented by score + streakBonus
  * - matchesPlayed: incremented by 1
@@ -236,7 +246,7 @@ export async function saveMatchBatch(
 export async function updateUserStatsFromMatch(
   userId: string,
   match: ServerMatch,
-  streakBonus: number = 0
+  streakBonus: number = 0,
 ): Promise<void> {
   try {
     const userRef = serverDb.collection('users').doc(userId);
@@ -245,7 +255,7 @@ export async function updateUserStatsFromMatch(
     // Get current user data
     const userDoc = await userRef.get();
     const userData = userDoc.exists ? userDoc.data() : null;
-    
+
     const currentBestStreak = userData?.bestStreak ?? 0;
     const currentPersonalBestScore = userData?.personalBestScore ?? 0;
     const lastMatchTimestamp = userData?.lastMatchTimestamp ?? null;
@@ -259,14 +269,14 @@ export async function updateUserStatsFromMatch(
     } else {
       const lastMatchDate = new Date(lastMatchTimestamp);
       const todayDate = new Date(match.timestamp);
-      
+
       // Normalize to start of day for comparison
       lastMatchDate.setHours(0, 0, 0, 0);
       todayDate.setHours(0, 0, 0, 0);
-      
+
       const diffMs = todayDate.getTime() - lastMatchDate.getTime();
       const diffDays = diffMs / (1000 * 60 * 60 * 24);
-      
+
       if (diffDays === 0) {
         // Same day - keep current streak
         newDailyStreak = currentDailyStreak;
@@ -287,7 +297,7 @@ export async function updateUserStatsFromMatch(
       lastMatchTimestamp: match.timestamp,
       dailyStreak: newDailyStreak,
       bestStreak: newBestStreak,
-      personalBestScore: Math.max(currentPersonalBestScore, match.score)
+      personalBestScore: Math.max(currentPersonalBestScore, match.score),
     });
   } catch (error) {
     console.error('[MatchServer] Error updating user stats:', error);

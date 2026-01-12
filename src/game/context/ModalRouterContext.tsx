@@ -1,7 +1,12 @@
 'use client';
 import { createContext, useContext, useReducer, ReactNode } from 'react';
 
-export type ModalType = 'gameover' | 'solution' | 'leaderboard' | 'settings' | 'bug-report';
+export type ModalType =
+  | 'gameover'
+  | 'solution'
+  | 'leaderboard'
+  | 'settings'
+  | 'bug-report';
 
 type ModalRouterProviderProps = {
   children: ReactNode;
@@ -11,7 +16,10 @@ type State = {
   history: ModalType[];
 };
 
-type Action = { type: 'OPEN_MENU'; menu: ModalType } | { type: 'RESET' } | { type: 'GO_BACK' };
+type Action =
+  | { type: 'OPEN_MENU'; menu: ModalType }
+  | { type: 'RESET' }
+  | { type: 'GO_BACK' };
 
 export type ModalRouterProviderState = {
   activeModal: ModalType | null;
@@ -20,7 +28,9 @@ export type ModalRouterProviderState = {
   goBack: () => void;
 };
 
-const ModalRouterContext = createContext<ModalRouterProviderState | undefined>(undefined);
+const ModalRouterContext = createContext<ModalRouterProviderState | undefined>(
+  undefined,
+);
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -30,13 +40,13 @@ function reducer(state: State, action: Action): State {
 
       return {
         ...state,
-        history: [...state.history, action.menu]
+        history: [...state.history, action.menu],
       };
     }
 
     case 'RESET': {
       return {
-        history: []
+        history: [],
       };
     }
 
@@ -47,7 +57,7 @@ function reducer(state: State, action: Action): State {
 
       return {
         ...state,
-        history: state.history.slice(0, -1)
+        history: state.history.slice(0, -1),
       };
     }
 
@@ -58,7 +68,7 @@ function reducer(state: State, action: Action): State {
 
 export function ModalRouterProvider({ children }: ModalRouterProviderProps) {
   const [state, dispatch] = useReducer(reducer, {
-    history: []
+    history: [],
   });
 
   const activeModal = state.history[state.history.length - 1] || null;
@@ -76,7 +86,9 @@ export function ModalRouterProvider({ children }: ModalRouterProviderProps) {
   };
 
   return (
-    <ModalRouterContext.Provider value={{ activeModal, openModal, closeModal, goBack }}>
+    <ModalRouterContext.Provider
+      value={{ activeModal, openModal, closeModal, goBack }}
+    >
       {children}
     </ModalRouterContext.Provider>
   );
@@ -85,7 +97,9 @@ export function ModalRouterProvider({ children }: ModalRouterProviderProps) {
 export const useModalRouter = () => {
   const context = useContext(ModalRouterContext);
   if (!context) {
-    throw new Error('useModalRouter must be used within an ModalRouterProvider');
+    throw new Error(
+      'useModalRouter must be used within an ModalRouterProvider',
+    );
   }
   return context;
 };

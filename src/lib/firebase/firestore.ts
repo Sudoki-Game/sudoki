@@ -7,7 +7,7 @@ import {
   orderBy,
   limit,
   getDocs,
-  setDoc
+  setDoc,
 } from 'firebase/firestore';
 import { db } from './client';
 import type { ServerUserData } from '@/user/types';
@@ -16,7 +16,9 @@ import type { ServerMatch } from '@/match/types';
 export type { ServerUserData };
 export type { ServerMatch };
 
-export async function getServerUserData(userId: string): Promise<ServerUserData | null> {
+export async function getServerUserData(
+  userId: string,
+): Promise<ServerUserData | null> {
   const userRef = doc(db, 'users', userId);
   const userSnap = await getDoc(userRef);
 
@@ -31,7 +33,10 @@ export async function userExists(userId: string): Promise<boolean> {
   return userSnap.exists();
 }
 
-export async function createUserEntry(userId: string, email: string | null): Promise<void> {
+export async function createUserEntry(
+  userId: string,
+  email: string | null,
+): Promise<void> {
   const userRef = doc(db, 'users', userId);
   const now = Date.now();
   const userDoc: ServerUserData = {
@@ -46,29 +51,34 @@ export async function createUserEntry(userId: string, email: string | null): Pro
     bestStreak: 0,
     matchesPlayed: 0,
     personalBestScore: 0,
-    lastMatchTimestamp: null
+    lastMatchTimestamp: null,
   };
 
   await setDoc(userRef, userDoc);
 }
 
-export async function updateUserDisplayName(userId: string, displayName: string): Promise<void> {
+export async function updateUserDisplayName(
+  userId: string,
+  displayName: string,
+): Promise<void> {
   const userRef = doc(db, 'users', userId);
   await setDoc(userRef, { displayName }, { merge: true });
 }
 
-export async function hasUserCompletedOnboarding(userId: string): Promise<boolean> {
+export async function hasUserCompletedOnboarding(
+  userId: string,
+): Promise<boolean> {
   const userData = await getServerUserData(userId);
   return userData ? userData.displayName.trim() !== '' : false;
 }
 
 export async function isDisplayNameTaken(
   displayName: string,
-  excludeUserId?: string
+  excludeUserId?: string,
 ): Promise<boolean> {
   const displayNameQuery = query(
     collection(db, 'users'),
-    where('displayName', '==', displayName.trim())
+    where('displayName', '==', displayName.trim()),
   );
 
   const querySnapshot = await getDocs(displayNameQuery);
@@ -85,12 +95,15 @@ export async function isDisplayNameTaken(
   return true;
 }
 
-export async function getUserMatches(userId: string, limitCount = 10): Promise<ServerMatch[]> {
+export async function getUserMatches(
+  userId: string,
+  limitCount = 10,
+): Promise<ServerMatch[]> {
   const matchesQuery = query(
     collection(db, 'matches'),
     where('userPlayed', '==', userId),
     orderBy('timestamp', 'desc'),
-    limit(limitCount)
+    limit(limitCount),
   );
 
   const querySnapshot = await getDocs(matchesQuery);

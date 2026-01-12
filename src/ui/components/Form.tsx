@@ -14,7 +14,12 @@ const Form = ({ children, className, ref, ...props }: FormProps) => {
 
 export type FormFieldProps = React.ComponentPropsWithRef<'div'>;
 
-export const FormField = ({ children, className, ref, ...props }: FormFieldProps) => {
+export const FormField = ({
+  children,
+  className,
+  ref,
+  ...props
+}: FormFieldProps) => {
   return (
     <div ref={ref} className={clsx(styles.formField, className)} {...props}>
       {children}

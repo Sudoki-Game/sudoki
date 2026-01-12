@@ -9,10 +9,7 @@
 
 import type { ClientMatch } from '@/match/types';
 import type { BaseUserStats } from '@/user/types';
-import {
-  calculateStatsFromMatches,
-  mergeMatchHistories,
-} from './stats';
+import { calculateStatsFromMatches, mergeMatchHistories } from './stats';
 import { MATCH_HISTORY_KEY } from '@/match/lib/client';
 import { USER_DATA_KEY } from '@/user/lib/client';
 
@@ -48,7 +45,7 @@ export interface MergeResult {
 export function prepareTransferData(matchHistory: ClientMatch[]): TransferData {
   // Sort matches by timestamp
   const sortedMatches = [...matchHistory].sort(
-    (a, b) => a.timestamp - b.timestamp
+    (a, b) => a.timestamp - b.timestamp,
   );
 
   // Recalculate stats from match history
@@ -56,7 +53,7 @@ export function prepareTransferData(matchHistory: ClientMatch[]): TransferData {
 
   return {
     matches: sortedMatches,
-    recalculatedStats
+    recalculatedStats,
   };
 }
 
@@ -67,7 +64,7 @@ export function prepareTransferData(matchHistory: ClientMatch[]): TransferData {
  */
 export function mergeWithServerData(
   localMatches: ClientMatch[],
-  serverMatches: ClientMatch[]
+  serverMatches: ClientMatch[],
 ): MergeResult {
   // Merge histories (server takes precedence)
   const mergedMatches = mergeMatchHistories(localMatches, serverMatches);
@@ -77,7 +74,7 @@ export function mergeWithServerData(
 
   return {
     mergedMatches,
-    recalculatedStats
+    recalculatedStats,
   };
 }
 

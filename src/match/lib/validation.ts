@@ -41,6 +41,6 @@ export function validateMatch(_match: BaseMatch): ValidationResult {
   // For now, always return valid
   return {
     isValid: true,
-    errors: []
+    errors: [],
   };
 }

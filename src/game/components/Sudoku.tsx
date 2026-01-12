@@ -32,7 +32,7 @@ const Sudoku = () => {
     hasPlayedToday,
     todaysMatch,
     gameOverReady,
-    clearGameOverReady
+    clearGameOverReady,
   } = useSudokuGame();
   const { dndSensors, boardRef, containerRef } = useSudokuControls();
   const { openModal } = useModalRouter();
@@ -60,7 +60,7 @@ const Sudoku = () => {
       hasPlayedToday,
       todaysMatch: !!todaysMatch,
       status: game.status,
-      isReady
+      isReady,
     });
     if (isReady && hasPlayedToday && todaysMatch && game.status === 'idle') {
       console.log('[Sudoku] Opening gameover modal for previous match');
@@ -69,11 +69,21 @@ const Sudoku = () => {
   }, [isReady, hasPlayedToday, todaysMatch, game.status, openModal]);
 
   return (
-    <div className={styles.root} inert={isDisabled} style={{ opacity: isDisabled ? '40%' : '' }}>
-      <DndContext sensors={dndSensors} onDragStart={handleDragStart} onDragEnd={handleDrop}>
+    <div
+      className={styles.root}
+      inert={isDisabled}
+      style={{ opacity: isDisabled ? '40%' : '' }}
+    >
+      <DndContext
+        sensors={dndSensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDrop}
+      >
         <DragOverlay dropAnimation={null}>
           {game.dragValue ? (
-            <div className={`${SudokuCellStyles.cell} ${SudokuCellStyles.cellDragging}`}>
+            <div
+              className={`${SudokuCellStyles.cell} ${SudokuCellStyles.cellDragging}`}
+            >
               {game.dragValue}
             </div>
           ) : null}

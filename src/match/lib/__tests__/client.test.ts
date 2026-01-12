@@ -1,6 +1,6 @@
 /**
  * Tests for Match Client (localStorage operations)
- * 
+ *
  * This file includes:
  * 1. Shared tests (run against both localStorage and Firestore)
  * 2. localStorage-specific tests (tamper detection, caching)
@@ -16,7 +16,7 @@ import {
   getCachedMatches,
   clearCacheFlag,
   clearCacheFlags,
-  MATCH_HISTORY_KEY
+  MATCH_HISTORY_KEY,
 } from '../client';
 import type { ClientMatch } from '@/match/types';
 import { runSharedMatchTests, type MatchStorageAdapter } from './shared-tests';
@@ -44,19 +44,22 @@ function createTestMatch(overrides: Partial<ClientMatch> = {}): ClientMatch {
     originalBoard: '[[null,2,3,4,5,6,7,8,9]]',
     solution: '[[1,2,3,4,5,6,7,8,9]]',
     timestamp: now,
-    ...overrides
+    ...overrides,
   };
 }
 
 /**
  * Create a match from a specific date
  */
-function createMatchFromDate(date: Date, overrides: Partial<ClientMatch> = {}): ClientMatch {
+function createMatchFromDate(
+  date: Date,
+  overrides: Partial<ClientMatch> = {},
+): ClientMatch {
   const timestamp = date.getTime();
   return createTestMatch({
     id: `test_${timestamp}`,
     timestamp,
-    ...overrides
+    ...overrides,
   });
 }
 
@@ -72,7 +75,8 @@ function createLocalStorageAdapter(): MatchStorageAdapter<ClientMatch> {
     clearAll: () => {
       clearMatchHistory();
     },
-    createMatch: (date: Date, overrides?: Partial<ClientMatch>) => createMatchFromDate(date, overrides)
+    createMatch: (date: Date, overrides?: Partial<ClientMatch>) =>
+      createMatchFromDate(date, overrides),
   };
 }
 
@@ -145,7 +149,9 @@ describe('[localStorage] Tamper detection', () => {
     if (storedData) {
       const parsed = JSON.parse(storedData);
       // Change the data but keep the old signature
-      parsed.data = Buffer.from(JSON.stringify([{ id: 'fake', score: 99999 }])).toString('base64');
+      parsed.data = Buffer.from(
+        JSON.stringify([{ id: 'fake', score: 99999 }]),
+      ).toString('base64');
       localStorage.setItem(MATCH_HISTORY_KEY, JSON.stringify(parsed));
     }
 

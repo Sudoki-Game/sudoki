@@ -25,14 +25,14 @@ const BoardCell = ({
   isSelected,
   isRelated,
   isAutoSolved,
-  handleClick
+  handleClick,
 }: BoardCellProps) => {
   const isImmutable = disabled || isFixed || isAutoSolved;
 
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({
     id: `cell-${row}-${col}`,
     data: { cell: { row, col } },
-    disabled: isImmutable
+    disabled: isImmutable,
   });
 
   // If empty, only show drop-zone
@@ -71,7 +71,7 @@ const BoardCell = ({
         isFixed,
         isAutoSolved,
         isOver,
-        onClick: handleClick
+        onClick: handleClick,
       }}
     />
   );

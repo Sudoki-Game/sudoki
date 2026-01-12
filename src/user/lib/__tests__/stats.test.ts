@@ -6,7 +6,7 @@ import {
   calculateStatsFromMatches,
   calculateStreakFromMatches,
   mergeMatchHistories,
-  calculateStreakBonus
+  calculateStreakBonus,
 } from '../stats';
 import type { ClientMatch } from '@/match/types';
 
@@ -15,7 +15,7 @@ import type { ClientMatch } from '@/match/types';
  */
 function createMatchForDate(
   date: Date,
-  overrides: Partial<ClientMatch> = {}
+  overrides: Partial<ClientMatch> = {},
 ): ClientMatch {
   const timestamp = date.getTime();
   return {
@@ -30,7 +30,7 @@ function createMatchForDate(
     originalBoard: '[]',
     solution: '[]',
     timestamp,
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -61,7 +61,7 @@ describe('calculateStatsFromMatches', () => {
     const matches = [
       createMatchForDate(daysAgo(2), { score: 100, streakBonus: 50 }),
       createMatchForDate(daysAgo(1), { score: 200, streakBonus: 100 }),
-      createMatchForDate(daysAgo(0), { score: 150, streakBonus: 0 })
+      createMatchForDate(daysAgo(0), { score: 150, streakBonus: 0 }),
     ];
 
     const stats = calculateStatsFromMatches(matches);
@@ -75,7 +75,7 @@ describe('calculateStatsFromMatches', () => {
       createMatchForDate(daysAgo(5)),
       createMatchForDate(daysAgo(3)),
       createMatchForDate(daysAgo(1)),
-      createMatchForDate(daysAgo(0))
+      createMatchForDate(daysAgo(0)),
     ];
 
     const stats = calculateStatsFromMatches(matches);
@@ -86,7 +86,7 @@ describe('calculateStatsFromMatches', () => {
     const matches = [
       createMatchForDate(daysAgo(2), { score: 100 }),
       createMatchForDate(daysAgo(1), { score: 500 }),
-      createMatchForDate(daysAgo(0), { score: 200 })
+      createMatchForDate(daysAgo(0), { score: 200 }),
     ];
 
     const stats = calculateStatsFromMatches(matches);
@@ -98,7 +98,7 @@ describe('calculateStatsFromMatches', () => {
     const matches = [
       createMatchForDate(daysAgo(5)),
       createMatchForDate(recentDate),
-      createMatchForDate(daysAgo(3))
+      createMatchForDate(daysAgo(3)),
     ];
 
     const stats = calculateStatsFromMatches(matches);
@@ -117,7 +117,7 @@ describe('calculateStreakFromMatches', () => {
     const matches = [
       createMatchForDate(daysAgo(2)),
       createMatchForDate(daysAgo(1)),
-      createMatchForDate(daysAgo(0))
+      createMatchForDate(daysAgo(0)),
     ];
 
     const { currentStreak } = calculateStreakFromMatches(matches);
@@ -130,7 +130,7 @@ describe('calculateStreakFromMatches', () => {
       createMatchForDate(daysAgo(4)),
       // Day 3 missed
       createMatchForDate(daysAgo(1)),
-      createMatchForDate(daysAgo(0))
+      createMatchForDate(daysAgo(0)),
     ];
 
     const { currentStreak, bestStreak } = calculateStreakFromMatches(matches);
@@ -147,7 +147,7 @@ describe('calculateStreakFromMatches', () => {
       createMatchForDate(daysAgo(6)),
       // Break
       createMatchForDate(daysAgo(1)),
-      createMatchForDate(daysAgo(0))
+      createMatchForDate(daysAgo(0)),
     ];
 
     const { currentStreak, bestStreak } = calculateStreakFromMatches(matches);
@@ -166,7 +166,7 @@ describe('calculateStreakFromMatches', () => {
   it('should have current streak of 0 if not played today', () => {
     const matches = [
       createMatchForDate(daysAgo(3)),
-      createMatchForDate(daysAgo(2))
+      createMatchForDate(daysAgo(2)),
       // Not played yesterday or today
     ];
 
@@ -177,7 +177,7 @@ describe('calculateStreakFromMatches', () => {
   it('should continue streak if played yesterday but not today', () => {
     const matches = [
       createMatchForDate(daysAgo(2)),
-      createMatchForDate(daysAgo(1))
+      createMatchForDate(daysAgo(1)),
       // Not played today yet
     ];
 
@@ -196,7 +196,7 @@ describe('mergeMatchHistories', () => {
   it('should return local matches if server is empty', () => {
     const localMatches = [
       createMatchForDate(daysAgo(1), { id: 'local_1' }),
-      createMatchForDate(daysAgo(0), { id: 'local_2' })
+      createMatchForDate(daysAgo(0), { id: 'local_2' }),
     ];
 
     const merged = mergeMatchHistories(localMatches, []);
@@ -206,7 +206,7 @@ describe('mergeMatchHistories', () => {
   it('should return server matches if local is empty', () => {
     const serverMatches = [
       createMatchForDate(daysAgo(1), { id: 'server_1' }),
-      createMatchForDate(daysAgo(0), { id: 'server_2' })
+      createMatchForDate(daysAgo(0), { id: 'server_2' }),
     ];
 
     const merged = mergeMatchHistories([], serverMatches);
@@ -216,10 +216,10 @@ describe('mergeMatchHistories', () => {
   it('should prefer server match when same day conflict exists', () => {
     const sameDay = daysAgo(1);
     const localMatches = [
-      createMatchForDate(sameDay, { id: 'local_1', score: 100 })
+      createMatchForDate(sameDay, { id: 'local_1', score: 100 }),
     ];
     const serverMatches = [
-      createMatchForDate(sameDay, { id: 'server_1', score: 200 })
+      createMatchForDate(sameDay, { id: 'server_1', score: 200 }),
     ];
 
     const merged = mergeMatchHistories(localMatches, serverMatches);
@@ -234,12 +234,19 @@ describe('mergeMatchHistories', () => {
 
     const merged = mergeMatchHistories(localMatches, serverMatches);
     expect(merged).toHaveLength(2);
-    expect(merged.map((m: { id: string }) => m.id).sort()).toEqual(['local_1', 'server_1']);
+    expect(merged.map((m: { id: string }) => m.id).sort()).toEqual([
+      'local_1',
+      'server_1',
+    ]);
   });
 
   it('should sort merged results by timestamp', () => {
-    const localMatches = [createMatchForDate(daysAgo(0), { id: 'local_today' })];
-    const serverMatches = [createMatchForDate(daysAgo(5), { id: 'server_old' })];
+    const localMatches = [
+      createMatchForDate(daysAgo(0), { id: 'local_today' }),
+    ];
+    const serverMatches = [
+      createMatchForDate(daysAgo(5), { id: 'server_old' }),
+    ];
 
     const merged = mergeMatchHistories(localMatches, serverMatches);
     expect(merged[0].id).toBe('server_old');

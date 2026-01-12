@@ -15,17 +15,28 @@ type DraggableProps = {
   cellProps: SudokuCellProps;
 } & React.ComponentProps<'div'>;
 
-const DraggableCell = ({ id, data, disabled, cellProps, ref, ...props }: DraggableProps) => {
+const DraggableCell = ({
+  id,
+  data,
+  disabled,
+  cellProps,
+  ref,
+  ...props
+}: DraggableProps) => {
   const { setNodeRef, attributes, listeners, isDragging } = useDraggable({
     id: id,
     data: data,
-    disabled: disabled
+    disabled: disabled,
   });
 
   const style = isDragging ? { opacity: 0 } : undefined;
 
   return (
-    <div ref={ref} className={clsx(styles.draggable, props.className)} {...props}>
+    <div
+      ref={ref}
+      className={clsx(styles.draggable, props.className)}
+      {...props}
+    >
       <SudokuCell
         ref={setNodeRef}
         style={style}
@@ -48,7 +59,7 @@ const DraggableCell = ({ id, data, disabled, cellProps, ref, ...props }: Draggab
             borderRadius: '0.75rem',
             opacity: 0.3,
             background: 'var(--shadow)',
-            boxShadow: 'inset 0 0.375rem 0 var(--shadow)'
+            boxShadow: 'inset 0 0.375rem 0 var(--shadow)',
           }}
         />
       )}

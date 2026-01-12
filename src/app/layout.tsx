@@ -4,11 +4,11 @@ import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
   title: 'Sudoki! - Alpha',
-  description: 'The online fun Sudoku game.'
+  description: 'The online fun Sudoku game.',
 };
 
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
