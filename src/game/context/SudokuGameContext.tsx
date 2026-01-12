@@ -31,6 +31,7 @@ import {
   getMatchHistory
 } from '@/match/lib/client';
 import { calculateStreakFromMatches, calculateStreakBonus } from '@/user/lib/stats';
+import { updateUserStatsFromMatch as updateUserStatsLocal } from '@/user/lib/client';
 import { auth } from '@/lib/firebase/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
@@ -796,6 +797,8 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         // Server save failed - cache to localStorage for later sync
         const result = await saveMatch(match, { isCached: true });
         if (result.success) {
+          // Update local user stats
+          await updateUserStatsLocal(match);
           updateLocalState();
         }
       }
@@ -803,6 +806,8 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
       // Anonymous user: save to localStorage only
       const result = await saveMatch(match);
       if (result.success) {
+        // Update local user stats
+        await updateUserStatsLocal(match);
         updateLocalState();
       }
     }

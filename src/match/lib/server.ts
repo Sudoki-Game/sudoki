@@ -9,7 +9,6 @@ import { serverDb } from '@/lib/firebase/server';
 import type { ServerMatch, SaveMatchResult } from '@/match/types';
 import { isMatchFromToday } from '@/match/types';
 import { FieldValue } from 'firebase-admin/firestore';
-import { calculateStreakFromMatches } from '@/user/lib/stats';
 
 /** Firestore collection name for matches */
 export const MATCHES_COLLECTION = 'matches';
@@ -226,12 +225,13 @@ export async function saveMatchBatch(
  * Update user stats based on a new match
  * This should be called after successfully saving a match
  * 
- * Updates:
+ * Updates incrementally (does not recalculate from match history):
  * - combinedScore: incremented by score + streakBonus
  * - matchesPlayed: incremented by 1
  * - lastMatchTimestamp: set to match timestamp
- * - dailyStreak: calculated from match history (current consecutive days)
+ * - dailyStreak: incremented if consecutive day, reset to 1 otherwise
  * - bestStreak: max of current bestStreak and new dailyStreak
+ * - personalBestScore: max of current and new match score
  */
 export async function updateUserStatsFromMatch(
   userId: string,
@@ -242,20 +242,52 @@ export async function updateUserStatsFromMatch(
     const userRef = serverDb.collection('users').doc(userId);
     const finalScore = match.score + streakBonus;
 
-    // Fetch match history to calculate updated streak values
-    const matchHistory = await getMatchHistory(userId);
-    const { currentStreak, bestStreak } = calculateStreakFromMatches(matchHistory);
-
-    // Get current user data to preserve bestStreak if it's higher
+    // Get current user data
     const userDoc = await userRef.get();
-    const currentBestStreak = userDoc.exists ? (userDoc.data()?.bestStreak ?? 0) : 0;
+    const userData = userDoc.exists ? userDoc.data() : null;
+    
+    const currentBestStreak = userData?.bestStreak ?? 0;
+    const currentPersonalBestScore = userData?.personalBestScore ?? 0;
+    const lastMatchTimestamp = userData?.lastMatchTimestamp ?? null;
+    const currentDailyStreak = userData?.dailyStreak ?? 0;
+
+    // Calculate new streak based on last match timestamp
+    let newDailyStreak: number;
+    if (lastMatchTimestamp === null) {
+      // First match ever
+      newDailyStreak = 1;
+    } else {
+      const lastMatchDate = new Date(lastMatchTimestamp);
+      const todayDate = new Date(match.timestamp);
+      
+      // Normalize to start of day for comparison
+      lastMatchDate.setHours(0, 0, 0, 0);
+      todayDate.setHours(0, 0, 0, 0);
+      
+      const diffMs = todayDate.getTime() - lastMatchDate.getTime();
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+      
+      if (diffDays === 0) {
+        // Same day - keep current streak
+        newDailyStreak = currentDailyStreak;
+      } else if (diffDays === 1) {
+        // Consecutive day - increment streak
+        newDailyStreak = currentDailyStreak + 1;
+      } else {
+        // Streak broken - reset to 1
+        newDailyStreak = 1;
+      }
+    }
+
+    const newBestStreak = Math.max(currentBestStreak, newDailyStreak);
 
     await userRef.update({
       combinedScore: FieldValue.increment(finalScore),
       matchesPlayed: FieldValue.increment(1),
       lastMatchTimestamp: match.timestamp,
-      dailyStreak: currentStreak,
-      bestStreak: Math.max(currentBestStreak, bestStreak, currentStreak)
+      dailyStreak: newDailyStreak,
+      bestStreak: newBestStreak,
+      personalBestScore: Math.max(currentPersonalBestScore, match.score)
     });
   } catch (error) {
     console.error('[MatchServer] Error updating user stats:', error);

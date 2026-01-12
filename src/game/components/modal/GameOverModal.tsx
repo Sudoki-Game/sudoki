@@ -9,15 +9,10 @@ import Modal from './Modal';
 import { auth } from '@/lib/firebase/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import {
-  getMatchHistory as getMatchHistoryLocal,
-  getTodaysMatch as getTodaysMatchLocal
-} from '@/match/lib/client';
-import {
-  getMatchHistory as getMatchHistoryServer,
-  getTodaysMatch as getTodaysMatchServer
-} from '@/app/actions/match';
-import { calculateStatsFromMatches } from '@/user/lib/stats';
+import { getTodaysMatch as getTodaysMatchLocal } from '@/match/lib/client';
+import { getUserData as getUserDataLocal } from '@/user/lib/client';
+import { getTodaysMatch as getTodaysMatchServer } from '@/app/actions/match';
+import { getUserStats as getUserStatsServer } from '@/app/actions/user';
 import { useSudokuGame } from '@/game/context/SudokuGameContext';
 import type { BaseUserStats } from '@/user/types';
 import type { ClientMatch } from '@/match/types';
@@ -47,15 +42,14 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
 
   // Load match data and user stats
   useEffect(() => {
-    // If we have context match, just fetch history for stats
+    // If we have context match, just fetch user stats directly
     if (contextMatch) {
       const fetchStats = async () => {
         const user = auth.currentUser;
         setIsLoggedIn(!!user);
-        const history = user
-          ? await getMatchHistoryServer(user.uid)
-          : await getMatchHistoryLocal();
-        const stats = calculateStatsFromMatches(history);
+        const stats = user
+          ? await getUserStatsServer(user.uid)
+          : await getUserDataLocal();
         setUserStats(stats);
         setIsReady(true);
       };
@@ -68,13 +62,13 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
     hasFetchedRef.current = true;
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      let history;
+      let stats: BaseUserStats;
       let todaysMatch: ClientMatch | null = null;
 
       if (user) {
         setIsLoggedIn(true);
         // Use server data for logged-in users
-        history = await getMatchHistoryServer(user.uid);
+        stats = await getUserStatsServer(user.uid);
         const serverMatch = await getTodaysMatchServer(user.uid);
         if (serverMatch) {
           todaysMatch = {
@@ -94,11 +88,10 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
       } else {
         setIsLoggedIn(false);
         // Use localStorage for anonymous users
-        history = await getMatchHistoryLocal();
+        stats = await getUserDataLocal();
         todaysMatch = await getTodaysMatchLocal();
       }
 
-      const stats = calculateStatsFromMatches(history);
       setUserStats(stats);
       setFetchedMatch(todaysMatch);
       setIsReady(true);
