@@ -1,23 +1,15 @@
 import { useModalRouter } from '@/game/context/ModalRouterContext';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebase/client';
-import { onAuthStateChanged } from 'firebase/auth';
-import { useState, useEffect } from 'react';
 import modalStyles from './Modal.module.css';
 import Button from '@/ui/components/Button';
 import Modal from './Modal';
+import { useAuth } from '@/context/AuthContext';
 
 const SettingsModal = () => {
+  const { isLoggedIn } = useAuth();
   const { openModal, closeModal, goBack } = useModalRouter();
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
-    });
-    return () => unsubscribe();
-  }, []);
 
   // Don't render auth buttons until we know the auth state
   const showAuthButton = isLoggedIn !== null;

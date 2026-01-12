@@ -3,8 +3,10 @@ import Image from 'next/image';
 import { useModalRouter } from '@/game/context/ModalRouterContext';
 import Button from '@/ui/components/Button';
 import styles from './Header.module.css';
+import { useAuth } from '@/context/AuthContext';
 
 const Header = () => {
+  const { isLoggedIn } = useAuth();
   const { openModal } = useModalRouter();
 
   return (
@@ -28,7 +30,7 @@ const Header = () => {
       />
 
       <Button
-        disabled
+        disabled={!isLoggedIn}
         size='icon'
         variant='warning'
         type='button'

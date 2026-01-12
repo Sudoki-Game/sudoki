@@ -15,6 +15,7 @@ import { auth } from '@/lib/firebase/client';
 
 export interface AuthContextType {
   loading: boolean;
+  isLoggedIn: boolean | null;
   getUserData: () => Promise<UserStats | null>;
 }
 
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState<boolean>(true);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(async (currentUser) => {
@@ -35,9 +37,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else {
         await removeSession();
       }
+
+      setIsLoggedIn(!!currentUser);
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -50,7 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={{ loading, getUserData }}>
+    <AuthContext.Provider value={{ loading, isLoggedIn, getUserData }}>
       {children}
     </AuthContext.Provider>
   );
