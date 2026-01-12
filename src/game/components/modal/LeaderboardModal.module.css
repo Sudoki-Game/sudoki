@@ -1,0 +1,103 @@
+.wrapper {
+  width: 100%;
+  background-color: var(--cyan);
+  border-radius: 0.75rem;
+  border: 2px solid var(--hot-pink);
+  box-sizing: border-box;
+  padding: 1rem;
+}
+
+.leaderboard {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Yang Bagus';
+  font-weight: normal;
+}
+
+.leaderboard th {
+  color: var(--label);
+  font-size: 1.125rem;
+  font-weight: normal;
+  height: 1.5rem;
+  text-align: left;
+
+  &.statHeader {
+    text-align: right;
+  }
+
+  &:first-child {
+    text-align: center;
+  }
+
+  &:last-child {
+    padding-right: 0.75rem;
+  }
+}
+
+.leaderboard tr {
+  height: 2.5rem;
+}
+
+.leaderboard td {
+  font-size: 1.25rem;
+  font-weight: normal;
+  height: 1.5rem;
+
+  &:first-child {
+    text-align: center;
+
+    > img {
+      margin: auto;
+    }
+  }
+
+  &:last-child {
+    padding-right: 0.7rem;
+  }
+}
+
+/* Cell styles */
+.rankCell {
+  width: 2.5rem;
+  color: var(--brown);
+  font-size: 1.25rem;
+  vertical-align: middle;
+}
+
+.rankCell img {
+  display: block;
+}
+
+.nameCell {
+  color: var(--text);
+}
+
+.statCell {
+  text-align: right;
+  color: var(--hot-pink);
+  font-family: 'Bear Days';
+}
+
+.rank {
+  color: var(--brown);
+}
+
+/* Current user highlight */
+.currentUser {
+  background-color: var(--hot-pink);
+}
+
+.currentUser td {
+  color: white;
+}
+
+/* Separator */
+
+.separator td {
+  border: none;
+  padding-right: 0 !important;
+
+  > hr {
+    border: 1px dashed var(--hot-pink);
+  }
+}

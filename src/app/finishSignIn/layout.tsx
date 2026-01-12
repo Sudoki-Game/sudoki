@@ -1,7 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Copyright from '@/components/Copyright';
-import headerStyles from '@/components/Header.module.css';
+import headerStyles from '@/game/components/Header.module.css';
+
 const FinishSignInLayout = async ({
   children
 }: Readonly<{

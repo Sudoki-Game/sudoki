@@ -29,7 +29,7 @@
 
   hr {
     grid-column: span 2;
-    border: 2px dashed var(--hot-pink);
+    border: 1px dashed var(--hot-pink);
   }
 }
 

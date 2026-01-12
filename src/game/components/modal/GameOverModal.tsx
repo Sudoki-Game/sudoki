@@ -47,9 +47,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
       const fetchStats = async () => {
         const user = auth.currentUser;
         setIsLoggedIn(!!user);
-        const stats = user
-          ? await getUserStatsServer(user.uid)
-          : await getUserDataLocal();
+        const stats = user ? await getUserStatsServer(user.uid) : await getUserDataLocal();
         setUserStats(stats);
         setIsReady(true);
       };
@@ -171,7 +169,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
           <span className={styles.statNumerical}>{userStats?.combinedScore ?? 0}</span>
         </section>
 
-        {!isLoggedIn && (
+        {!isLoggedIn ? (
           <div className={styles.registerCTA}>
             <p>Want to see your score on the leaderboard?</p>
             <Button
@@ -184,6 +182,16 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
               Create an Account
             </Button>
           </div>
+        ) : (
+          <Button
+            fill
+            size='lg'
+            variant={'ok'}
+            type='button'
+            onClick={() => openModal('leaderboard')}
+          >
+            Leaderboard
+          </Button>
         )}
 
         <Button disabled={isWin} fill size='lg' type='button' onClick={() => openModal('solution')}>
