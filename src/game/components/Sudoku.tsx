@@ -56,7 +56,12 @@ const Sudoku = () => {
 
   // Show game over modal if user has already played today (on page load)
   useEffect(() => {
-    console.log('[Sudoku] Checking hasPlayedToday:', { hasPlayedToday, todaysMatch: !!todaysMatch, status: game.status, isReady });
+    console.log('[Sudoku] Checking hasPlayedToday:', {
+      hasPlayedToday,
+      todaysMatch: !!todaysMatch,
+      status: game.status,
+      isReady
+    });
     if (isReady && hasPlayedToday && todaysMatch && game.status === 'idle') {
       console.log('[Sudoku] Opening gameover modal for previous match');
       openModal('gameover');

@@ -1,12 +1,7 @@
 'use client';
 import { createContext, useContext, useReducer, ReactNode } from 'react';
 
-export type ModalType =
-  | 'gameover'
-  | 'solution'
-  | 'leaderboard'
-  | 'settings'
-  | 'bug-report';
+export type ModalType = 'gameover' | 'solution' | 'leaderboard' | 'settings' | 'bug-report';
 
 type ModalRouterProviderProps = {
   children: ReactNode;
@@ -16,11 +11,12 @@ type State = {
   history: ModalType[];
 };
 
-type Action = { type: 'OPEN_MENU'; menu: ModalType } | { type: 'GO_BACK' };
+type Action = { type: 'OPEN_MENU'; menu: ModalType } | { type: 'RESET' } | { type: 'GO_BACK' };
 
 export type ModalRouterProviderState = {
   activeModal: ModalType | null;
   openModal: (menu: ModalType) => void;
+  closeModal: () => void;
   goBack: () => void;
 };
 
@@ -35,6 +31,12 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         history: [...state.history, action.menu]
+      };
+    }
+
+    case 'RESET': {
+      return {
+        history: []
       };
     }
 
@@ -65,12 +67,16 @@ export function ModalRouterProvider({ children }: ModalRouterProviderProps) {
     dispatch({ type: 'OPEN_MENU', menu });
   };
 
+  const closeModal = () => {
+    dispatch({ type: 'RESET' });
+  };
+
   const goBack = () => {
     dispatch({ type: 'GO_BACK' });
   };
 
   return (
-    <ModalRouterContext.Provider value={{ activeModal, openModal, goBack }}>
+    <ModalRouterContext.Provider value={{ activeModal, openModal, closeModal, goBack }}>
       {children}
     </ModalRouterContext.Provider>
   );

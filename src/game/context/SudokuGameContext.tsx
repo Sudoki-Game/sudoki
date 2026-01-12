@@ -232,7 +232,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
    * Check if user has already played today and sync cached matches on mount
    * Follows different paths for logged-in vs anonymous users (see Game Load diagram)
    * Auto-starts a new game if the user hasn't played today
-   * 
+   *
    * Uses onAuthStateChanged to wait for Firebase Auth to initialize before checking
    */
   useEffect(() => {
@@ -250,7 +250,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         }
 
         // 2. Check server for today's match
-        console.log('[SudokuGame] Checking server for today\'s match...');
+        console.log("[SudokuGame] Checking server for today's match...");
         const serverTodaysMatch = await getTodaysMatchServer(user.uid);
         console.log('[SudokuGame] Server result:', serverTodaysMatch?.id ?? 'no match');
         if (serverTodaysMatch) {
@@ -306,6 +306,12 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         dispatch({ type: 'NEW_GAME', payload: { board: puzzle, solution, difficulty } });
         setElapsedTime(0);
         setIsPaused(false);
+
+        // Reset existing match data if user has just logged out
+        setPlayedToday(false);
+        setTodaysMatch(null);
+        setLastMatch(null);
+        setGameOverReady(false);
       }
 
       // Mark context as ready after initialization completes
@@ -751,9 +757,10 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     // - Server for logged-in users (localStorage may be empty after sync)
     // - localStorage for anonymous users
     const isLoggedIn = !!auth.currentUser;
-    const matchHistory = isLoggedIn && auth.currentUser
-      ? await getMatchHistoryServer(auth.currentUser.uid)
-      : await getMatchHistory();
+    const matchHistory =
+      isLoggedIn && auth.currentUser
+        ? await getMatchHistoryServer(auth.currentUser.uid)
+        : await getMatchHistory();
     const { currentStreak } = calculateStreakFromMatches(matchHistory);
 
     // Calculate streak bonus for playing on consecutive days (awarded regardless of win/loss)
