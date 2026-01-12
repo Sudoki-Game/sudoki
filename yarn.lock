@@ -8388,6 +8388,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prettier@npm:3.7.4":
+  version: 3.7.4
+  resolution: "prettier@npm:3.7.4"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10c0/9675d2cd08eacb1faf1d1a2dbfe24bfab6a912b059fc9defdb380a408893d88213e794a40a2700bd29b140eb3172e0b07c852853f6e22f16f3374659a1a13389
+  languageName: node
+  linkType: hard
+
 "pretty-format@npm:30.2.0, pretty-format@npm:^30.0.0":
   version: 30.2.0
   resolution: "pretty-format@npm:30.2.0"
@@ -9353,6 +9362,7 @@ __metadata:
     jest-environment-jsdom: "npm:^30.2.0"
     next: "npm:16.0.10"
     nodemailer: "npm:^7.0.11"
+    prettier: "npm:3.7.4"
     react: "npm:19.2.0"
     react-dom: "npm:19.2.0"
     ts-jest: "npm:^29.4.6"
