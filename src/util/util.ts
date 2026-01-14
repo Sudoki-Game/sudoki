@@ -164,26 +164,71 @@ export function removeConflictsForCell(
 }
 
 /**
- * Generates a fully solved Sudoku board using backtracking.
+ * Shuffles an array in place using the provided random function.
+ * Uses Fisher-Yates shuffle algorithm.
+ *
+ * @param array - The array to shuffle
+ * @param random - A function returning a random number between 0 and 1
+ * @returns The shuffled array (same reference)
+ */
+export function shuffleWithRandom<T>(array: T[], random: () => number): T[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+/**
+ * Checks if placing a value at the given position causes conflicts.
+ * Lighter weight than getConflicts() - just returns boolean.
+ */
+function hasConflict(
+  board: Board,
+  row: number,
+  col: number,
+  val: number,
+): boolean {
+  // Check row and column
+  for (let i = 0; i < 9; i++) {
+    if (i !== col && board[row][i] === val) return true;
+    if (i !== row && board[i][col] === val) return true;
+  }
+
+  // Check 3x3 box
+  const boxRow = Math.floor(row / 3) * 3;
+  const boxCol = Math.floor(col / 3) * 3;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      const r = boxRow + i;
+      const c = boxCol + j;
+      if ((r !== row || c !== col) && board[r][c] === val) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Generates a fully solved Sudoku board using backtracking with a custom random function.
+ * @param random - A function returning a random number between 0 and 1
  * @returns A valid, completely filled Sudoku board.
  */
-export function generateSolvedSudoku(): Board {
+export function generateSeededSolvedSudoku(random: () => number): Board {
   const board = createEmptyBoard();
 
-  function solve() {
+  function solve(): boolean {
     for (let row = 0; row < 9; row++) {
       for (let col = 0; col < 9; col++) {
         if (board[row][col] === null) {
-          // Try numbers 1-9
+          // Create and shuffle numbers 1-9 with provided random
           const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-          // Shuffle for randomization
-          for (let i = nums.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [nums[i], nums[j]] = [nums[j], nums[i]];
-          }
+          shuffleWithRandom(nums, random);
 
           for (const num of nums) {
-            if (getConflicts(board, row, col, num).size === 0) {
+            if (!hasConflict(board, row, col, num)) {
               board[row][col] = num;
 
               if (solve()) {
@@ -206,23 +251,26 @@ export function generateSolvedSudoku(): Board {
 }
 
 /**
- * Generates a Sudoku puzzle and its solution for a given difficulty.
+ * Generates a Sudoku puzzle and its solution for a given difficulty using a seeded random.
  * @param difficulty - The desired puzzle difficulty.
+ * @param random - A function returning a random number between 0 and 1
  * @returns The puzzle (with cells removed) and its solution.
  */
-export function generatePuzzledifficulty(difficulty: Difficulty): {
+export function generateSeededPuzzle(
+  difficulty: Difficulty,
+  random: () => number,
+): {
   puzzle: Board;
-  solution: number[][];
+  solution: Board;
 } {
-  const solved = generateSolvedSudoku();
-  const puzzle = JSON.parse(JSON.stringify(solved));
-  const solution = JSON.parse(JSON.stringify(solved));
+  const solution = generateSeededSolvedSudoku(random);
+  const puzzle: Board = solution.map((row) => [...row]);
 
   // Number of cells to remove based on difficulty
-  let cellsToRemove;
+  let cellsToRemove: number;
   switch (difficulty) {
     case 'im-too-young-to-die':
-      cellsToRemove = 2; // Because i'm not very good
+      cellsToRemove = 2;
       break;
     case 'easy':
       cellsToRemove = 35;
@@ -237,18 +285,14 @@ export function generatePuzzledifficulty(difficulty: Difficulty): {
       cellsToRemove = 45;
   }
 
-  const positions = [];
+  // Create array of all positions and shuffle with seeded random
+  const positions: [number, number][] = [];
   for (let i = 0; i < 9; i++) {
     for (let j = 0; j < 9; j++) {
       positions.push([i, j]);
     }
   }
-
-  // Shuffle positions
-  for (let i = positions.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [positions[i], positions[j]] = [positions[j], positions[i]];
-  }
+  shuffleWithRandom(positions, random);
 
   // Remove cells
   for (let i = 0; i < cellsToRemove && i < positions.length; i++) {
@@ -257,4 +301,61 @@ export function generatePuzzledifficulty(difficulty: Difficulty): {
   }
 
   return { puzzle, solution };
+}
+
+/**
+ * Creates a seeded pseudo-random number generator using Mulberry32 algorithm.
+ * Same seed always produces the same sequence of numbers.
+ *
+ * @param seed - The seed value to initialize the generator
+ * @returns A function that returns a random number between 0 and 1
+ */
+export function createSeededRandom(seed: number): () => number {
+  let state = seed;
+
+  return function (): number {
+    state += 0x6d2b79f5;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Converts a date string to a numeric seed.
+ * e.g., "2026-01-14" → 20260114
+ *
+ * @param dateString - ISO date string (YYYY-MM-DD)
+ * @returns Numeric seed value
+ */
+export function dateToSeed(dateString: string): number {
+  return parseInt(dateString.replace(/-/g, ''), 10);
+}
+
+/**
+ * Gets today's date string in UTC.
+ * @returns Date string in YYYY-MM-DD format
+ */
+export function getTodayDateString(): string {
+  const now = new Date();
+  return now.toISOString().split('T')[0];
+}
+
+/**
+ * Generates a puzzle deterministically based on a date string.
+ * Everyone gets the same puzzle on the same day.
+ *
+ * @param dateString - The date in YYYY-MM-DD format
+ * @param difficulty - The puzzle difficulty level
+ * @returns The puzzle and its solution
+ */
+export function generateDailyPuzzle(
+  dateString: string,
+  difficulty: Difficulty = 'medium',
+): { puzzle: Board; solution: Board } {
+  const seed = dateToSeed(dateString);
+  const random = createSeededRandom(seed);
+
+  return generateSeededPuzzle(difficulty, random);
 }

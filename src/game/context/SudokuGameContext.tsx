@@ -16,13 +16,13 @@ import type { GameAction, GameState, ClientMatch } from '../types';
 import { generateMatchId } from '../types';
 import { type DragStartEvent, type DragEndEvent } from '@dnd-kit/core';
 import {
-  generatePuzzledifficulty,
   removeConflictsForCell,
   getConflicts,
   isGameWon,
   createEmptyBoard,
   computeHighlights,
 } from '../../util/util';
+import { getDailyPuzzle } from '@/app/actions/puzzle';
 import {
   MAX_LIVES,
   SCORE_CORRECT_CELL,
@@ -121,9 +121,9 @@ export type SudokuGameProviderState = {
   handleClick: (row: number, col: number) => void;
 
   /**
-   * Start a new Sudoku game
+   * Start a new Sudoku game (fetches from server)
    */
-  newGame: () => void;
+  newGame: () => Promise<void>;
 
   /**
    * Fill in a random cell on the game board
@@ -256,12 +256,13 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
 
   /**
    * Starts a new game.
-   * Generates board and resets state.
+   * Fetches today's puzzle from the server.
    */
-  const newGame = () => {
+  const newGame = async () => {
     setElapsedTime(0);
-    const difficulty = 'medium';
-    const { puzzle, solution } = generatePuzzledifficulty(difficulty);
+    setIsReady(false);
+
+    const { puzzle, solution, difficulty } = await getDailyPuzzle('medium');
     dispatch({
       type: 'NEW_GAME',
       payload: { board: puzzle, solution, difficulty },
@@ -355,7 +356,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         console.log(
           '[SudokuGame] User has not played today, starting new game...',
         );
-        newGame();
+        await newGame();
         setElapsedTime(0);
         setIsPaused(false);
 
