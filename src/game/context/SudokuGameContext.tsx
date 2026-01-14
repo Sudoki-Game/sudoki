@@ -248,6 +248,29 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   const [lastMatch, setLastMatch] = useState<ClientMatch | null>(null);
 
   /**
+   * Grid of all fixed cells
+   */
+  const fixedCells = state.originalBoard.map((row) =>
+    row.map((val) => val !== null),
+  );
+
+  /**
+   * Starts a new game.
+   * Generates board and resets state.
+   */
+  const newGame = () => {
+    setElapsedTime(0);
+    const difficulty = 'medium';
+    const { puzzle, solution } = generatePuzzledifficulty(difficulty);
+    dispatch({
+      type: 'NEW_GAME',
+      payload: { board: puzzle, solution, difficulty },
+    });
+    setIsReady(true);
+    setIsPaused(false);
+  };
+
+  /**
    * Check if user has already played today and sync cached matches on mount
    * Follows different paths for logged-in vs anonymous users (see Game Load diagram)
    * Auto-starts a new game if the user hasn't played today
@@ -332,12 +355,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         console.log(
           '[SudokuGame] User has not played today, starting new game...',
         );
-        const difficulty = 'medium';
-        const { puzzle, solution } = generatePuzzledifficulty(difficulty);
-        dispatch({
-          type: 'NEW_GAME',
-          payload: { board: puzzle, solution, difficulty },
-        });
+        newGame();
         setElapsedTime(0);
         setIsPaused(false);
 
@@ -361,13 +379,6 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   }, []);
 
   /**
-   * Grid of all fixed cells
-   */
-  const fixedCells = state.originalBoard.map((row) =>
-    row.map((val) => val !== null),
-  );
-
-  /**
    * Toggle pause state - only works during active gameplay
    */
   const togglePause = (override?: boolean) => {
@@ -380,22 +391,6 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     if (shouldPause) {
       dispatch({ type: 'RESET_SELECTION' });
     }
-  };
-
-  /**
-   * Starts a new game.
-   * Generates board and resets state.
-   */
-  const newGame = () => {
-    setElapsedTime(0);
-    const difficulty = 'medium';
-    const { puzzle, solution } = generatePuzzledifficulty(difficulty);
-    dispatch({
-      type: 'NEW_GAME',
-      payload: { board: puzzle, solution, difficulty },
-    });
-    setIsReady(true);
-    setIsPaused(false);
   };
 
   /**
