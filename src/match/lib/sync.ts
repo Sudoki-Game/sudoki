@@ -14,6 +14,7 @@ import {
   getMatchHistory,
   clearMatchHistory,
 } from './client';
+import { clearUserData } from '@/user/lib/client';
 import {
   hasMatchForDate,
   saveMatch as saveMatchToServer,
@@ -102,6 +103,7 @@ export async function uploadAllLocalMatches(
         '[MatchSync] All local matches synced, clearing localStorage',
       );
       clearMatchHistory();
+      clearUserData();
     }
 
     result.success = result.failed === 0;
