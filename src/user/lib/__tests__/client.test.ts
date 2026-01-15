@@ -36,7 +36,7 @@ function createTestUserData(
 }
 
 beforeEach(() => {
-  process.env = { ...originalEnv, HMAC_SECRET: mockHmacSecret };
+  process.env = { ...originalEnv, NEXT_PUBLIC_HMAC_SECRET: mockHmacSecret };
   localStorage.clear();
 });
 
