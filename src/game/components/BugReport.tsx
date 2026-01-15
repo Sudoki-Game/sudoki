@@ -31,7 +31,7 @@ const BugReport = () => {
   return (
     <Form action={formAction}>
       <FormField>
-        <Label htmlFor='email'>Email (SelectOptional)</Label>
+        <Label htmlFor='email'>Email (Optional)</Label>
         <Input
           type='email'
           name='email'
