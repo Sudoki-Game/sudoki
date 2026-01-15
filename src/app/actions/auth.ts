@@ -5,11 +5,11 @@ import { SessionResult } from '@/types/auth';
 import { serverAuth } from '@/lib/firebase/server';
 import {
   userExists,
-  createUserEntry,
-  updateUserDisplayName,
+  createUser,
+  updateDisplayName,
   isDisplayNameTaken,
-  hasUserCompletedOnboarding as checkOnboarding,
-} from '@/lib/firebase/firestore';
+  checkOnboardingComplete,
+} from '@/user/lib/server';
 
 export async function createSession(idToken: string): Promise<SessionResult> {
   try {
@@ -21,7 +21,7 @@ export async function createSession(idToken: string): Promise<SessionResult> {
     const isNewUser = !exists;
 
     if (isNewUser) {
-      await createUserEntry(uid, decodedToken.email || null);
+      await createUser(uid, decodedToken.email || null);
     }
 
     const cookieStore = await cookies();
@@ -102,7 +102,7 @@ export async function completeOnboarding(
     }
 
     const decodedToken = await serverAuth.verifyIdToken(session);
-    await updateUserDisplayName(decodedToken.uid, trimmedName);
+    await updateDisplayName(decodedToken.uid, trimmedName);
 
     return { success: true };
   } catch (error) {
@@ -129,7 +129,7 @@ export async function checkUserOnboarding(): Promise<{
     }
 
     const decodedToken = await serverAuth.verifyIdToken(session);
-    const completed = await checkOnboarding(decodedToken.uid);
+    const completed = await checkOnboardingComplete(decodedToken.uid);
 
     return { hasCompleted: completed, uid: decodedToken.uid };
   } catch (error) {

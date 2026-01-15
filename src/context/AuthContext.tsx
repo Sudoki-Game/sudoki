@@ -8,9 +8,9 @@ import {
   ReactNode,
 } from 'react';
 import { createSession, removeSession } from '@/app/actions/auth';
+import { getUserStats } from '@/app/actions/user';
 import { UserStats } from '@/types/auth';
 import { onAuthStateChanged } from '@/lib/firebase/auth';
-import { getServerUserData } from '@/lib/firebase/firestore';
 import { auth } from '@/lib/firebase/client';
 
 export interface AuthContextType {
@@ -46,7 +46,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const getUserData = async (): Promise<UserStats | null> => {
     if (auth.currentUser) {
-      const serverData = await getServerUserData(auth.currentUser.uid);
+      const serverData = await getUserStats(auth.currentUser.uid);
       return serverData;
     }
     return null;

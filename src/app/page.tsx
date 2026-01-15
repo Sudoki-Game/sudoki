@@ -4,7 +4,7 @@ import { ModalRouterProvider } from '@/game/context/ModalRouterContext';
 import Sudoku from '@/game/components/Sudoku';
 import { SudokuGameProvider } from '@/game/context/SudokuGameContext';
 import { getServerUser } from '@/lib/auth/server';
-import { hasUserCompletedOnboarding } from '@/lib/firebase/firestore';
+import { checkOnboardingComplete } from '@/user/lib/server';
 import { redirect } from 'next/navigation';
 import ModalRouter from '@/game/components/modal/ModalRouter';
 
@@ -13,7 +13,7 @@ export default async function Home() {
 
   if (user) {
     // Check user is onboarded
-    const hasCompletedOnboarding = await hasUserCompletedOnboarding(user?.uid);
+    const hasCompletedOnboarding = await checkOnboardingComplete(user?.uid);
 
     if (!hasCompletedOnboarding) {
       console.log(hasCompletedOnboarding);

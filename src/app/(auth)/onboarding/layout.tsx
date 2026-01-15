@@ -2,7 +2,7 @@ import React from 'react';
 import { getServerUser } from '@/lib/auth/server';
 import { redirect } from 'next/navigation';
 import { AuthUser } from '@/types';
-import { hasUserCompletedOnboarding } from '@/lib/firebase/firestore';
+import { checkOnboardingComplete } from '@/user/lib/server';
 
 const OnboardingLayout = async ({
   children,
@@ -10,7 +10,7 @@ const OnboardingLayout = async ({
   children: React.ReactNode;
 }>) => {
   const user = (await getServerUser()) as AuthUser;
-  const hasCompletedOnboarding = await hasUserCompletedOnboarding(user.uid);
+  const hasCompletedOnboarding = await checkOnboardingComplete(user.uid);
 
   if (hasCompletedOnboarding) {
     redirect('/');
