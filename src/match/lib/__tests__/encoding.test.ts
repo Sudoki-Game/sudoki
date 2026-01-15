@@ -20,7 +20,7 @@ const originalEnv = process.env;
 
 beforeEach(() => {
   // Reset environment before each test
-  process.env = { ...originalEnv, NEXT_PUBLIC_HMAC_SECRET: mockHmacSecret };
+  process.env = { ...originalEnv, HMAC_SECRET: mockHmacSecret };
 });
 
 afterAll(() => {
@@ -65,7 +65,7 @@ describe('getHmacKey', () => {
   });
 
   it('should throw error if HMAC secret is not set', () => {
-    delete process.env.NEXT_PUBLIC_HMAC_SECRET;
+    delete process.env.HMAC_SECRET;
     expect(() => getHmacKey()).toThrow('HMAC secret not configured');
   });
 });

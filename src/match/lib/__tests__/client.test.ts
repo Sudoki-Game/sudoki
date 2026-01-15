@@ -81,7 +81,7 @@ function createLocalStorageAdapter(): MatchStorageAdapter<ClientMatch> {
 }
 
 beforeEach(() => {
-  process.env = { ...originalEnv, NEXT_PUBLIC_HMAC_SECRET: mockHmacSecret };
+  process.env = { ...originalEnv, HMAC_SECRET: mockHmacSecret };
   localStorage.clear();
 });
 

@@ -21,10 +21,10 @@ function isNodeEnvironment(): boolean {
  * @throws Error if secret is not configured
  */
 export function getHmacKey(): string {
-  const secret = process.env.NEXT_PUBLIC_HMAC_SECRET;
+  const secret = process.env.HMAC_SECRET;
   if (!secret) {
     throw new Error(
-      'HMAC secret not configured. Set NEXT_PUBLIC_HMAC_SECRET environment variable.',
+      'HMAC secret not configured. Set HMAC_SECRET environment variable.',
     );
   }
   return secret;
