@@ -13,9 +13,9 @@
  * 3. Generate fresh (fallback)
  */
 
-import { generateDailyPuzzle, getTodayDateString } from '@/util/util';
-import { serverDb } from '@/lib/firebase/server';
+import { serverDb } from '@/firebase/server';
 import type { Difficulty, Board } from '@/game/types';
+import { generateDailyPuzzle, getTodayDateString } from '@/game/util';
 
 /**
  * In-memory cache for puzzles (survives within same serverless instance)

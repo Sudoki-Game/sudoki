@@ -7,7 +7,7 @@ import {
   mapFirebaseError,
   sendMagicLink,
   signInWithGoogle,
-} from '@/lib/firebase/auth';
+} from '@/auth/lib/firebase';
 import styles from './LoginForm.module.css';
 import Button from '@/ui/components/Button';
 import Form from '@/ui/components/Form';

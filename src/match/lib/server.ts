@@ -5,7 +5,7 @@
  * These functions are meant to be called from server actions or API routes.
  */
 
-import { serverDb } from '@/lib/firebase/server';
+import { serverDb } from '@/firebase/server';
 import type { ServerMatch, SaveMatchResult } from '@/match/types';
 import { isMatchFromToday } from '@/match/types';
 import { FieldValue } from 'firebase-admin/firestore';

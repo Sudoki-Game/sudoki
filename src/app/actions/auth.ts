@@ -1,8 +1,8 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { SessionResult } from '@/types/auth';
-import { serverAuth } from '@/lib/firebase/server';
+import { SessionResult } from '@/auth/types';
+import { serverAuth } from '@/firebase/server';
 import {
   userExists,
   createUser,
@@ -10,6 +10,9 @@ import {
   isDisplayNameTaken,
   checkOnboardingComplete,
 } from '@/user/lib/server';
+import { hasLocalDataToTransfer } from '@/user/lib/sync';
+import { getMatchHistory } from '@/match/lib/server';
+import { uploadAllLocalMatches } from '@/match/lib/sync';
 
 export async function createSession(idToken: string): Promise<SessionResult> {
   try {
@@ -103,6 +106,19 @@ export async function completeOnboarding(
 
     const decodedToken = await serverAuth.verifyIdToken(session);
     await updateDisplayName(decodedToken.uid, trimmedName);
+
+    // Upload local data to server
+    try {
+      if (hasLocalDataToTransfer()) {
+        const localMatches = await getMatchHistory(decodedToken.uid);
+        if (localMatches.length > 0) {
+          console.log('[SudokuGame] Uploading local matches to server...');
+          await uploadAllLocalMatches(decodedToken.uid);
+        }
+      }
+    } catch (error) {
+      console.warn('[Onboarding] Local data upload failed:', error);
+    }
 
     return { success: true };
   } catch (error) {

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useModalRouter } from '@/game/context/ModalRouterContext';
 import Button from '@/ui/components/Button';
 import styles from './Header.module.css';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/auth/context/AuthContext';
 
 const Header = () => {
   const { isLoggedIn } = useAuth();

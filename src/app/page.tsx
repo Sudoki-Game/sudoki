@@ -1,9 +1,9 @@
-import Copyright from '@/components/Copyright';
+import Copyright from '@/ui/components/Copyright';
 import Header from '@/game/components/Header';
 import { ModalRouterProvider } from '@/game/context/ModalRouterContext';
 import Sudoku from '@/game/components/Sudoku';
 import { SudokuGameProvider } from '@/game/context/SudokuGameContext';
-import { getServerUser } from '@/lib/auth/server';
+import { getServerUser } from '@/auth/lib/server';
 import { checkOnboardingComplete } from '@/user/lib/server';
 import { redirect } from 'next/navigation';
 import ModalRouter from '@/game/components/modal/ModalRouter';

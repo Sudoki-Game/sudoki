@@ -1,5 +1,5 @@
 import React from 'react';
-import { getServerUser } from '@/lib/auth/server';
+import { getServerUser } from '@/auth/lib/server';
 import { redirect } from 'next/navigation';
 import { AuthUser } from '@/types';
 import { checkOnboardingComplete } from '@/user/lib/server';

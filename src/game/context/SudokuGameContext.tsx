@@ -21,15 +21,15 @@ import {
   isGameWon,
   createEmptyBoard,
   computeHighlights,
-} from '../../util/util';
+} from '../util';
 import { getDailyPuzzle } from '@/app/actions/puzzle';
 import {
   MAX_LIVES,
   SCORE_CORRECT_CELL,
   SCORE_CONFLICT_PENALTY,
   SCORE_REMOVED_VALID_CELL,
-} from '@/util/constants';
-import { playSound } from '@/util/sound';
+} from '@/game/util/constants';
+import { playSound } from '@/game/lib/sound';
 import {
   saveMatch,
   hasPlayedToday as hasPlayedTodayLocal,
@@ -41,8 +41,8 @@ import {
   calculateStreakBonus,
 } from '@/user/lib/stats';
 import { updateUserStatsFromMatch as updateUserStatsLocal } from '@/user/lib/client';
-import { auth } from '@/lib/firebase/client';
-import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/firebase/client';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import {
   saveMatch as saveMatchToServer,
   getTodaysMatch as getTodaysMatchServer,

@@ -1,7 +1,7 @@
 'use server';
 import { cookies } from 'next/headers';
-import { serverAuth } from '../firebase/server';
-import { AuthUser } from '@/types';
+import { serverAuth } from '../../firebase/server';
+import { AuthUser } from '../types';
 
 export async function getServerUser(): Promise<AuthUser | null> {
   const cookieStore = await cookies();

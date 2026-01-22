@@ -7,7 +7,7 @@
  * These are called from client components via RPC.
  */
 
-import { serverDb } from '@/lib/firebase/server';
+import { serverDb } from '@/firebase/server';
 import type { BaseUserStats } from '@/user/types';
 import { createDefaultBaseUserStats } from '@/user/types';
 
