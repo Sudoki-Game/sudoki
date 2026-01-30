@@ -13,22 +13,100 @@ import {
   clearCacheFlags,
   getMatchHistory,
   clearMatchHistory,
+  getTodaysMatch,
 } from './client';
 import { clearUserData } from '@/user/lib/client';
 import {
   hasMatchForDate,
+  hasPlayedToday,
   saveMatch as saveMatchToServer,
 } from '@/app/actions/match';
 
 /**
- * Result of cache upload operation
+ * Result of upload operation
  */
-export interface CacheUploadResult {
+export interface UploadResult {
   success: boolean;
   uploaded: number;
   skipped: number;
   failed: number;
   error?: string;
+}
+
+/**
+ * Upload a local match for today if it exists and is not already on the server.
+ *
+ * @param userId - The authenticated user's ID
+ * @returns Upload result with counts
+ */
+export async function uploadTodaysLocalMatch(userId: string): Promise<UploadResult> {
+  const result: UploadResult = {
+    success: true,
+    uploaded: 0,
+    skipped: 0,
+    failed: 0,
+  };
+  try {
+    // Get local match for today
+    const match = await getTodaysMatch();
+
+    if (match == null) {
+      console.log(`[MatchSync] No local match found for today to upload`);
+      result.failed++;
+      return result;
+    }
+
+    // Check if server already has a match for today
+    const alreadyExists = await hasPlayedToday(userId);
+
+    if (alreadyExists) {
+      console.log(
+        `[MatchSync] Todays match ${match.id} skipped - server already has match for this date`,
+      );
+      result.skipped++;
+      return result;
+    }
+
+    // Convert to ServerMatch
+    const serverMatch = toServerMatch(match, userId);
+
+    // Upload to server
+    const saveResult = await saveMatchToServer(userId, serverMatch);
+
+    if (saveResult.success) {
+      console.log(`[MatchSync] Match ${match.id} uploaded successfully`);
+      result.uploaded++;
+    } else {
+      console.warn(
+        `[MatchSync] Match ${match.id} failed to upload: ${saveResult.error}`,
+      );
+      result.failed++;
+    }
+
+    // If all matches were uploaded successfully, clear localStorage
+    // to avoid duplicate data (server is now source of truth)
+    if (result.failed === 0) {
+      console.log(
+        '[MatchSync] Todays match synced, clearing localStorage',
+      );
+      clearMatchHistory();
+      clearUserData();
+    }
+
+    result.success = result.failed === 0;
+    return result;
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+    console.error('[MatchSync] Error during local match upload:', errorMessage);
+    return {
+      success: false,
+      uploaded: result.uploaded,
+      skipped: result.skipped,
+      failed: result.failed,
+      error: errorMessage,
+    };
+  }
 }
 
 /**
@@ -41,8 +119,8 @@ export interface CacheUploadResult {
  */
 export async function uploadAllLocalMatches(
   userId: string,
-): Promise<CacheUploadResult> {
-  const result: CacheUploadResult = {
+): Promise<UploadResult> {
+  const result: UploadResult = {
     success: true,
     uploaded: 0,
     skipped: 0,
@@ -131,8 +209,8 @@ export async function uploadAllLocalMatches(
  */
 export async function uploadCachedMatches(
   userId: string,
-): Promise<CacheUploadResult> {
-  const result: CacheUploadResult = {
+): Promise<UploadResult> {
+  const result: UploadResult = {
     success: true,
     uploaded: 0,
     skipped: 0,

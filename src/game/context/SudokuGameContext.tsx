@@ -48,7 +48,7 @@ import {
   getTodaysMatch as getTodaysMatchServer,
   getMatchHistory as getMatchHistoryServer,
 } from '@/app/actions/match';
-import { uploadAllLocalMatches } from '@/match/lib/sync';
+import { uploadCachedMatches, uploadTodaysLocalMatch } from '@/match/lib/sync';
 
 type SudokuGameProviderProps = {
   children: React.ReactNode;
@@ -272,35 +272,57 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   };
 
   /**
-   * Check if user has already played today and sync cached matches on mount
+   * Check if user has already played today
    * Follows different paths for logged-in vs anonymous users (see Game Load diagram)
    * Auto-starts a new game if the user hasn't played today
    *
    * Uses onAuthStateChanged to wait for Firebase Auth to initialize before checking
    */
   useEffect(() => {
-    const initializeGameState = async (
-      user: import('firebase/auth').User | null,
-    ) => {
+    const initializeGameState = async (user: User | null) => {
       let hasPlayed = false;
 
       if (user) {
         console.log('[SudokuGame] Logged-in user:', user.uid);
-        // Logged-in user flow:
-        // 1. Upload any local matches first (handles both fresh login sync and cached matches)
-        const localMatches = await getMatchHistory();
-        if (localMatches.length > 0) {
-          console.log('[SudokuGame] Uploading local matches to server...');
-          await uploadAllLocalMatches(user.uid);
+
+        // Sync cached matches to server after login
+        try {
+          const syncResult = await uploadCachedMatches(user.uid);
+          if (syncResult.uploaded > 0) {
+            console.log(
+              `[SudokuGame] Synced ${syncResult.uploaded} cached matches to server.`,
+            );
+          }
+          if (syncResult.failed > 0) {
+            console.warn(
+              `[SudokuGame] Failed to sync ${syncResult.failed} cached matches.`,
+            );
+          }
+        } catch (err) {
+          console.warn('[SudokuGame] Error syncing cached matches:', err);
         }
 
-        // 2. Check server for today's match
+        // Sync todays local match to server
+        try {
+          const syncResult = await uploadTodaysLocalMatch(user.uid);
+          if (syncResult.uploaded > 0) {
+            console.log(`[SudokuGame] Synced todays match to server.`);
+          }
+          if (syncResult.failed > 0) {
+            console.warn(`[SudokuGame] Failed to sync todays match.`);
+          }
+        } catch (err) {
+          console.warn('[SudokuGame] Error syncing todays match:', err);
+        }
+
+        // Check server for today's match
         console.log("[SudokuGame] Checking server for today's match...");
         const serverTodaysMatch = await getTodaysMatchServer(user.uid);
         console.log(
           '[SudokuGame] Server result:',
           serverTodaysMatch?.id ?? 'no match',
         );
+
         if (serverTodaysMatch) {
           hasPlayed = true;
           setPlayedToday(true);
@@ -320,16 +342,6 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
           };
           setTodaysMatch(clientMatch);
           setLastMatch(clientMatch);
-        } else {
-          // 3. Check localStorage cache (might have cached match for today)
-          const localPlayed = await hasPlayedTodayLocal();
-          if (localPlayed) {
-            hasPlayed = true;
-            const localMatch = await getTodaysMatchLocal();
-            setPlayedToday(true);
-            setTodaysMatch(localMatch);
-            setLastMatch(localMatch);
-          }
         }
       } else {
         // Anonymous user flow: check localStorage only
