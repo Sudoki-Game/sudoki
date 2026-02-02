@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { SessionResult } from '@/types';
+import { SessionResult } from '@/auth/types';
 import {
   mapFirebaseError,
   sendMagicLink,

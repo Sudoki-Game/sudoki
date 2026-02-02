@@ -22,6 +22,7 @@ function createTestMatch(overrides: Partial<ClientMatch> = {}): ClientMatch {
   return {
     id: `match_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
     isWon: true,
+    difficulty: 'medium',
     score: 100,
     streakBonus: 0,
     autoSolvesCount: 0,

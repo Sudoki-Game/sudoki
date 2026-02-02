@@ -22,7 +22,7 @@ import {
   saveMatch as saveMatchToServer,
 } from '@/app/actions/match';
 import { getUserStats } from '@/app/actions/user';
-import { calculateStreakBonusForMatch } from './validation';
+import { calculateStreakBonusForMatch, validateMatch } from './validation';
 
 /**
  * Result of upload operation
@@ -41,7 +41,9 @@ export interface UploadResult {
  * @param userId - The authenticated user's ID
  * @returns Upload result with counts
  */
-export async function uploadTodaysLocalMatch(userId: string): Promise<UploadResult> {
+export async function uploadTodaysLocalMatch(
+  userId: string,
+): Promise<UploadResult> {
   const result: UploadResult = {
     success: true,
     uploaded: 0,
@@ -56,6 +58,25 @@ export async function uploadTodaysLocalMatch(userId: string): Promise<UploadResu
       console.log(`[MatchSync] No local match found for today to upload`);
       result.failed++;
       return result;
+    }
+
+    // Validate match before uploading
+    const validation = validateMatch(match);
+
+    if (!validation.isValid) {
+      console.error('[MatchSync] Invalid match detected:', {
+        matchId: match.id,
+        errors: validation.errors,
+      });
+      result.skipped++;
+      return result;
+    }
+
+    if (validation.warnings.length > 0) {
+      console.warn('[MatchSync] Match validation warnings:', {
+        matchId: match.id,
+        warnings: validation.warnings,
+      });
     }
 
     // Check if server already has a match for today
@@ -73,7 +94,11 @@ export async function uploadTodaysLocalMatch(userId: string): Promise<UploadResu
     const userStats = await getUserStats(userId);
 
     // Convert to ServerMatch (handles streak bonus calculation internally)
-    const serverMatch = toServerMatch(match, userId, userStats.lastMatchTimestamp);
+    const serverMatch = toServerMatch(
+      match,
+      userId,
+      userStats.lastMatchTimestamp,
+    );
 
     // Upload to server
     const saveResult = await saveMatchToServer(userId, serverMatch);
@@ -91,9 +116,7 @@ export async function uploadTodaysLocalMatch(userId: string): Promise<UploadResu
     // If all matches were uploaded successfully, clear localStorage
     // to avoid duplicate data (server is now source of truth)
     if (result.failed === 0) {
-      console.log(
-        '[MatchSync] Todays match synced, clearing localStorage',
-      );
+      console.log('[MatchSync] Todays match synced, clearing localStorage');
       clearMatchHistory();
       clearUserData();
     }
@@ -151,6 +174,25 @@ export async function uploadAllLocalMatches(
 
     for (const match of localMatches) {
       try {
+        // Validate match before uploading
+        const validation = validateMatch(match);
+
+        if (!validation.isValid) {
+          console.error('[MatchSync] Invalid match detected:', {
+            matchId: match.id,
+            errors: validation.errors,
+          });
+          result.skipped++;
+          continue; // Skip this match, continue with others
+        }
+
+        if (validation.warnings.length > 0) {
+          console.warn('[MatchSync] Match validation warnings:', {
+            matchId: match.id,
+            warnings: validation.warnings,
+          });
+        }
+
         // Check if server already has a match for this date
         const alreadyExists = await hasMatchForDate(userId, match.timestamp);
 
@@ -169,9 +211,7 @@ export async function uploadAllLocalMatches(
         const saveResult = await saveMatchToServer(userId, serverMatch);
 
         if (saveResult.success) {
-          console.log(
-            `[MatchSync] Match ${match.id} uploaded successfully`,
-          );
+          console.log(`[MatchSync] Match ${match.id} uploaded successfully`);
           result.uploaded++;
           // Update last match timestamp for next iteration
           lastMatchTimestamp = match.timestamp;
@@ -249,6 +289,27 @@ export async function uploadCachedMatches(
 
     for (const match of cachedMatches) {
       try {
+        // Validate match before uploading
+        const validation = validateMatch(match);
+
+        if (!validation.isValid) {
+          console.error('[MatchSync] Invalid cached match detected:', {
+            matchId: match.id,
+            errors: validation.errors,
+          });
+          result.skipped++;
+          // Still clear the cache flag since we don't want to keep retrying invalid matches
+          successfullyUploaded.push(match.id);
+          continue; // Skip this match, continue with others
+        }
+
+        if (validation.warnings.length > 0) {
+          console.warn('[MatchSync] Cached match validation warnings:', {
+            matchId: match.id,
+            warnings: validation.warnings,
+          });
+        }
+
         // Check if server already has a match for this date
         const alreadyExists = await hasMatchForDate(userId, match.timestamp);
 
@@ -269,9 +330,7 @@ export async function uploadCachedMatches(
         const saveResult = await saveMatchToServer(userId, serverMatch);
 
         if (saveResult.success) {
-          console.log(
-            `[MatchSync] Match ${match.id} uploaded successfully`,
-          );
+          console.log(`[MatchSync] Match ${match.id} uploaded successfully`);
           result.uploaded++;
           successfullyUploaded.push(match.id);
           // Update last match timestamp for next iteration
@@ -312,7 +371,7 @@ export async function uploadCachedMatches(
 /**
  * Convert a ClientMatch to ServerMatch for upload
  * Handles streak bonus calculation and validation
- * 
+ *
  * @param match - The client match to convert
  * @param userId - The user ID
  * @param lastMatchTimestamp - Timestamp of the last match before this one (for streak calculation)
@@ -329,7 +388,7 @@ export function toServerMatch(
   // Remove client-only fields and add server fields
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { isCached: _isCached, ...baseMatch } = match;
-  
+
   return {
     ...baseMatch,
     userPlayed: userId,

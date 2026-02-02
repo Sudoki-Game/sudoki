@@ -29,6 +29,7 @@ function createMatch(
   return {
     id: `match_${timestamp}`,
     isWon: true,
+    difficulty: 'medium',
     score: 500,
     streakBonus: 0, // Local matches often have 0 or incorrect bonus
     autoSolvesCount: 0,
@@ -80,7 +81,11 @@ describe('Match Sync Module', () => {
       const userId = 'test-user';
       const lastMatchTimestamp = null; // No previous match
 
-      const serverMatch = toServerMatch(clientMatch, userId, lastMatchTimestamp);
+      const serverMatch = toServerMatch(
+        clientMatch,
+        userId,
+        lastMatchTimestamp,
+      );
 
       expect(serverMatch.streakBonus).toBe(0);
     });
@@ -90,7 +95,11 @@ describe('Match Sync Module', () => {
       const userId = 'test-user';
       const lastMatchTimestamp = daysAgo(1); // Yesterday
 
-      const serverMatch = toServerMatch(clientMatch, userId, lastMatchTimestamp);
+      const serverMatch = toServerMatch(
+        clientMatch,
+        userId,
+        lastMatchTimestamp,
+      );
 
       expect(serverMatch.streakBonus).toBe(200);
     });
@@ -100,7 +109,11 @@ describe('Match Sync Module', () => {
       const userId = 'test-user';
       const lastMatchTimestamp = daysAgo(5); // 5 days ago (streak broken)
 
-      const serverMatch = toServerMatch(clientMatch, userId, lastMatchTimestamp);
+      const serverMatch = toServerMatch(
+        clientMatch,
+        userId,
+        lastMatchTimestamp,
+      );
 
       expect(serverMatch.streakBonus).toBe(0);
     });

@@ -74,6 +74,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
           todaysMatch = {
             id: serverMatch.id,
             isWon: serverMatch.isWon,
+            difficulty: serverMatch.difficulty,
             score: serverMatch.score,
             streakBonus: serverMatch.streakBonus,
             autoSolvesCount: serverMatch.autoSolvesCount,

@@ -35,7 +35,10 @@ import {
   hasPlayedToday as hasPlayedTodayLocal,
   getTodaysMatch as getTodaysMatchLocal,
 } from '@/match/lib/client';
-import { getStreakBonusForNewMatch } from '@/match/lib/validation';
+import {
+  getStreakBonusForNewMatch,
+  validateMatch,
+} from '@/match/lib/validation';
 import { updateUserStatsFromMatch as updateUserStatsLocal } from '@/user/lib/client';
 import { auth } from '@/firebase/client';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -325,6 +328,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
           const clientMatch: ClientMatch = {
             id: serverTodaysMatch.id,
             isWon: serverTodaysMatch.isWon,
+            difficulty: serverTodaysMatch.difficulty || 'medium', // Fallback for old matches
             score: serverTodaysMatch.score,
             streakBonus: serverTodaysMatch.streakBonus,
             autoSolvesCount: serverTodaysMatch.autoSolvesCount,
@@ -814,6 +818,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     const match: ClientMatch = {
       id: generateMatchId(!!auth.currentUser),
       isWon,
+      difficulty: completedState.difficulty,
       score: completedState.score,
       streakBonus,
       autoSolvesCount: completedState.autoSolves.size,
@@ -824,6 +829,26 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
       solution: JSON.stringify(completedState.solution),
       timestamp: Date.now(),
     };
+
+    // Validate match before saving
+    const validation = validateMatch(match);
+
+    if (!validation.isValid) {
+      console.error('[SudokuGame] Invalid match created during gameplay:', {
+        matchId: match.id,
+        errors: validation.errors,
+      });
+      // Continue anyway - show game over modal but don't save
+      setGameOverReady(true);
+      return;
+    }
+
+    if (validation.warnings.length > 0) {
+      console.warn('[SudokuGame] Match validation warnings:', {
+        matchId: match.id,
+        warnings: validation.warnings,
+      });
+    }
 
     // Update local state regardless of save method
     const updateLocalState = () => {
