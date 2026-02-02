@@ -34,19 +34,14 @@ import {
   saveMatch,
   hasPlayedToday as hasPlayedTodayLocal,
   getTodaysMatch as getTodaysMatchLocal,
-  getMatchHistory,
 } from '@/match/lib/client';
-import {
-  calculateStreakFromMatches,
-  calculateStreakBonus,
-} from '@/user/lib/stats';
+import { getStreakBonusForNewMatch } from '@/match/lib/validation';
 import { updateUserStatsFromMatch as updateUserStatsLocal } from '@/user/lib/client';
 import { auth } from '@/firebase/client';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import {
   saveMatch as saveMatchToServer,
   getTodaysMatch as getTodaysMatchServer,
-  getMatchHistory as getMatchHistoryServer,
 } from '@/app/actions/match';
 import { uploadCachedMatches, uploadTodaysLocalMatch } from '@/match/lib/sync';
 
@@ -812,18 +807,8 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     // Only count as a completed match if the game was won
     const isWon = newStatus === 'win';
 
-    // Get match history for streak calculation from the correct source:
-    // - Server for logged-in users (localStorage may be empty after sync)
-    // - localStorage for anonymous users
-    const isLoggedIn = !!auth.currentUser;
-    const matchHistory =
-      isLoggedIn && auth.currentUser
-        ? await getMatchHistoryServer(auth.currentUser.uid)
-        : await getMatchHistory();
-    const { currentStreak } = calculateStreakFromMatches(matchHistory);
-
-    // Calculate streak bonus for playing on consecutive days (awarded regardless of win/loss)
-    const streakBonus = calculateStreakBonus(currentStreak + 1);
+    const userId = auth.currentUser?.uid ?? null;
+    const streakBonus = await getStreakBonusForNewMatch(userId);
 
     // Create match data matching the BaseMatch interface
     const match: ClientMatch = {

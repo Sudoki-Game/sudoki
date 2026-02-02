@@ -21,6 +21,8 @@ import {
   hasPlayedToday,
   saveMatch as saveMatchToServer,
 } from '@/app/actions/match';
+import { getUserStats } from '@/app/actions/user';
+import { calculateStreakBonusForMatch } from './validation';
 
 /**
  * Result of upload operation
@@ -67,8 +69,11 @@ export async function uploadTodaysLocalMatch(userId: string): Promise<UploadResu
       return result;
     }
 
-    // Convert to ServerMatch
-    const serverMatch = toServerMatch(match, userId);
+    // Get last match timestamp for streak calculation
+    const userStats = await getUserStats(userId);
+
+    // Convert to ServerMatch (handles streak bonus calculation internally)
+    const serverMatch = toServerMatch(match, userId, userStats.lastMatchTimestamp);
 
     // Upload to server
     const saveResult = await saveMatchToServer(userId, serverMatch);
@@ -140,6 +145,10 @@ export async function uploadAllLocalMatches(
       `[MatchSync] Found ${localMatches.length} local matches to upload`,
     );
 
+    // Get initial last match timestamp (efficient - just one field from user stats)
+    const userStats = await getUserStats(userId);
+    let lastMatchTimestamp = userStats.lastMatchTimestamp;
+
     for (const match of localMatches) {
       try {
         // Check if server already has a match for this date
@@ -153,15 +162,19 @@ export async function uploadAllLocalMatches(
           continue;
         }
 
-        // Convert to ServerMatch
-        const serverMatch = toServerMatch(match, userId);
+        // Convert to ServerMatch (handles streak bonus calculation internally)
+        const serverMatch = toServerMatch(match, userId, lastMatchTimestamp);
 
         // Upload to server
         const saveResult = await saveMatchToServer(userId, serverMatch);
 
         if (saveResult.success) {
-          console.log(`[MatchSync] Match ${match.id} uploaded successfully`);
+          console.log(
+            `[MatchSync] Match ${match.id} uploaded successfully`,
+          );
           result.uploaded++;
+          // Update last match timestamp for next iteration
+          lastMatchTimestamp = match.timestamp;
         } else {
           console.warn(
             `[MatchSync] Match ${match.id} failed to upload: ${saveResult.error}`,
@@ -230,6 +243,9 @@ export async function uploadCachedMatches(
     );
 
     const successfullyUploaded: string[] = [];
+    // Get initial last match timestamp (efficient - just one field from user stats)
+    const userStats = await getUserStats(userId);
+    let lastMatchTimestamp = userStats.lastMatchTimestamp;
 
     for (const match of cachedMatches) {
       try {
@@ -246,21 +262,20 @@ export async function uploadCachedMatches(
           continue;
         }
 
-        // Convert to ServerMatch
-        const serverMatch: ServerMatch = {
-          ...match,
-          userPlayed: userId,
-        };
-        // Remove client-only isCached property
-        delete (serverMatch as ClientMatch).isCached;
+        // Convert to ServerMatch (handles streak bonus calculation and isCached removal internally)
+        const serverMatch = toServerMatch(match, userId, lastMatchTimestamp);
 
         // Upload to server
         const saveResult = await saveMatchToServer(userId, serverMatch);
 
         if (saveResult.success) {
-          console.log(`[MatchSync] Match ${match.id} uploaded successfully`);
+          console.log(
+            `[MatchSync] Match ${match.id} uploaded successfully`,
+          );
           result.uploaded++;
           successfullyUploaded.push(match.id);
+          // Update last match timestamp for next iteration
+          lastMatchTimestamp = match.timestamp;
         } else {
           console.warn(
             `[MatchSync] Match ${match.id} failed to upload: ${saveResult.error}`,
@@ -296,13 +311,28 @@ export async function uploadCachedMatches(
 
 /**
  * Convert a ClientMatch to ServerMatch for upload
+ * Handles streak bonus calculation and validation
+ * 
+ * @param match - The client match to convert
+ * @param userId - The user ID
+ * @param lastMatchTimestamp - Timestamp of the last match before this one (for streak calculation)
+ * @returns ServerMatch ready for upload
  */
-export function toServerMatch(match: ClientMatch, userId: string): ServerMatch {
+export function toServerMatch(
+  match: ClientMatch,
+  userId: string,
+  lastMatchTimestamp: number | null,
+): ServerMatch {
+  // Calculate correct streak bonus based on last match timestamp
+  const correctStreakBonus = calculateStreakBonusForMatch(lastMatchTimestamp);
+
   // Remove client-only fields and add server fields
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { isCached: _isCached, ...baseMatch } = match;
+  
   return {
     ...baseMatch,
     userPlayed: userId,
+    streakBonus: correctStreakBonus,
   };
 }
