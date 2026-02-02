@@ -175,6 +175,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
           <span className={styles.stat}>Total Score</span>
           <span className={styles.statNumerical}>
             {userStats?.combinedScore ?? 0}
+            <span className={styles.statIncrement}>(+{match.score + match.streakBonus})</span>
           </span>
         </section>
 
