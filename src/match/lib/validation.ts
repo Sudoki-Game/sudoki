@@ -5,6 +5,7 @@
  * Includes streak calculation and match processing.
  */
 
+import { getUserStats } from '@/app/actions/user';
 import {
   STREAK_BONUS_AMOUNT,
   SCORE_PER_EMPTY_CELL,
@@ -13,11 +14,7 @@ import {
 } from '@/game/util/constants';
 import type { BaseMatch } from '@/match/types';
 import type { Board } from '@/game/types';
-// NOTE: getUserData is currently only used by getLastMatchTimestamp (for anonymous users).
-// We keep this as a top-level import intentionally for consistency and to avoid dynamic imports
-// in a hot validation path; see CodeQL rule "A problem found by Copilot Code Review".
 import { getUserData } from '@/user/lib/client';
-import { getUserStats } from '@/app/actions/user';
 import { wouldContinueStreak } from '@/user/lib/stats';
 
 /**
