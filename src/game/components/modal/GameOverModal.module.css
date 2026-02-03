@@ -15,7 +15,7 @@
 
 .statContainer {
   display: grid;
-  grid-template-columns: 1fr 12rem;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   padding: 1.5rem;
 
