@@ -111,7 +111,7 @@ const LoginForm = () => {
 
       <p className={styles.privacyPolicyText}>
         By creating an account, you agree to our{' '}
-        <Link href={'/privacy-policy'}>Privacy Policy</Link>.
+        <Link href={'/privacy'}>Privacy Policy</Link>.
       </p>
     </div>
   );
