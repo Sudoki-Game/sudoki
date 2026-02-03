@@ -300,17 +300,17 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
           console.warn('[SudokuGame] Error syncing cached matches:', err);
         }
 
-        // Sync todays local match to server
+        // Sync today's local match to server
         try {
           const syncResult = await uploadTodaysLocalMatch(user.uid);
           if (syncResult.uploaded > 0) {
-            console.log(`[SudokuGame] Synced todays match to server.`);
+            console.log(`[SudokuGame] Synced today's match to server.`);
           }
           if (syncResult.failed > 0) {
-            console.warn(`[SudokuGame] Failed to sync todays match.`);
+            console.warn(`[SudokuGame] Failed to sync today's match.`);
           }
         } catch (err) {
-          console.warn('[SudokuGame] Error syncing todays match:', err);
+          console.warn('[SudokuGame] Error syncing today\'s match:', err);
         }
 
         // Check server for today's match
@@ -325,10 +325,17 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
           hasPlayed = true;
           setPlayedToday(true);
           // Convert ServerMatch to ClientMatch for state
+          const difficulty = serverTodaysMatch.difficulty || 'medium'; // Fallback for old matches
+          if (!serverTodaysMatch.difficulty) {
+            console.warn(
+              '[SudokuGame] Missing difficulty for today\'s server match, falling back to "medium". Match id:',
+              serverTodaysMatch.id,
+            );
+          }
           const clientMatch: ClientMatch = {
             id: serverTodaysMatch.id,
             isWon: serverTodaysMatch.isWon,
-            difficulty: serverTodaysMatch.difficulty || 'medium', // Fallback for old matches
+            difficulty,
             score: serverTodaysMatch.score,
             streakBonus: serverTodaysMatch.streakBonus,
             autoSolvesCount: serverTodaysMatch.autoSolvesCount,
