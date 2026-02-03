@@ -54,7 +54,7 @@ export async function uploadTodaysLocalMatch(
     // Get local match for today
     const match = await getTodaysMatch();
 
-    if (match == null) {
+    if (match === null || match === undefined) {
       console.log(`[MatchSync] No local match found for today to upload`);
       result.failed++;
       return result;
@@ -84,7 +84,7 @@ export async function uploadTodaysLocalMatch(
 
     if (alreadyExists) {
       console.log(
-        `[MatchSync] Todays match ${match.id} skipped - server already has match for this date`,
+        `[MatchSync] Today's match ${match.id} skipped - server already has match for this date`,
       );
       result.skipped++;
       return result;
@@ -116,7 +116,7 @@ export async function uploadTodaysLocalMatch(
     // If all matches were uploaded successfully, clear localStorage
     // to avoid duplicate data (server is now source of truth)
     if (result.failed === 0) {
-      console.log('[MatchSync] Todays match synced, clearing localStorage');
+      console.log('[MatchSync] Today\'s match synced, clearing localStorage');
       clearMatchHistory();
       clearUserData();
     }

@@ -5,7 +5,6 @@
  * Includes streak calculation and match processing.
  */
 
-import { getUserStats } from '@/app/actions/user';
 import {
   STREAK_BONUS_AMOUNT,
   SCORE_PER_EMPTY_CELL,
@@ -15,6 +14,7 @@ import {
 import type { BaseMatch } from '@/match/types';
 import type { Board } from '@/game/types';
 import { getUserData } from '@/user/lib/client';
+import { getUserStats } from '@/app/actions/user';
 import { wouldContinueStreak } from '@/user/lib/stats';
 
 /**
