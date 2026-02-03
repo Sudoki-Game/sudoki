@@ -116,7 +116,7 @@ export async function uploadTodaysLocalMatch(
     // If all matches were uploaded successfully, clear localStorage
     // to avoid duplicate data (server is now source of truth)
     if (result.failed === 0) {
-      console.log('[MatchSync] Today\'s match synced, clearing localStorage');
+      console.log("[MatchSync] Today's match synced, clearing localStorage");
       clearMatchHistory();
       clearUserData();
     }
