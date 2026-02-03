@@ -14,7 +14,7 @@
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-  padding: 1.25rem;
+  padding: 0 1.25rem;
   gap: 2rem;
   box-sizing: border-box;
   width: 100%;
@@ -22,7 +22,7 @@
 
   @media (orientation: portrait) and (max-width: 640px) {
     justify-content: space-evenly;
-    padding: 1.25rem 1rem;
+    padding: 0 1rem;
     /* gap: 1rem; */
   }
 }
