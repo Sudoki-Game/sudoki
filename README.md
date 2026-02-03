@@ -1,24 +1,56 @@
 # Sudoki
 
-Sudoki is a modern, multiplayer Sudoku web application built with Next.js 16, React 19, and TypeScript. Play solo or compete with others in real-time multiplayer matches!
+Sudoki is a web-based Sudoku game built around a **single daily puzzle** that everyone plays. Built with Next.js 16, React 19, and TypeScript, it features a risk/reward scoring system where players earn points for valid placements while lives limit mistakes. Daily streak bonuses reward persistence, encouraging players to return while staying competitive.
 
-Created by [Dylan Almond](https://dylanalmond.net/work/sudoki), this project represents the evolution of a simple Sudoku game into a full-featured multiplayer experience with real-time synchronization and competitive gameplay.
+Created by [Dylan Almond](https://dylanalmond.net/work/sudoki), Sudoki delivers a daily puzzle experience that's challenging and encouraging—balancing tension through scoring mechanics with positive reinforcement via streaks and shared competition.
+
+**Play now at [sudoki.uk](https://sudoki.uk/)**
+
+## Overview
+
+Many Sudoku apps overwhelm users with clutter, endless modes, or harsh penalties for mistakes. Sudoki solves this by focusing on a **single daily puzzle** that all players tackle together—creating consistent difficulty and fair competition without punishment.
+
+### The Problem
+
+Players need a Sudoku experience that is **challenging but fair**, rewarding effort and persistence while keeping them engaged and motivated to return daily—without overwhelming complexity or harsh mistake penalties.
+
+### The Solution
+
+Sudoki balances challenge and encouragement through a **risk/reward scoring system**:
+
+- Every valid placement increases your score
+- Invalid placements **cost a life and reduce your score**
+- Players can continue solving as long as they have lives
+- Daily **streak bonuses** reward consistency and habit formation
+
+Because the **daily puzzle is the same for everyone**, difficulty remains consistent, letting players compete fairly while staying motivated to improve their scores and maintain streaks.
 
 ## Features
 
-- **Interactive Sudoku Gameplay** - Classic Sudoku with intuitive controls and drag-and-drop support
-- **Multiplayer Mode** - Real-time matches with other players
-- **Random Board Generation** - Endless variety of puzzles with different difficulty levels
-- **Daily Puzzles** - Fresh challenges every day
-- **Scoring System** - Track your performance and compete with others
-- **Hint System** - Get help when you're stuck
-- **Lives System** - Challenge yourself with limited mistakes
-- **Firebase Authentication** - Secure user authentication and email sign-in
-- **User Statistics** - Track your progress and performance over time
-- **Responsive Design** - Works seamlessly on desktop and mobile devices
+### Core Gameplay
+
+- **Single Daily Puzzle** - Everyone plays the same puzzle each day for fair competition
+- **Risk/Reward Scoring** - Earn points for valid placements, lose points and lives for mistakes
+- **Lives System** - Limited mistakes create tension while allowing recovery
+- **Daily Streak Bonuses** - Reward consistency and encourage daily engagement
+- **Persistent Progress** - Continue playing as long as you have lives remaining
+
+### Design & Experience
+
+- **Minimal, Focused Interface** - Clean design with the puzzle grid dominating the screen
+- **Responsive Design** - Seamless experience on desktop and mobile devices
+- **Multi-Input Support** - Touch, keyboard, and mouse controls for accessibility
+- **Drag-and-Drop Gameplay** - Intuitive controls for placing values
+- **Clear Feedback** - Unobtrusive visual feedback for invalid placements
 - **Sound Effects** - Engaging audio feedback for game actions
-- **Real-time Sync** - Live game state synchronization across players
-- **Dark Mode** - Choose between light and dark themes
+
+### Technical Excellence
+
+- **Server-Side Match Validation** - Anti-cheat system ensures fair, accurate scores
+- **Offline Data Syncing** - Link existing progress to new accounts without losing streaks
+- **Firebase Authentication** - Secure user authentication and account management
+- **Real-Time Leaderboards** - Compare your performance with players worldwide
+- **User Statistics** - Track your progress, streaks, and performance over time
 
 ## Tech Stack
 
@@ -28,6 +60,12 @@ Created by [Dylan Almond](https://dylanalmond.net/work/sudoki), this project rep
 - **Styling**: CSS Modules
 - **Package Manager**: Yarn 4.12.0 (via Corepack)
 - **Deployment**: Firebase App Hosting
+
+## Design Philosophy
+
+The interface is **minimal and focused**. The puzzle grid dominates the screen, ensuring players can concentrate on gameplay. Feedback for invalid placements is clear but unobtrusive, maintaining flow without frustration.
+
+By combining **score, lives, and streak bonuses**, Sudoki encourages persistence, habit formation, and friendly competition—without clutter or overwhelming complexity. The shared daily puzzle creates a sense of community and fair competition, as everyone faces the same challenge.
 
 ## Prerequisites
 
@@ -179,9 +217,19 @@ To deploy:
 
 ## About the Project
 
-Sudoki is created by Dylan Almond, a full-stack developer. This project represents the evolution of a simple web-based Sudoku game into a comprehensive multiplayer experience with real-time synchronization and competitive features.
+Sudoki is created by Dylan Almond, a full-stack developer. The game delivers a **daily puzzle experience that's challenging and encouraging**—creating tension through the risk/reward mechanic while promoting engagement via streaks and positive scoring.
 
-For more information about the creator and other projects, visit [dylanalmond.net](https://dylanalmond.net/work/sudoki).
+The shared daily puzzle ensures **consistent difficulty**, making competition fair and motivating players to return daily to improve scores and maintain streaks. For more information about the creator and other projects, visit [dylanalmond.net](https://dylanalmond.net/work/sudoki).
+
+## Future Enhancements
+
+Planned features for future iterations include:
+
+- **Difficulty Tiers** - Challenge advanced players with harder puzzles
+- **Extended Progression** - Personalized scoring and achievement systems
+- **Optional Notifications** - Reminders to increase daily engagement
+- **Social Features** - Friend challenges or cooperative puzzle modes
+- **Enhanced Statistics** - Deeper analytics and performance tracking
 
 ## License
 
