@@ -7,7 +7,7 @@ import modalStyles from './Modal.module.css';
 import Button from '../../../ui/components/Button';
 import { useState, useEffect } from 'react';
 import type { GameState, Board, ClientMatch } from '@/game/types';
-import { auth } from '@/lib/firebase/client';
+import { auth } from '@/firebase/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import { getTodaysMatch as getTodaysMatchLocal } from '@/match/lib/client';
 import { getTodaysMatch as getTodaysMatchServer } from '@/app/actions/match';
@@ -56,6 +56,7 @@ const SolutionModal = () => {
           match = {
             id: serverMatch.id,
             isWon: serverMatch.isWon,
+            difficulty: serverMatch.difficulty,
             score: serverMatch.score,
             streakBonus: serverMatch.streakBonus,
             autoSolvesCount: serverMatch.autoSolvesCount,

@@ -2,8 +2,8 @@ import { useSudokuGame } from '@/game/context/SudokuGameContext';
 import Image from 'next/image';
 import styles from './SudokuControls.module.css';
 import DraggableCell from './DraggableCell';
-import { playSound } from '@/util/sound';
 import Button from '@/ui/components/Button';
+import { playSound } from '../lib/sound';
 
 const SudokuControls = () => {
   const { game, isReady, isPaused, autoSolve, updateCell } = useSudokuGame();

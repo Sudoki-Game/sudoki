@@ -13,7 +13,7 @@ import {
   generateSeededSolvedSudoku,
   generateSeededPuzzle,
   generateDailyPuzzle,
-} from '../util';
+} from '..';
 import type { Board, Difficulty } from '@/game/types';
 
 describe('Seeded Random Number Generator', () => {

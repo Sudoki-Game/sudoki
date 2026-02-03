@@ -21,6 +21,7 @@ function createMatchForDate(
   return {
     id: `match_${timestamp}`,
     isWon: true,
+    difficulty: 'medium',
     score: 100,
     streakBonus: 0,
     autoSolvesCount: 0,

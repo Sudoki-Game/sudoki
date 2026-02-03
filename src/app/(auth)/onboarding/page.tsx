@@ -1,6 +1,6 @@
 'use client';
 
-import OnboardingForm from '@/onboarding/components/OnboardingForm';
+import OnboardingForm from '@/auth/components/OnboardingForm';
 import styles from './page.module.css';
 
 const OnboardingPage = () => {

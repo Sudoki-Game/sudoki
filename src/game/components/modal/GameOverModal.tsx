@@ -1,12 +1,11 @@
 import { useModalRouter } from '@/game/context/ModalRouterContext';
 import Image from 'next/image';
-import { MAX_LIVES } from '@/util/constants';
 import styles from './GameOverModal.module.css';
 import modalStyles from './Modal.module.css';
 import { useRouter } from 'next/navigation';
 import Button from '@/ui/components/Button';
 import Modal from './Modal';
-import { auth } from '@/lib/firebase/client';
+import { auth } from '@/firebase/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { getTodaysMatch as getTodaysMatchLocal } from '@/match/lib/client';
@@ -16,6 +15,7 @@ import { getUserStats as getUserStatsServer } from '@/app/actions/user';
 import { useSudokuGame } from '@/game/context/SudokuGameContext';
 import type { BaseUserStats } from '@/user/types';
 import type { ClientMatch } from '@/match/types';
+import { MAX_LIVES } from '@/game/util/constants';
 
 interface GameOverModalProps {
   onClose: () => void;
@@ -74,6 +74,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
           todaysMatch = {
             id: serverMatch.id,
             isWon: serverMatch.isWon,
+            difficulty: serverMatch.difficulty,
             score: serverMatch.score,
             streakBonus: serverMatch.streakBonus,
             autoSolvesCount: serverMatch.autoSolvesCount,
@@ -174,6 +175,7 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
           <span className={styles.stat}>Total Score</span>
           <span className={styles.statNumerical}>
             {userStats?.combinedScore ?? 0}
+            <span className={styles.statIncrement}>(+{match.score + match.streakBonus})</span>
           </span>
         </section>
 

@@ -1,6 +1,8 @@
 'use client';
 
 import { useActionState, useEffect } from 'react';
+import { uploadAllLocalMatches } from '@/match/lib/sync';
+import { getAuth } from 'firebase/auth';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { completeOnboarding, OnboardingResult } from '@/app/actions/auth';
@@ -32,6 +34,34 @@ const OnboardingForm = () => {
     // Redirect after successful submission
     if (state.success) {
       router.replace('/');
+
+      // Background sync: transfer local matches to server for new user
+      (async () => {
+        try {
+          const auth = getAuth();
+          const user = auth.currentUser;
+          if (!user) {
+            console.warn(
+              '[OnboardingSync] No authenticated user found for sync.',
+            );
+            return;
+          }
+          // Use the dedicated sync method for onboarding
+          const result = await uploadAllLocalMatches(user.uid);
+          if (result.uploaded > 0) {
+            console.log(
+              `[OnboardingSync] Uploaded ${result.uploaded} matches to server during onboarding.`,
+            );
+          }
+          if (result.failed > 0) {
+            console.warn(
+              `[OnboardingSync] Failed to upload ${result.failed} matches during onboarding.`,
+            );
+          }
+        } catch (err) {
+          console.warn('[OnboardingSync] Error during onboarding sync:', err);
+        }
+      })();
     }
   }, [state.success, router]);
 

@@ -4,7 +4,6 @@
  */
 
 import { useSudokuGame } from '@/game/context/SudokuGameContext';
-import { playSound } from '@/util/sound';
 import {
   useSensors,
   useSensor,
@@ -14,6 +13,7 @@ import {
   SensorOptions,
 } from '@dnd-kit/core';
 import { useEffect, useRef } from 'react';
+import { playSound } from '../lib/sound';
 
 interface SudokuControls {
   /**

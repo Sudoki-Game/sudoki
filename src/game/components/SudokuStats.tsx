@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import { MAX_LIVES } from '@/util/constants';
 import styles from './SudokuStats.module.css';
+import { MAX_LIVES } from '../util/constants';
 
 interface SudokuStatsProps {
   score: number;

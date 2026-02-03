@@ -35,6 +35,7 @@ function createTestMatch(overrides: Partial<ClientMatch> = {}): ClientMatch {
   return {
     id: `test_${now}`,
     isWon: true,
+    difficulty: 'medium',
     score: 500,
     streakBonus: 0,
     autoSolvesCount: 0,

@@ -21,34 +21,32 @@ import {
   isGameWon,
   createEmptyBoard,
   computeHighlights,
-} from '../../util/util';
+} from '../util';
 import { getDailyPuzzle } from '@/app/actions/puzzle';
 import {
   MAX_LIVES,
   SCORE_CORRECT_CELL,
   SCORE_CONFLICT_PENALTY,
   SCORE_REMOVED_VALID_CELL,
-} from '@/util/constants';
-import { playSound } from '@/util/sound';
+} from '@/game/util/constants';
+import { playSound } from '@/game/lib/sound';
 import {
   saveMatch,
   hasPlayedToday as hasPlayedTodayLocal,
   getTodaysMatch as getTodaysMatchLocal,
-  getMatchHistory,
 } from '@/match/lib/client';
 import {
-  calculateStreakFromMatches,
-  calculateStreakBonus,
-} from '@/user/lib/stats';
+  getStreakBonusForNewMatch,
+  validateMatch,
+} from '@/match/lib/validation';
 import { updateUserStatsFromMatch as updateUserStatsLocal } from '@/user/lib/client';
-import { auth } from '@/lib/firebase/client';
-import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/firebase/client';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import {
   saveMatch as saveMatchToServer,
   getTodaysMatch as getTodaysMatchServer,
-  getMatchHistory as getMatchHistoryServer,
 } from '@/app/actions/match';
-import { uploadAllLocalMatches } from '@/match/lib/sync';
+import { uploadCachedMatches, uploadTodaysLocalMatch } from '@/match/lib/sync';
 
 type SudokuGameProviderProps = {
   children: React.ReactNode;
@@ -272,42 +270,72 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   };
 
   /**
-   * Check if user has already played today and sync cached matches on mount
+   * Check if user has already played today
    * Follows different paths for logged-in vs anonymous users (see Game Load diagram)
    * Auto-starts a new game if the user hasn't played today
    *
    * Uses onAuthStateChanged to wait for Firebase Auth to initialize before checking
    */
   useEffect(() => {
-    const initializeGameState = async (
-      user: import('firebase/auth').User | null,
-    ) => {
+    const initializeGameState = async (user: User | null) => {
       let hasPlayed = false;
 
       if (user) {
         console.log('[SudokuGame] Logged-in user:', user.uid);
-        // Logged-in user flow:
-        // 1. Upload any local matches first (handles both fresh login sync and cached matches)
-        const localMatches = await getMatchHistory();
-        if (localMatches.length > 0) {
-          console.log('[SudokuGame] Uploading local matches to server...');
-          await uploadAllLocalMatches(user.uid);
+
+        // Sync cached matches to server after login
+        try {
+          const syncResult = await uploadCachedMatches(user.uid);
+          if (syncResult.uploaded > 0) {
+            console.log(
+              `[SudokuGame] Synced ${syncResult.uploaded} cached matches to server.`,
+            );
+          }
+          if (syncResult.failed > 0) {
+            console.warn(
+              `[SudokuGame] Failed to sync ${syncResult.failed} cached matches.`,
+            );
+          }
+        } catch (err) {
+          console.warn('[SudokuGame] Error syncing cached matches:', err);
         }
 
-        // 2. Check server for today's match
+        // Sync today's local match to server
+        try {
+          const syncResult = await uploadTodaysLocalMatch(user.uid);
+          if (syncResult.uploaded > 0) {
+            console.log(`[SudokuGame] Synced today's match to server.`);
+          }
+          if (syncResult.failed > 0) {
+            console.warn(`[SudokuGame] Failed to sync today's match.`);
+          }
+        } catch (err) {
+          console.warn('[SudokuGame] Error syncing today\'s match:', err);
+        }
+
+        // Check server for today's match
         console.log("[SudokuGame] Checking server for today's match...");
         const serverTodaysMatch = await getTodaysMatchServer(user.uid);
         console.log(
           '[SudokuGame] Server result:',
           serverTodaysMatch?.id ?? 'no match',
         );
+
         if (serverTodaysMatch) {
           hasPlayed = true;
           setPlayedToday(true);
           // Convert ServerMatch to ClientMatch for state
+          const difficulty = serverTodaysMatch.difficulty ?? 'medium'; // Fallback for old matches
+          if (!serverTodaysMatch.difficulty) {
+            console.warn(
+              '[SudokuGame] Missing difficulty for today\'s server match, falling back to "medium". Match id:',
+              serverTodaysMatch.id,
+            );
+          }
           const clientMatch: ClientMatch = {
             id: serverTodaysMatch.id,
             isWon: serverTodaysMatch.isWon,
+            difficulty,
             score: serverTodaysMatch.score,
             streakBonus: serverTodaysMatch.streakBonus,
             autoSolvesCount: serverTodaysMatch.autoSolvesCount,
@@ -320,16 +348,6 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
           };
           setTodaysMatch(clientMatch);
           setLastMatch(clientMatch);
-        } else {
-          // 3. Check localStorage cache (might have cached match for today)
-          const localPlayed = await hasPlayedTodayLocal();
-          if (localPlayed) {
-            hasPlayed = true;
-            const localMatch = await getTodaysMatchLocal();
-            setPlayedToday(true);
-            setTodaysMatch(localMatch);
-            setLastMatch(localMatch);
-          }
         }
       } else {
         // Anonymous user flow: check localStorage only
@@ -800,23 +818,14 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     // Only count as a completed match if the game was won
     const isWon = newStatus === 'win';
 
-    // Get match history for streak calculation from the correct source:
-    // - Server for logged-in users (localStorage may be empty after sync)
-    // - localStorage for anonymous users
-    const isLoggedIn = !!auth.currentUser;
-    const matchHistory =
-      isLoggedIn && auth.currentUser
-        ? await getMatchHistoryServer(auth.currentUser.uid)
-        : await getMatchHistory();
-    const { currentStreak } = calculateStreakFromMatches(matchHistory);
-
-    // Calculate streak bonus for playing on consecutive days (awarded regardless of win/loss)
-    const streakBonus = calculateStreakBonus(currentStreak + 1);
+    const userId = auth.currentUser?.uid ?? null;
+    const streakBonus = await getStreakBonusForNewMatch(userId);
 
     // Create match data matching the BaseMatch interface
     const match: ClientMatch = {
       id: generateMatchId(!!auth.currentUser),
       isWon,
+      difficulty: completedState.difficulty,
       score: completedState.score,
       streakBonus,
       autoSolvesCount: completedState.autoSolves.size,
@@ -827,6 +836,26 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
       solution: JSON.stringify(completedState.solution),
       timestamp: Date.now(),
     };
+
+    // Validate match before saving
+    const validation = validateMatch(match);
+
+    if (!validation.isValid) {
+      console.error('[SudokuGame] Invalid match created during gameplay:', {
+        matchId: match.id,
+        errors: validation.errors,
+      });
+      // Continue anyway - show game over modal but don't save
+      setGameOverReady(true);
+      return;
+    }
+
+    if (validation.warnings.length > 0) {
+      console.warn('[SudokuGame] Match validation warnings:', {
+        matchId: match.id,
+        warnings: validation.warnings,
+      });
+    }
 
     // Update local state regardless of save method
     const updateLocalState = () => {

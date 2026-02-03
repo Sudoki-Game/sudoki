@@ -7,7 +7,7 @@ import {
   User,
   sendSignInLinkToEmail,
 } from 'firebase/auth';
-import { auth } from './client';
+import { auth } from '../../firebase/client';
 import { FirebaseError } from 'firebase/app';
 
 const actionCodeSettings = {

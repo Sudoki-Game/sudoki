@@ -4,7 +4,7 @@
  * Server-side operations for user data using Firebase Admin SDK.
  */
 
-import { serverDb } from '@/lib/firebase/server';
+import { serverDb } from '@/firebase/server';
 import type { ServerUserData } from '@/user/types';
 import {
   createInitialServerUserData,

@@ -1,8 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
-import Copyright from '@/components/Copyright';
+import Copyright from '@/ui/components/Copyright';
 import headerStyles from '@/game/components/Header.module.css';
-import { getServerUser } from '@/lib/auth/server';
+import { getServerUser } from '@/auth/lib/server';
 import { redirect } from 'next/navigation';
 
 const LoginLayout = async ({

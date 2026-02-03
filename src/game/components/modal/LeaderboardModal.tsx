@@ -5,7 +5,7 @@ import Button from '@/ui/components/Button';
 import Modal from './Modal';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { auth } from '@/lib/firebase/client';
+import { auth } from '@/firebase/client';
 import {
   getTopPlayers,
   getNearbyPlayers,

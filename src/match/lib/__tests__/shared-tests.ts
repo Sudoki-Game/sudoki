@@ -37,6 +37,7 @@ export function createBaseMatchForDate(
   return {
     id: `match_${timestamp}`,
     isWon: true,
+    difficulty: 'medium',
     score: 100,
     streakBonus: 0,
     autoSolvesCount: 0,
@@ -59,7 +60,7 @@ export interface MatchStorageAdapter<T extends BaseMatch> {
   getTodaysMatch: () => Promise<T | null>;
   hasPlayedToday: () => Promise<boolean>;
   clearAll: () => void | Promise<void>;
-  createMatch: (date: Date, overrides?: Partial<T>) => T;
+  createMatch: (date: Date, overrides?: Partial<BaseMatch>) => T;
 }
 
 /**

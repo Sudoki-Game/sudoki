@@ -15,7 +15,7 @@
 
 .statContainer {
   display: grid;
-  grid-template-columns: 1fr 6rem;
+  grid-template-columns: 1fr 12rem;
   gap: 1rem;
   padding: 1.5rem;
 
@@ -45,6 +45,14 @@
   font-size: 1.5rem;
   color: var(--red);
   margin-left: auto;
+}
+
+.statIncrement {
+  font-family: 'Bear Days';
+  margin-bottom: 0.25rem;
+  font-size: 1.25rem;
+  color: var(--red);
+  margin-left: 0.5rem;
 }
 
 .registerCTA {

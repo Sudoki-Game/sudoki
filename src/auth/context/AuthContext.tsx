@@ -9,9 +9,9 @@ import {
 } from 'react';
 import { createSession, removeSession } from '@/app/actions/auth';
 import { getUserStats } from '@/app/actions/user';
-import { UserStats } from '@/types/auth';
-import { onAuthStateChanged } from '@/lib/firebase/auth';
-import { auth } from '@/lib/firebase/client';
+import { UserStats } from '@/auth/types';
+import { onAuthStateChanged } from '@/auth/lib/firebase';
+import { auth } from '@/firebase/client';
 
 export interface AuthContextType {
   loading: boolean;

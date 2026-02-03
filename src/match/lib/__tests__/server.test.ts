@@ -34,6 +34,7 @@ function createServerMatchForDate(
     id: `match_${timestamp}`,
     userPlayed: userId,
     isWon: true,
+    difficulty: 'medium',
     score: 100,
     streakBonus: 0,
     autoSolvesCount: 0,
