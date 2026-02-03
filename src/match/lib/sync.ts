@@ -56,7 +56,7 @@ export async function uploadTodaysLocalMatch(
 
     if (match === null || match === undefined) {
       console.log(`[MatchSync] No local match found for today to upload`);
-      result.failed++;
+      result.skipped++;
       return result;
     }
 
