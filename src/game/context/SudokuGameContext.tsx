@@ -325,7 +325,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
           hasPlayed = true;
           setPlayedToday(true);
           // Convert ServerMatch to ClientMatch for state
-          const difficulty = serverTodaysMatch.difficulty || 'medium'; // Fallback for old matches
+          const difficulty = serverTodaysMatch.difficulty ?? 'medium'; // Fallback for old matches
           if (!serverTodaysMatch.difficulty) {
             console.warn(
               '[SudokuGame] Missing difficulty for today\'s server match, falling back to "medium". Match id:',
