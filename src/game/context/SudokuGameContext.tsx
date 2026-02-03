@@ -310,7 +310,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
             console.warn(`[SudokuGame] Failed to sync today's match.`);
           }
         } catch (err) {
-          console.warn('[SudokuGame] Error syncing today\'s match:', err);
+          console.warn("[SudokuGame] Error syncing today's match:", err);
         }
 
         // Check server for today's match
