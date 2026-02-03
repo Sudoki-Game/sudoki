@@ -1,29 +1,17 @@
 # Sudoki
 
-Sudoki is a web-based Sudoku game built around a **single daily puzzle** that everyone plays. Built with Next.js 16, React 19, and TypeScript, it features a risk/reward scoring system where players earn points for valid placements while lives limit mistakes. Daily streak bonuses reward persistence, encouraging players to return while staying competitive.
+A web-based Sudoku game built around a **single daily puzzle** that everyone plays. Built with Next.js 16, React 19, and TypeScript, it features a risk/reward scoring system where players earn points for valid placements while lives limit mistakes. Daily streak bonuses reward persistence, encouraging players to return while staying competitive.
 
-Created by [Dylan Almond](https://dylanalmond.net/work/sudoki), Sudoki delivers a daily puzzle experience that's challenging and encouraging—balancing tension through scoring mechanics with positive reinforcement via streaks and shared competition.
+## How It Works
 
-**Play now at [sudoki.uk](https://sudoki.uk/)**
+The game focuses on a **single daily puzzle** that all players tackle together—creating consistent difficulty and fair competition.
 
-## Overview
+### Core Mechanics
 
-Many Sudoku apps overwhelm users with clutter, endless modes, or harsh penalties for mistakes. Sudoki solves this by focusing on a **single daily puzzle** that all players tackle together—creating consistent difficulty and fair competition without punishment.
-
-### The Problem
-
-Players need a Sudoku experience that is **challenging but fair**, rewarding effort and persistence while keeping them engaged and motivated to return daily—without overwhelming complexity or harsh mistake penalties.
-
-### The Solution
-
-Sudoki balances challenge and encouragement through a **risk/reward scoring system**:
-
-- Every valid placement increases your score
-- Invalid placements **cost a life and reduce your score**
-- Players can continue solving as long as they have lives
-- Daily **streak bonuses** reward consistency and habit formation
-
-Because the **daily puzzle is the same for everyone**, difficulty remains consistent, letting players compete fairly while staying motivated to improve their scores and maintain streaks.
+- **Risk/Reward Scoring**: Every valid placement increases your score; invalid placements cost a life and reduce your score
+- **Lives System**: Players can continue solving as long as they have lives remaining
+- **Daily Streaks**: Reward consistency and habit formation
+- **Shared Puzzle**: Because the daily puzzle is the same for everyone, difficulty remains consistent and competition is fair
 
 ## Features
 
@@ -215,26 +203,12 @@ To deploy:
 8. Push to the branch: `git push origin feature/my-feature`
 9. Submit a pull request
 
-## About the Project
+## Roadmap
 
-Sudoki is created by Dylan Almond, a full-stack developer. The game delivers a **daily puzzle experience that's challenging and encouraging**—creating tension through the risk/reward mechanic while promoting engagement via streaks and positive scoring.
-
-The shared daily puzzle ensures **consistent difficulty**, making competition fair and motivating players to return daily to improve scores and maintain streaks. For more information about the creator and other projects, visit [dylanalmond.net](https://dylanalmond.net/work/sudoki).
-
-## Future Enhancements
-
-Planned features for future iterations include:
+Planned features for future iterations:
 
 - **Difficulty Tiers** - Challenge advanced players with harder puzzles
 - **Extended Progression** - Personalized scoring and achievement systems
 - **Optional Notifications** - Reminders to increase daily engagement
 - **Social Features** - Friend challenges or cooperative puzzle modes
 - **Enhanced Statistics** - Deeper analytics and performance tracking
-
-## License
-
-This project is private and proprietary.
-
-## Support
-
-For bug reports or feature requests, please open an issue on the GitHub repository.
