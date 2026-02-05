@@ -304,3 +304,33 @@ export async function updateUserStatsFromMatch(
     throw error;
   }
 }
+
+/**
+ * Delete all matches for a user
+ * Used when deleting a user account
+ */
+export async function deleteUserMatches(userId: string): Promise<boolean> {
+  try {
+    const userMatchesRef = serverDb
+      .collection(MATCHES_COLLECTION)
+      .where('userPlayed', '==', userId);
+
+    const querySnapshot = await userMatchesRef.get();
+
+    if (querySnapshot.empty) {
+      return true; // No matches to delete
+    }
+
+    // Use batch delete for efficiency
+    const batch = serverDb.batch();
+    querySnapshot.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+    return true;
+  } catch (error) {
+    console.error('[MatchServer] Error deleting user matches:', error);
+    return false;
+  }
+}

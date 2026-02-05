@@ -41,6 +41,14 @@ const Sudoku = () => {
 
   const { activeModal } = useModalRouter();
 
+  // Show how-to-play modal for first-time users
+  useEffect(() => {
+    const hasSeenTutorial = localStorage.getItem('sudoki_tutorial_seen');
+    if (!hasSeenTutorial && isReady && !hasPlayedToday) {
+      openModal('how-to-play');
+    }
+  }, [isReady, hasPlayedToday, openModal]);
+
   // Disable game on menu active
   useEffect(() => {
     togglePause(!!activeModal);

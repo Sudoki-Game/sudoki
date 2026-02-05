@@ -10,6 +10,7 @@ import {
   createInitialServerUserData,
   hasCompletedOnboarding,
 } from '@/user/types';
+import { deleteUserMatches } from '@/match/lib/server';
 
 /** Firestore collection name for users */
 export const USERS_COLLECTION = 'users';
@@ -152,4 +153,27 @@ export async function getOrCreateUser(
   }
 
   return createUser(userId, email);
+}
+
+/**
+ * Delete user from Firestore
+ * Also deletes all associated matches
+ */
+export async function deleteUser(userId: string): Promise<boolean> {
+  try {
+    // Delete all user's matches first
+    const matchesDeleted = await deleteUserMatches(userId);
+    if (!matchesDeleted) {
+      console.error('[UserServer] Failed to delete user matches');
+      return false;
+    }
+
+    // Then delete the user document
+    const userRef = serverDb.collection(USERS_COLLECTION).doc(userId);
+    await userRef.delete();
+    return true;
+  } catch (error) {
+    console.error('[UserServer] Error deleting user:', error);
+    return false;
+  }
 }
