@@ -7,17 +7,24 @@ import ReportBugModal from './ReportBugModal';
 import LeaderboardModal from './LeaderboardModal';
 import HowToPlayModal from './HowToPlayModal';
 
+export const MODALS = {
+  settings: SettingsModal,
+  gameover: GameOverModal,
+  solution: SolutionModal,
+  'bug-report': ReportBugModal,
+  leaderboard: LeaderboardModal,
+  'how-to-play': HowToPlayModal,
+} as const;
+
+export type ModalType = keyof typeof MODALS;
+
 const ModalRouter = () => {
   const { activeModal } = useModalRouter();
 
-  if (activeModal === null) return null;
+  if (!activeModal) return null;
 
-  if (activeModal === 'settings') return <SettingsModal />;
-  if (activeModal === 'gameover') return <GameOverModal onClose={() => {}} />;
-  if (activeModal === 'solution') return <SolutionModal />;
-  if (activeModal === 'bug-report') return <ReportBugModal />;
-  if (activeModal === 'leaderboard') return <LeaderboardModal />;
-  if (activeModal === 'how-to-play') return <HowToPlayModal />;
+  const Component = MODALS[activeModal];
+  return <Component onClose={() => {}} />;
 };
 
 export default ModalRouter;

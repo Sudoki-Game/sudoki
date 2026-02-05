@@ -1,4 +1,5 @@
-import React from 'react';
+import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './Dialog.module.css';
 import Button from './Button';
 
@@ -27,25 +28,66 @@ const Dialog = ({
   isLoading = false,
   loadingText = 'Loading...',
 }: DialogProps) => {
-  if (!open) return null;
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget && !isLoading) {
-      onClose();
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (open) {
+      dialog.showModal();
+    } else {
+      dialog.close();
     }
-  };
+  }, [open]);
 
-  return (
-    <div className={styles.backdrop} onClick={handleBackdropClick}>
-      <div className={styles.dialog} role="dialog" aria-modal="true">
+  // Handle ESC key and backdrop click
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const handleCancel = (e: Event) => {
+      e.preventDefault();
+      if (!isLoading) {
+        onClose();
+      }
+    };
+
+    const handleClick = (e: MouseEvent) => {
+      const rect = dialog.getBoundingClientRect();
+      const isInDialog =
+        rect.top <= e.clientY &&
+        e.clientY <= rect.top + rect.height &&
+        rect.left <= e.clientX &&
+        e.clientX <= rect.left + rect.width;
+
+      if (!isInDialog && !isLoading) {
+        onClose();
+      }
+    };
+
+    dialog.addEventListener('cancel', handleCancel);
+    dialog.addEventListener('click', handleClick);
+
+    return () => {
+      dialog.removeEventListener('cancel', handleCancel);
+      dialog.removeEventListener('click', handleClick);
+    };
+  }, [onClose, isLoading]);
+
+  if (typeof window === 'undefined') return null;
+
+  return createPortal(
+    <dialog ref={dialogRef} className={styles.dialog}>
+      <div className={styles.content}>
         <h3 className={styles.title}>{title}</h3>
         {description && <p className={styles.description}>{description}</p>}
         <div className={styles.actions}>
           <Button
             fill
-            size="lg"
+            size='lg'
             variant={variant}
-            type="button"
+            type='button'
             onClick={onConfirm}
             disabled={isLoading}
           >
@@ -54,8 +96,8 @@ const Dialog = ({
           {cancelText && (
             <Button
               fill
-              size="lg"
-              type="button"
+              size='lg'
+              type='button'
               onClick={onClose}
               disabled={isLoading}
             >
@@ -64,7 +106,8 @@ const Dialog = ({
           )}
         </div>
       </div>
-    </div>
+    </dialog>,
+    document.body,
   );
 };
 

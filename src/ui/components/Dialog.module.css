@@ -1,15 +1,18 @@
-.backdrop {
+.dialog {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: none;
+  padding: 0;
+  background: transparent;
+  max-width: calc(100dvw - 2rem);
+  max-height: calc(100dvh - 2rem);
+  overflow: visible;
+  width: 100%;
+}
+
+.dialog::backdrop {
   animation: fadeIn 0.2s ease-in-out;
 }
 
@@ -22,7 +25,7 @@
   }
 }
 
-.dialog {
+.content {
   background-color: white;
   border: 2px solid var(--hot-pink);
   border-radius: 0.75rem;
@@ -31,6 +34,7 @@
   max-width: 420px;
   box-sizing: border-box;
   animation: slideUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  margin: auto;
 }
 
 @keyframes slideUp {
