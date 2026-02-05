@@ -125,6 +125,15 @@ const SettingsModal = () => {
           Report a Bug
         </Button>
 
+        <Button
+          fill
+          size='lg'
+          type='button'
+          onClick={() => openModal('how-to-play')}
+        >
+          How to Play
+        </Button>
+
         <Button fill size='lg' type='button' onClick={goBack}>
           Go Back
         </Button>

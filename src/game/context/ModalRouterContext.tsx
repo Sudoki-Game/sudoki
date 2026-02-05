@@ -6,7 +6,8 @@ export type ModalType =
   | 'solution'
   | 'leaderboard'
   | 'settings'
-  | 'bug-report';
+  | 'bug-report'
+  | 'how-to-play';
 
 type ModalRouterProviderProps = {
   children: ReactNode;
