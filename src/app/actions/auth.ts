@@ -9,6 +9,7 @@ import {
   updateDisplayName,
   isDisplayNameTaken,
   checkOnboardingComplete,
+  deleteUser,
 } from '@/user/lib/server';
 
 export async function createSession(idToken: string): Promise<SessionResult> {
@@ -135,5 +136,47 @@ export async function checkUserOnboarding(): Promise<{
   } catch (error) {
     console.error('Error checking user onboarding:', error);
     return { hasCompleted: false };
+  }
+}
+
+export interface DeleteAccountResult {
+  success: boolean;
+  error?: string;
+}
+
+/**
+ * Delete the authenticated user's account
+ * Removes both Firebase Auth account and Firestore user data
+ */
+export async function deleteAccount(): Promise<DeleteAccountResult> {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    const decodedToken = await serverAuth.verifyIdToken(session);
+    const uid = decodedToken.uid;
+
+    // Delete user from Firestore first
+    const firestoreDeleted = await deleteUser(uid);
+    if (!firestoreDeleted) {
+      return { success: false, error: 'Failed to delete user data' };
+    }
+
+    // Delete user from Firebase Auth
+    await serverAuth.deleteUser(uid);
+
+    // Remove session cookie
+    await removeSession();
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Failed to delete account',
+    };
   }
 }
