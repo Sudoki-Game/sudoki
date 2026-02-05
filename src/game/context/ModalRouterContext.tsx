@@ -1,13 +1,6 @@
 'use client';
 import { createContext, useContext, useReducer, ReactNode } from 'react';
-
-export type ModalType =
-  | 'gameover'
-  | 'solution'
-  | 'leaderboard'
-  | 'settings'
-  | 'bug-report'
-  | 'how-to-play';
+import { ModalType } from '../components/modal/ModalRouter';
 
 type ModalRouterProviderProps = {
   children: ReactNode;
