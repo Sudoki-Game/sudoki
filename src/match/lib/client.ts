@@ -12,6 +12,7 @@ import {
   extractVerifiedPayload,
   SignedPayload,
 } from './encoding';
+import { validateMatch } from './validation';
 
 /** localStorage key for match history */
 export const MATCH_HISTORY_KEY = 'sudoku_match_history';
@@ -33,6 +34,26 @@ export async function saveMatch(
   options?: SaveMatchOptions,
 ): Promise<SaveMatchResult> {
   try {
+    // Validate match data before saving
+    const validation = validateMatch(match);
+    if (!validation.isValid) {
+      const errorDetails = validation.errors
+        .map((e) => `${e.field}: ${e.message}`)
+        .join('; ');
+      console.error('[MatchClient] Match validation failed:', {
+        matchId: match.id,
+        errors: validation.errors,
+      });
+      return { success: false, error: `Invalid match data: ${errorDetails}` };
+    }
+
+    if (validation.warnings.length > 0) {
+      console.warn('[MatchClient] Match validation warnings:', {
+        matchId: match.id,
+        warnings: validation.warnings,
+      });
+    }
+
     // Get existing history
     const history = await getMatchHistory();
 

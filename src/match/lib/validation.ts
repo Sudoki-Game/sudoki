@@ -504,8 +504,20 @@ export function validateMatch(match: BaseMatch): ValidationResult {
   errors.push(...timestampErrors.filter((e) => e.severity === 'critical'));
   warnings.push(...timestampErrors.filter((e) => e.severity === 'warning'));
 
+  const isValid = errors.length === 0;
+
+  // Log validation result
+  if (isValid) {
+    console.log('[Validation] Match validation passed:', {
+      matchId: match.id,
+      difficulty: match.difficulty,
+      score: match.score,
+      warningCount: warnings.length,
+    });
+  }
+
   return {
-    isValid: errors.length === 0,
+    isValid,
     errors,
     warnings,
   };

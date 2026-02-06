@@ -22,7 +22,7 @@ import {
   saveMatch as saveMatchToServer,
 } from '@/app/actions/match';
 import { getUserStats } from '@/app/actions/user';
-import { calculateStreakBonusForMatch, validateMatch } from './validation';
+import { calculateStreakBonusForMatch } from './validation';
 
 /**
  * Result of upload operation
@@ -58,25 +58,6 @@ export async function uploadTodaysLocalMatch(
       console.log(`[MatchSync] No local match found for today to upload`);
       result.skipped++;
       return result;
-    }
-
-    // Validate match before uploading
-    const validation = validateMatch(match);
-
-    if (!validation.isValid) {
-      console.error('[MatchSync] Invalid match detected:', {
-        matchId: match.id,
-        errors: validation.errors,
-      });
-      result.skipped++;
-      return result;
-    }
-
-    if (validation.warnings.length > 0) {
-      console.warn('[MatchSync] Match validation warnings:', {
-        matchId: match.id,
-        warnings: validation.warnings,
-      });
     }
 
     // Check if server already has a match for today
@@ -174,25 +155,6 @@ export async function uploadAllLocalMatches(
 
     for (const match of localMatches) {
       try {
-        // Validate match before uploading
-        const validation = validateMatch(match);
-
-        if (!validation.isValid) {
-          console.error('[MatchSync] Invalid match detected:', {
-            matchId: match.id,
-            errors: validation.errors,
-          });
-          result.skipped++;
-          continue; // Skip this match, continue with others
-        }
-
-        if (validation.warnings.length > 0) {
-          console.warn('[MatchSync] Match validation warnings:', {
-            matchId: match.id,
-            warnings: validation.warnings,
-          });
-        }
-
         // Check if server already has a match for this date
         const alreadyExists = await hasMatchForDate(userId, match.timestamp);
 
@@ -289,27 +251,6 @@ export async function uploadCachedMatches(
 
     for (const match of cachedMatches) {
       try {
-        // Validate match before uploading
-        const validation = validateMatch(match);
-
-        if (!validation.isValid) {
-          console.error('[MatchSync] Invalid cached match detected:', {
-            matchId: match.id,
-            errors: validation.errors,
-          });
-          result.skipped++;
-          // Still clear the cache flag since we don't want to keep retrying invalid matches
-          successfullyUploaded.push(match.id);
-          continue; // Skip this match, continue with others
-        }
-
-        if (validation.warnings.length > 0) {
-          console.warn('[MatchSync] Cached match validation warnings:', {
-            matchId: match.id,
-            warnings: validation.warnings,
-          });
-        }
-
         // Check if server already has a match for this date
         const alreadyExists = await hasMatchForDate(userId, match.timestamp);
 
