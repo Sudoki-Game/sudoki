@@ -21,6 +21,16 @@ import {
 import type { ClientMatch } from '@/match/types';
 import { runSharedMatchTests, type MatchStorageAdapter } from './shared-tests';
 
+// Mock the validation module to avoid Firebase Admin SDK import chain
+jest.mock('../validation', () => ({
+  validateMatch: jest.fn(() => ({
+    isValid: true,
+    errors: [],
+    warnings: [],
+  })),
+  getStreakBonusForNewMatch: jest.fn(() => Promise.resolve(0)),
+}));
+
 // Mock the HMAC secret
 const mockHmacSecret = 'test-hmac-secret-key-12345';
 

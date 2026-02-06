@@ -8,6 +8,16 @@
 
 import { ClientMatch } from '@/match/types';
 
+// Mock the validation module to avoid Firebase Admin SDK import chain
+jest.mock('@/match/lib/validation', () => ({
+  validateMatch: jest.fn(() => ({
+    isValid: true,
+    errors: [],
+    warnings: [],
+  })),
+  getStreakBonusForNewMatch: jest.fn(() => Promise.resolve(0)),
+}));
+
 // We'll implement these functions
 import {
   prepareTransferData,

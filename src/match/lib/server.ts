@@ -9,19 +9,10 @@ import { serverDb } from '@/firebase/server';
 import type { ServerMatch, SaveMatchResult } from '@/match/types';
 import { isMatchFromToday } from '@/match/types';
 import { FieldValue } from 'firebase-admin/firestore';
+import { validateMatch } from './validation';
 
 /** Firestore collection name for matches */
 export const MATCHES_COLLECTION = 'matches';
-
-/**
- * Validate match data before saving
- * For now, returns true - will be implemented later with full validation
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function validateMatch(_match: ServerMatch): boolean {
-  // TODO: Implement full validation (board validation, score validation, etc.)
-  return true;
-}
 
 /**
  * Save a match to Firestore
@@ -37,8 +28,23 @@ export async function saveMatch(
 ): Promise<SaveMatchResult> {
   try {
     // Validate match data
-    if (!validateMatch(match)) {
-      return { success: false, error: 'Invalid match data' };
+    const validation = validateMatch(match);
+    if (!validation.isValid) {
+      const errorDetails = validation.errors
+        .map((e) => `${e.field}: ${e.message}`)
+        .join('; ');
+      console.error('[MatchServer] Match validation failed:', {
+        matchId: match.id,
+        errors: validation.errors,
+      });
+      return { success: false, error: `Invalid match data: ${errorDetails}` };
+    }
+
+    if (validation.warnings.length > 0) {
+      console.warn('[MatchServer] Match validation warnings:', {
+        matchId: match.id,
+        warnings: validation.warnings,
+      });
     }
 
     // Ensure userPlayed matches the authenticated user
