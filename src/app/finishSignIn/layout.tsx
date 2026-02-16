@@ -2,6 +2,19 @@ import React from 'react';
 import Image from 'next/image';
 import Copyright from '@/ui/components/Copyright';
 import headerStyles from '@/game/components/Header.module.css';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Complete Sign In',
+  description: 'Complete your secure email sign-in to continue to Sudoki.',
+  alternates: {
+    canonical: '/finishSignIn',
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 const FinishSignInLayout = async ({
   children,
