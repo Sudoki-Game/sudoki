@@ -13,10 +13,8 @@ const SudokuControls = () => {
   // Click to update current selection
   const handleClick = (value: number) => {
     if (
-      game.selected.col !== null &&
-      game.selected.col !== undefined &&
-      game.selected.row !== null &&
-      game.selected.row !== undefined
+      game.selected.col != null &&
+      game.selected.row != null
     ) {
       updateCell(game.selected.row, game.selected.col, value);
       playSound('/game/audio/metronome.mp3', { pitch: 1.8 });

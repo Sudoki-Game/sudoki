@@ -182,10 +182,8 @@ function reducer(state: GameState, action: GameAction): GameState {
       };
     case 'SELECT_CELL': {
       const highlights: Set<string> =
-        action.row !== null &&
-        action.row !== undefined &&
-        action.col !== null &&
-        action.col !== undefined
+        action.row != null &&
+        action.col != null
           ? computeHighlights(action.row, action.col, state.board)
           : new Set();
 
@@ -435,10 +433,8 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     if (!cell) return;
 
     const isBoardCell =
-      cell.row !== null &&
-      cell.row !== undefined &&
-      cell.col !== null &&
-      cell.col !== undefined;
+      cell.row != null &&
+      cell.col != null;
 
     dispatch({ type: 'SET_DRAG_VALUE', value: cell.value });
 
@@ -648,10 +644,8 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
 
     const { row: sourceRow, col: sourceCol } = active.data.current?.cell ?? {};
     const sourceIsCell =
-      sourceRow !== null &&
-      sourceRow !== undefined &&
-      sourceCol !== null &&
-      sourceCol !== undefined;
+      sourceRow != null &&
+      sourceCol != null;
 
     // Handle missing target
     if (!over) {

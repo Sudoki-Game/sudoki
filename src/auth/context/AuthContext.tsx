@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { createSession, removeSession } from '@/app/actions/auth';
 import { getUserStats } from '@/app/actions/user';
-import type { BaseUserStats } from '@/auth/types';
+import type { BaseUserStats } from '@/user/types';
 import { onAuthStateChanged } from '@/auth/lib/firebase';
 import { auth } from '@/firebase/client';
 
