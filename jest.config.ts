@@ -20,6 +20,14 @@ const config: Config = {
     '!src/**/types/**',
     '!src/app/**/*.tsx', // Exclude Next.js app router pages from coverage
   ],
+  coverageThreshold: {
+    global: {
+      statements: 35,
+      lines: 35,
+      functions: 50,
+      branches: 80,
+    },
+  },
 };
 
 export default createJestConfig(config);

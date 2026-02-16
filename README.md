@@ -177,6 +177,13 @@ yarn test:coverage
 
 Tests are located in `__tests__/` directories alongside the code they test.
 
+Jest enforces staged global coverage thresholds to prevent regressions:
+
+- Statements: `35%`
+- Lines: `35%`
+- Functions: `50%`
+- Branches: `80%`
+
 ## Deployment
 
 This application is deployed via Firebase App Hosting. The configuration is defined in:
