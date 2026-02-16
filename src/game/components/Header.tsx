@@ -24,7 +24,9 @@ const Header = () => {
         className={styles.logo}
         src={'/logo.svg'}
         alt='Sudoki! Logo'
-        loading='eager'
+        priority
+        fetchPriority='high'
+        sizes='(max-width: 768px) 196px, 275px'
         height={84}
         width={275}
       />

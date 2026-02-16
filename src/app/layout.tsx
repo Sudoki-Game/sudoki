@@ -1,9 +1,16 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import type { Graph } from 'schema-dts';
+import { Grandstander } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/auth/context/AuthContext';
 import { DialogProvider } from '@/ui/context/DialogContext';
+
+const grandstander = Grandstander({
+  subsets: ['latin'],
+  weight: ['400', '700', '900'],
+  display: 'swap',
+});
 
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? 'https://sudoku.uk'
@@ -100,7 +107,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body>
+      <body className={grandstander.className}>
         <AuthProvider>
           <DialogProvider>{children}</DialogProvider>
         </AuthProvider>
