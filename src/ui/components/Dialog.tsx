@@ -16,6 +16,9 @@ export interface DialogProps {
   loadingText?: string;
 }
 
+/**
+ * Modal confirmation dialog rendered through a portal.
+ */
 const Dialog = ({
   open,
   onClose,

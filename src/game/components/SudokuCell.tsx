@@ -48,7 +48,7 @@ const SudokuCell = ({
     sudokuCellVariants({
       selected: isSelected,
       preFilled: isFixed && !isRelated,
-      empty: !isRelated && cellValue == null,
+      empty: !isRelated && cellValue === null,
       autoSolved: !isSelected && isAutoSolved,
       danger: !isSelected && isConflicting,
       highlight: !isConflicting && !isSelected && (isRelated || isOver),

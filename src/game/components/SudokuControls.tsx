@@ -12,7 +12,10 @@ const SudokuControls = () => {
 
   // Click to update current selection
   const handleClick = (value: number) => {
-    if (game.selected.col != null && game.selected.row != null) {
+    if (
+      game.selected.col != null &&
+      game.selected.row != null
+    ) {
       updateCell(game.selected.row, game.selected.col, value);
       playSound('/game/audio/metronome.mp3', { pitch: 1.8 });
     }
@@ -34,7 +37,7 @@ const SudokuControls = () => {
             data-testid={`draggable-${i + 1}`}
             cellProps={{
               cellValue: i + 1,
-              disabled: disabled,
+              disabled,
               isSelected: false,
               isRelated: false,
               isConflicting: false,

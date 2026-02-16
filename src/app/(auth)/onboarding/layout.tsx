@@ -1,8 +1,8 @@
-import React from 'react';
+import type React from 'react';
 import { getServerUser } from '@/auth/lib/server';
 import { redirect } from 'next/navigation';
 import { checkOnboardingComplete } from '@/user/lib/server';
-import { AuthUser } from '@/auth/types';
+import { type AuthUser } from '@/auth/types';
 
 const OnboardingLayout = async ({
   children,

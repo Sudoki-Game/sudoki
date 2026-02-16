@@ -41,7 +41,7 @@ export async function createUserEntry(
   const now = Date.now();
   const userDoc: ServerUserData = {
     uid: userId,
-    email: email,
+    email,
     displayName: '',
     isActive: true,
     createdAt: now,

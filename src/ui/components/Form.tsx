@@ -4,6 +4,9 @@ import styles from './Form.module.css';
 
 export type FormProps = React.ComponentPropsWithRef<'form'>;
 
+/**
+ * Styled form container used across auth and modal flows.
+ */
 const Form = ({ children, className, ref, ...props }: FormProps) => {
   return (
     <form ref={ref} className={clsx(styles.form, className)} {...props}>
@@ -14,6 +17,9 @@ const Form = ({ children, className, ref, ...props }: FormProps) => {
 
 export type FormFieldProps = React.ComponentPropsWithRef<'div'>;
 
+/**
+ * Styled field wrapper for grouping labels and inputs.
+ */
 export const FormField = ({
   children,
   className,

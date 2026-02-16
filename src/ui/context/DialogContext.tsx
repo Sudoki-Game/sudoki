@@ -4,7 +4,7 @@ import {
   createContext,
   useContext,
   useState,
-  ReactNode,
+  type ReactNode,
   useCallback,
 } from 'react';
 import Dialog from '@/ui/components/Dialog';
@@ -20,6 +20,9 @@ export interface DialogConfig {
   loadingText?: string;
 }
 
+/**
+ * Dialog context API exposed to client components.
+ */
 interface DialogContextType {
   showDialog: (config: DialogConfig) => void;
   hideDialog: () => void;
@@ -27,6 +30,9 @@ interface DialogContextType {
 
 const DialogContext = createContext<DialogContextType | undefined>(undefined);
 
+/**
+ * Provides global dialog controls and hosts the dialog portal instance.
+ */
 export function DialogProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [config, setConfig] = useState<DialogConfig | null>(null);

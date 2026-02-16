@@ -17,4 +17,10 @@ export const DIFFICULTY_EMPTY_CELLS: Record<string, number> = {
   medium: 45,
   hard: 55,
 } as const;
+
+/**
+ * Valid difficulty levels
+ */
+export type DifficultyLevel = keyof typeof DIFFICULTY_EMPTY_CELLS;
+
 export const STREAK_BONUS_AMOUNT = 200;

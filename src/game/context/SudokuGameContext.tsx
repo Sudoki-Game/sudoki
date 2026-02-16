@@ -38,7 +38,7 @@ import {
 import { getStreakBonusForNewMatch } from '@/match/lib/validation';
 import { updateUserStatsFromMatch as updateUserStatsLocal } from '@/user/lib/client';
 import { auth } from '@/firebase/client';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, type User } from 'firebase/auth';
 import {
   saveMatch as saveMatchToServer,
   getTodaysMatch as getTodaysMatchServer,
@@ -182,14 +182,15 @@ function reducer(state: GameState, action: GameAction): GameState {
       };
     case 'SELECT_CELL': {
       const highlights: Set<string> =
-        action.row != null && action.col != null
+        action.row != null &&
+        action.col != null
           ? computeHighlights(action.row, action.col, state.board)
           : new Set();
 
       return {
         ...state,
         selected: { row: action.row, col: action.col },
-        highlights: highlights,
+        highlights,
       };
     }
     case 'RESET_SELECTION':
@@ -431,7 +432,9 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
 
     if (!cell) return;
 
-    const isBoardCell = cell.row != null && cell.col != null;
+    const isBoardCell =
+      cell.row != null &&
+      cell.col != null;
 
     dispatch({ type: 'SET_DRAG_VALUE', value: cell.value });
 
@@ -635,7 +638,9 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     if (!active) return;
 
     const { row: sourceRow, col: sourceCol } = active.data.current?.cell ?? {};
-    const sourceIsCell = sourceRow != null && sourceCol != null;
+    const sourceIsCell =
+      sourceRow != null &&
+      sourceCol != null;
 
     // Handle missing target
     if (!over) {
