@@ -137,9 +137,9 @@ const useSudokuGameControls = (): SudokuControls => {
         containerRef.current === e.target
       ) {
         if (
-          game.selected.row !== null ||
-          game.selected.row !== undefined ||
-          game.selected.col !== null ||
+          game.selected.row !== null &&
+          game.selected.row !== undefined &&
+          game.selected.col !== null &&
           game.selected.col !== undefined
         ) {
           dispatch({ type: 'RESET_SELECTION' });
