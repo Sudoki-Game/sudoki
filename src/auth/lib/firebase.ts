@@ -3,8 +3,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   onAuthStateChanged as _onAuthStateChanged,
-  NextOrObserver,
-  User,
+  type NextOrObserver,
+  type User,
   sendSignInLinkToEmail,
 } from 'firebase/auth';
 import { auth } from '../../firebase/client';

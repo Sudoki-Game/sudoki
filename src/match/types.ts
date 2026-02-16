@@ -5,7 +5,7 @@
  * Client and server types extend a base type with their respective fields.
  */
 
-import { DIFFICULTY_EMPTY_CELLS } from '@/game/util/constants';
+import { type DIFFICULTY_EMPTY_CELLS } from '@/game/util/constants';
 
 /**
  * Base match data shared between client and server

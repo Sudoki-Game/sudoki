@@ -5,7 +5,7 @@
 
 import { useDraggable } from '@dnd-kit/core';
 import styles from './DraggableCell.module.css';
-import SudokuCell, { SudokuCellProps } from './SudokuCell';
+import SudokuCell, { type SudokuCellProps } from './SudokuCell';
 import clsx from 'clsx';
 
 type DraggableProps = {
@@ -24,9 +24,9 @@ const DraggableCell = ({
   ...props
 }: DraggableProps) => {
   const { setNodeRef, attributes, listeners, isDragging } = useDraggable({
-    id: id,
-    data: data,
-    disabled: disabled,
+    id,
+    data,
+    disabled,
   });
 
   const style = isDragging ? { opacity: 0 } : undefined;

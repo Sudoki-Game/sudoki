@@ -6,7 +6,7 @@
  * - Syncing data on login
  */
 
-import { ClientMatch } from '@/match/types';
+import { type ClientMatch } from '@/match/types';
 
 // Mock the validation module to avoid Firebase Admin SDK import chain
 jest.mock('@/match/lib/validation', () => ({

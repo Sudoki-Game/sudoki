@@ -9,8 +9,8 @@ import {
   useSensor,
   PointerSensor,
   KeyboardSensor,
-  SensorDescriptor,
-  SensorOptions,
+  type SensorDescriptor,
+  type SensorOptions,
 } from '@dnd-kit/core';
 import { useEffect, useRef } from 'react';
 import { playSound } from '../lib/sound';
@@ -136,7 +136,12 @@ const useSudokuGameControls = (): SudokuControls => {
         !containerRef.current?.contains(e.target as Node) ||
         containerRef.current === e.target
       ) {
-        if (game.selected.row != null || game.selected.col != null) {
+        if (
+          game.selected.row !== null ||
+          game.selected.row !== undefined ||
+          game.selected.col !== null ||
+          game.selected.col !== undefined
+        ) {
           dispatch({ type: 'RESET_SELECTION' });
         }
       }

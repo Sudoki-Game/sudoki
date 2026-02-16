@@ -36,7 +36,7 @@ const BoardCell = ({
   });
 
   // If empty, only show drop-zone
-  if (cellValue == null) {
+  if (cellValue === null) {
     return (
       <SudokuCell
         ref={setDroppableRef}

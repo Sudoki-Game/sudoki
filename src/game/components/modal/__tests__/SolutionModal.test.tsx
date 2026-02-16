@@ -2,7 +2,6 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import SolutionModal from '../SolutionModal';
 import { useModalRouter } from '@/game/context/ModalRouterContext';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/firebase/client';
 import { getTodaysMatch as getTodaysMatchLocal } from '@/match/lib/client';
 import { getTodaysMatch as getTodaysMatchServer } from '@/app/actions/match';
 

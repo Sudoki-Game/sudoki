@@ -3,7 +3,7 @@
  * @license GNU General Public License v3.0
  */
 
-import { Board, Difficulty } from '../types';
+import { type Board, type Difficulty } from '../types';
 
 /**
  * Generates an empty 9x9 Sudoku board.

@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { SessionResult } from '@/auth/types';
+import { type SessionResult } from '@/auth/types';
 import { serverAuth } from '@/firebase/server';
 import {
   userExists,

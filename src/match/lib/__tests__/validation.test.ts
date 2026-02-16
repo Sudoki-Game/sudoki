@@ -23,7 +23,6 @@ import {
   getLastMatchTimestamp,
   getStreakBonusForNewMatch,
 } from '../validation';
-import { DIFFICULTY_EMPTY_CELLS } from '@/game/util/constants';
 import { getUserData } from '@/user/lib/client';
 import { getUserStats } from '@/app/actions/user';
 import { wouldContinueStreak } from '@/user/lib/stats';
@@ -520,7 +519,7 @@ describe('Full Match Validation', () => {
 
   it('should reject match with unknown difficulty', () => {
     const match = createValidMatch({
-      difficulty: 'invalid-difficulty' as keyof typeof DIFFICULTY_EMPTY_CELLS,
+      difficulty: 'invalid-difficulty' as BaseMatch['difficulty'],
     });
     const result = validateMatch(match);
 
