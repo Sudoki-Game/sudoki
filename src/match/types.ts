@@ -5,7 +5,7 @@
  * Client and server types extend a base type with their respective fields.
  */
 
-import { type DIFFICULTY_EMPTY_CELLS } from '@/game/util/constants';
+import type { DifficultyLevel } from '@/game/util/constants';
 
 /**
  * Base match data shared between client and server
@@ -42,7 +42,7 @@ export interface BaseMatch {
   solution: string;
 
   /** Difficulty level of the puzzle */
-  difficulty: keyof typeof DIFFICULTY_EMPTY_CELLS;
+  difficulty: DifficultyLevel;
 
   /** Unix timestamp when match was completed */
   timestamp: number;
