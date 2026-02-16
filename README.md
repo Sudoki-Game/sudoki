@@ -177,12 +177,25 @@ yarn test:coverage
 
 Tests are located in `__tests__/` directories alongside the code they test.
 
-Jest enforces staged global coverage thresholds to prevent regressions:
+Jest enforces coverage thresholds to prevent regressions.
 
-- Statements: `35%`
-- Lines: `35%`
-- Functions: `50%`
+### Global threshold
+
+- Statements: `80%`
+- Lines: `80%`
+- Functions: `80%`
 - Branches: `80%`
+
+### Scoped thresholds
+
+- `src/app/actions/`: `90%` (all metrics)
+- `src/auth/lib`: `90%` (all metrics)
+- `src/firebase/`: `90%` (all metrics)
+- `src/match/lib`: `90%` (all metrics)
+- `src/user/lib`: `90%` (all metrics)
+- `src/ui/components`: `40%` (all metrics)
+- `src/auth/components`: `60%` (all metrics)
+- `src/game/components/`: `60%` (all metrics)
 
 ## Deployment
 

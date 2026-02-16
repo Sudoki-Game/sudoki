@@ -22,10 +22,60 @@ const config: Config = {
   ],
   coverageThreshold: {
     global: {
-      statements: 35,
-      lines: 35,
-      functions: 50,
+      statements: 80,
+      lines: 80,
+      functions: 80,
       branches: 80,
+    },
+    // Lib
+    './src/app/actions/': {
+      statements: 90,
+      lines: 90,
+      functions: 90,
+      branches: 90,
+    },
+    './src/auth/lib': {
+      statements: 90,
+      lines: 90,
+      functions: 90,
+      branches: 90,
+    },
+    './src/firebase/': {
+      statements: 90,
+      lines: 90,
+      functions: 90,
+      branches: 90,
+    },
+    './src/match/lib': {
+      statements: 90,
+      lines: 90,
+      functions: 90,
+      branches: 90,
+    },
+    './src/user/lib': {
+      statements: 90,
+      lines: 90,
+      functions: 90,
+      branches: 90,
+    },
+    // Components
+    './src/ui/components': {
+      statements: 40,
+      lines: 40,
+      functions: 40,
+      branches: 40,
+    },
+    './src/auth/components': {
+      statements: 60,
+      lines: 60,
+      functions: 60,
+      branches: 60,
+    },
+    './src/game/components/': {
+      statements: 60,
+      lines: 60,
+      functions: 60,
+      branches: 60,
     },
   },
 };
