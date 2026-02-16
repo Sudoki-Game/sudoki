@@ -3,6 +3,9 @@ import { createPortal } from 'react-dom';
 import styles from './Dialog.module.css';
 import Button from './Button';
 
+/**
+ * Configuration for the confirmation dialog component.
+ */
 export interface DialogProps {
   open: boolean;
   onClose: () => void;
@@ -16,6 +19,9 @@ export interface DialogProps {
   loadingText?: string;
 }
 
+/**
+ * Modal confirmation dialog rendered through a portal.
+ */
 const Dialog = ({
   open,
   onClose,
