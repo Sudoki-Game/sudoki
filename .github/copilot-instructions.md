@@ -57,10 +57,6 @@ yarn test        # Takes ~3s, all tests should pass
 yarn test:watch  # Run tests in watch mode
 yarn test:coverage  # Generate coverage report
 
-# Format code
-yarn prettier --check .  # Check formatting
-yarn prettier --write .  # Auto-fix formatting issues
-
 # Build for production
 yarn build       # Takes ~30s, requires .env.local file
 
@@ -74,7 +70,7 @@ yarn start       # Run production build
 1. **Always enable Corepack first:** `corepack enable`
 2. **Always install dependencies after cloning:** `yarn install`
 3. **Always create `.env.local` before building:** `cp .env.example .env.local`
-4. **Run prettier before linting** if you've made code changes
+4. **Use ESLint + TypeScript checks for style consistency**
 5. **Run lint before building** to catch TypeScript errors early
 6. **Run tests after code changes** to ensure nothing broke
 
@@ -89,8 +85,8 @@ yarn start       # Run production build
 **Issue:** Tests fail with "ts-node is required"
 **Solution:** Add `ts-node` to devDependencies with `yarn add -D ts-node` (this is a known missing dependency in the project)
 
-**Issue:** Prettier check shows formatting issues
-**Solution:** Run `yarn prettier --write .` to auto-fix
+**Issue:** Style consistency concerns during cleanup
+**Solution:** Run `yarn lint` and address ESLint/TypeScript findings; Prettier remains supported in the repo but is intentionally not run in this cleanup stream to avoid large formatting-only diffs
 
 ## Project Architecture
 
@@ -204,7 +200,7 @@ Each module typically has:
 
 Before submitting changes, ensure:
 
-1. ✅ Code is properly formatted: `yarn prettier --write .`
+1. ✅ Code style is validated via lint: `yarn lint`
 2. ✅ Linting passes: `yarn lint`
 3. ✅ All tests pass: `yarn test`
 4. ✅ Build succeeds: `yarn build` (requires `.env.local`)
@@ -235,7 +231,6 @@ yarn install
 cp .env.example .env.local
 
 # Pre-commit validation
-yarn prettier --write .
 yarn lint
 yarn test
 

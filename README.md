@@ -125,10 +125,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 ### Code Quality
 
 - `yarn lint` - Run ESLint and TypeScript type checking
-- `yarn prettier` - Format code with Prettier
 - `yarn test` - Run all tests
 - `yarn test:watch` - Run tests in watch mode
 - `yarn test:coverage` - Generate test coverage report
+
+Note: Prettier remains part of this repository toolchain, but this cleanup initiative intentionally does not run it to avoid broad formatting-only diffs. Style consistency in this stream is enforced through ESLint + TypeScript checks.
 
 ## Project Structure
 
@@ -198,10 +199,9 @@ To deploy:
 3. Make your changes
 4. Run tests: `yarn test`
 5. Run linter: `yarn lint`
-6. Format code: `yarn prettier`
-7. Commit your changes: `git commit -am 'Add new feature'`
-8. Push to the branch: `git push origin feature/my-feature`
-9. Submit a pull request
+6. Commit your changes: `git commit -am 'Add new feature'`
+7. Push to the branch: `git push origin feature/my-feature`
+8. Submit a pull request
 
 ## Roadmap
 
