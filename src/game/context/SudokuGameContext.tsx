@@ -536,12 +536,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     const value = state.dragValue!;
 
     // If we have no source to check, check the value at the target
-    if (
-      sourceRow === null ||
-      sourceRow === undefined ||
-      sourceCol === null ||
-      sourceCol === undefined
-    ) {
+    if (sourceRow == null || sourceCol == null) {
       sourceRow = targetRow;
       sourceCol = targetCol;
     }
