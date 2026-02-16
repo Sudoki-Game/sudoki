@@ -9,7 +9,7 @@ import { createDefaultLocalUserData } from '@/user/types';
 import {
   createSignedPayload,
   extractVerifiedPayload,
-  SignedPayload,
+  type SignedPayload,
 } from '@/match/lib/encoding';
 import type { ClientMatch } from '@/match/types';
 

@@ -5,18 +5,18 @@ import {
   useContext,
   useEffect,
   useState,
-  ReactNode,
+  type ReactNode,
 } from 'react';
 import { createSession, removeSession } from '@/app/actions/auth';
 import { getUserStats } from '@/app/actions/user';
-import { UserStats } from '@/auth/types';
+import type { BaseUserStats } from '@/user/types';
 import { onAuthStateChanged } from '@/auth/lib/firebase';
 import { auth } from '@/firebase/client';
 
 export interface AuthContextType {
   loading: boolean;
   isLoggedIn: boolean | null;
-  getUserData: () => Promise<UserStats | null>;
+  getUserData: () => Promise<BaseUserStats | null>;
 }
 
 interface AuthProviderProps {
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => unsubscribe();
   }, []);
 
-  const getUserData = async (): Promise<UserStats | null> => {
+  const getUserData = async (): Promise<BaseUserStats | null> => {
     if (auth.currentUser) {
       const serverData = await getUserStats(auth.currentUser.uid);
       return serverData;

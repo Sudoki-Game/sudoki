@@ -46,3 +46,5 @@ env:
     secret: client-firebase-measurement-id
   - variable: NEXT_PUBLIC_HMAC_SECRET
     secret: hmac-secret
+  - variable: NEXT_PUBLIC_SITE_URL
+    secret: site-url

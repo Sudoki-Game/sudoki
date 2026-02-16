@@ -23,14 +23,3 @@ export interface SessionResult {
   error?: string;
   isNewUser?: boolean;
 }
-
-/**
- * Alias for backward compatibility
- * @deprecated Use BaseUserStats instead
- */
-export type UserStats = import('@/user/types').BaseUserStats;
-
-export interface AuthContextType {
-  loading: boolean;
-  getUserData: () => Promise<import('@/user/types').BaseUserStats | null>;
-}

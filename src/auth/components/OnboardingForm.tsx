@@ -5,7 +5,7 @@ import { uploadAllLocalMatches } from '@/match/lib/sync';
 import { getAuth } from 'firebase/auth';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import { completeOnboarding, OnboardingResult } from '@/app/actions/auth';
+import { completeOnboarding, type OnboardingResult } from '@/app/actions/auth';
 import Button from '@/ui/components/Button';
 import Form from '@/ui/components/Form';
 import Input from '@/ui/components/Input';

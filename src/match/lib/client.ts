@@ -10,7 +10,7 @@ import { isMatchFromToday } from '@/match/types';
 import {
   createSignedPayload,
   extractVerifiedPayload,
-  SignedPayload,
+  type SignedPayload,
 } from './encoding';
 import { validateMatch } from './validation';
 

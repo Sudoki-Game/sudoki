@@ -125,10 +125,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 ### Code Quality
 
 - `yarn lint` - Run ESLint and TypeScript type checking
-- `yarn prettier` - Format code with Prettier
 - `yarn test` - Run all tests
 - `yarn test:watch` - Run tests in watch mode
 - `yarn test:coverage` - Generate test coverage report
+
+Note: Prettier remains part of this repository toolchain, but this cleanup initiative intentionally does not run it to avoid broad formatting-only diffs. Style consistency in this stream is enforced through ESLint + TypeScript checks.
 
 ## Project Structure
 
@@ -176,6 +177,26 @@ yarn test:coverage
 
 Tests are located in `__tests__/` directories alongside the code they test.
 
+Jest enforces coverage thresholds to prevent regressions.
+
+### Global threshold
+
+- Statements: `80%`
+- Lines: `80%`
+- Functions: `80%`
+- Branches: `80%`
+
+### Scoped thresholds
+
+- `src/app/actions/`: `90%` (all metrics)
+- `src/auth/lib`: `90%` (all metrics)
+- `src/firebase/`: `90%` (all metrics)
+- `src/match/lib`: `90%` (all metrics)
+- `src/user/lib`: `90%` (all metrics)
+- `src/ui/components`: `40%` (all metrics)
+- `src/auth/components`: `60%` (all metrics)
+- `src/game/components/`: `60%` (all metrics)
+
 ## Deployment
 
 This application is deployed via Firebase App Hosting. The configuration is defined in:
@@ -198,10 +219,9 @@ To deploy:
 3. Make your changes
 4. Run tests: `yarn test`
 5. Run linter: `yarn lint`
-6. Format code: `yarn prettier`
-7. Commit your changes: `git commit -am 'Add new feature'`
-8. Push to the branch: `git push origin feature/my-feature`
-9. Submit a pull request
+6. Commit your changes: `git commit -am 'Add new feature'`
+7. Push to the branch: `git push origin feature/my-feature`
+8. Submit a pull request
 
 ## Roadmap
 
