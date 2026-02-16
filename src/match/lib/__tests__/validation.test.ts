@@ -19,13 +19,31 @@ import {
   validateLives,
   validateWinCondition,
   validateTimestamp,
+  calculateStreakBonusForMatch,
+  getLastMatchTimestamp,
+  getStreakBonusForNewMatch,
 } from '../validation';
 import { DIFFICULTY_EMPTY_CELLS } from '@/game/util/constants';
+import { getUserData } from '@/user/lib/client';
+import { getUserStats } from '@/app/actions/user';
+import { wouldContinueStreak } from '@/user/lib/stats';
 
 // Mock Firebase before imports
 jest.mock('@/firebase/server', () => ({
   serverAuth: {},
   serverDb: {},
+}));
+
+jest.mock('@/user/lib/client', () => ({
+  getUserData: jest.fn(),
+}));
+
+jest.mock('@/app/actions/user', () => ({
+  getUserStats: jest.fn(),
+}));
+
+jest.mock('@/user/lib/stats', () => ({
+  wouldContinueStreak: jest.fn(),
 }));
 
 /**
@@ -511,6 +529,67 @@ describe('Full Match Validation', () => {
       field: 'difficulty',
       message: 'Unknown difficulty: invalid-difficulty',
       severity: 'critical',
+    });
+  });
+});
+
+describe('Streak Helper Functions', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('calculateStreakBonusForMatch', () => {
+    it('returns 0 when there is no previous match', () => {
+      expect(calculateStreakBonusForMatch(null)).toBe(0);
+    });
+
+    it('returns bonus when streak would continue', () => {
+      (wouldContinueStreak as jest.Mock).mockReturnValue(true);
+
+      expect(calculateStreakBonusForMatch(Date.now() - 24 * 60 * 60 * 1000)).toBe(
+        200,
+      );
+    });
+
+    it('returns 0 when streak is broken', () => {
+      (wouldContinueStreak as jest.Mock).mockReturnValue(false);
+
+      expect(calculateStreakBonusForMatch(Date.now() - 3 * 24 * 60 * 60 * 1000)).toBe(
+        0,
+      );
+    });
+  });
+
+  describe('getLastMatchTimestamp', () => {
+    it('gets timestamp from server stats for authenticated users', async () => {
+      (getUserStats as jest.Mock).mockResolvedValue({ lastMatchTimestamp: 12345 });
+
+      await expect(getLastMatchTimestamp('user-1')).resolves.toBe(12345);
+      expect(getUserStats).toHaveBeenCalledWith('user-1');
+    });
+
+    it('returns null when server stats are missing timestamp', async () => {
+      (getUserStats as jest.Mock).mockResolvedValue(undefined);
+
+      await expect(getLastMatchTimestamp('user-2')).resolves.toBeNull();
+    });
+
+    it('gets timestamp from local user data for anonymous users', async () => {
+      (getUserData as jest.Mock).mockResolvedValue({ lastMatchTimestamp: 54321 });
+
+      await expect(getLastMatchTimestamp(null)).resolves.toBe(54321);
+      expect(getUserData).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getStreakBonusForNewMatch', () => {
+    it('calculates bonus based on resolved last match timestamp', async () => {
+      (getUserStats as jest.Mock).mockResolvedValue({
+        lastMatchTimestamp: 1700000000000,
+      });
+      (wouldContinueStreak as jest.Mock).mockReturnValue(true);
+
+      await expect(getStreakBonusForNewMatch('user-3')).resolves.toBe(200);
     });
   });
 });

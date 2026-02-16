@@ -141,14 +141,30 @@ describe('auth/lib/firebase', () => {
       const { mapFirebaseError } = await loadFirebaseLib();
 
       expect(
+        mapFirebaseError(
+          new FirebaseError('auth/invalid-credential', 'bad credential'),
+        ),
+      ).toBe('Incorrect password');
+      expect(
         mapFirebaseError(new FirebaseError('auth/wrong-password', 'wrong pwd')),
       ).toBe('Incorrect password');
       expect(
         mapFirebaseError(new FirebaseError('auth/email-already-in-use', 'dup')),
       ).toBe('An account with this email already exists');
       expect(
+        mapFirebaseError(new FirebaseError('auth/invalid-email', 'invalid email')),
+      ).toBe('Invalid email address');
+      expect(
+        mapFirebaseError(new FirebaseError('auth/too-many-requests', 'rate limit')),
+      ).toBe('Too many attempts. Please try again later');
+      expect(
         mapFirebaseError(new FirebaseError('auth/network-request-failed', 'net')),
       ).toBe('Network error. Please check your connection');
+      expect(
+        mapFirebaseError(
+          new FirebaseError('auth/popup-closed-by-user', 'popup closed'),
+        ),
+      ).toBe('Auth session closed by user, please try again');
     });
 
     it('returns fallback message for unknown firebase code', async () => {
