@@ -2,9 +2,6 @@ import React from 'react';
 import clsx from 'clsx';
 import styles from './Form.module.css';
 
-/**
- * Shared props for form wrapper components.
- */
 export type FormProps = React.ComponentPropsWithRef<'form'>;
 
 /**

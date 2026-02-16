@@ -9,9 +9,6 @@ import {
 } from 'react';
 import Dialog from '@/ui/components/Dialog';
 
-/**
- * Runtime options for showing a confirmation dialog.
- */
 export interface DialogConfig {
   title: string;
   description?: string;
@@ -86,9 +83,6 @@ export function DialogProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * Access dialog controls from components inside `DialogProvider`.
- */
 export function useDialog() {
   const context = useContext(DialogContext);
   if (!context) {

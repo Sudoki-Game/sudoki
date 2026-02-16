@@ -3,9 +3,6 @@ import { createPortal } from 'react-dom';
 import styles from './Dialog.module.css';
 import Button from './Button';
 
-/**
- * Configuration for the confirmation dialog component.
- */
 export interface DialogProps {
   open: boolean;
   onClose: () => void;
