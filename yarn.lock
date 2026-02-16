@@ -8875,6 +8875,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"schema-dts@npm:^1.1.5":
+  version: 1.1.5
+  resolution: "schema-dts@npm:1.1.5"
+  checksum: 10c0/babe23a1577c75c5df79d73acf34af3399e60928eab46f2236a0c4212061f5778d613a31c9e9ec86a2807d20b1ea460673d72d3fe1f64fb7543867460e607f76
+  languageName: node
+  linkType: hard
+
 "semver@npm:^6.3.1":
   version: 6.3.1
   resolution: "semver@npm:6.3.1"
@@ -9452,6 +9459,7 @@ __metadata:
     prettier: "npm:3.7.4"
     react: "npm:19.2.0"
     react-dom: "npm:19.2.0"
+    schema-dts: "npm:^1.1.5"
     ts-jest: "npm:^29.4.6"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5"

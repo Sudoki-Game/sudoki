@@ -1,14 +1,18 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
+import type { Graph } from 'schema-dts';
 import './globals.css';
 import { AuthProvider } from '@/auth/context/AuthContext';
 import { DialogProvider } from '@/ui/context/DialogContext';
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://sudoku.uk').replace(/\/$/, '');
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://sudoku.uk'
+).replace(/\/$/, '');
 const AUTHOR_NAME = 'Dylan Almond';
 const AUTHOR_URL = 'https://dylanalmond.net';
 const AUTHOR_EMAIL = 'dylan@dylanalmond.net';
 
-const structuredData = {
+const structuredData: Graph = {
   '@context': 'https://schema.org',
   '@graph': [
     {
@@ -88,11 +92,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body>
-        <script
+      <head>
+        <Script
+          id='structured-data'
           type='application/ld+json'
+          strategy='beforeInteractive'
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
+      </head>
+      <body>
         <AuthProvider>
           <DialogProvider>{children}</DialogProvider>
         </AuthProvider>
