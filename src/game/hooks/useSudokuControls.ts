@@ -103,7 +103,7 @@ const useSudokuGameControls = (): SudokuControls => {
       }
 
       // Handle number input + deletion
-      if (row !== null && col !== null) {
+      if (row != null && col != null) {
         const isNumber = /^[1-9]$/.test(e.key);
         const isDeleteOrBackspace =
           e.key === '0' || e.key === 'Delete' || e.key === 'Backspace';
@@ -137,10 +137,8 @@ const useSudokuGameControls = (): SudokuControls => {
         containerRef.current === e.target
       ) {
         if (
-          game.selected.row !== null &&
-          game.selected.row !== undefined &&
-          game.selected.col !== null &&
-          game.selected.col !== undefined
+          game.selected.row != null &&
+          game.selected.col != null
         ) {
           dispatch({ type: 'RESET_SELECTION' });
         }

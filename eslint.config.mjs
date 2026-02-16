@@ -12,7 +12,7 @@ const eslintConfig = defineConfig([
       'object-shorthand': ['warn', 'always'],
       'prefer-const': 'warn',
       'no-var': 'error',
-      eqeqeq: ['warn', 'always'],
+      eqeqeq: ['warn', 'always', { null: 'ignore' }],
       '@typescript-eslint/consistent-type-imports': [
         'warn',
         { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
