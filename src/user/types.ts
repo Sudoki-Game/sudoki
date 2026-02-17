@@ -1,3 +1,28 @@
+interface BotStateWeights {
+  active: number;
+  steady: number;
+  drifting: number;
+}
+
+type BotState = 'active' | 'steady' | 'drifting';
+type BotPersona = 'casual' | 'regular' | 'committed-light';
+
+interface BotProfileData {
+  uid: string;
+  displayName: string;
+  persona: BotPersona;
+  difficultyPct: number;
+  budgetMin: number;
+  budgetMax: number;
+  streakCap: number;
+  weekdayWeights: number[];
+  playMultipliers: BotStateWeights;
+  difficultyShiftByState: BotStateWeights;
+  stateTransitions: Record<BotState, BotStateWeights>;
+  isActive: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
 /**
  * User Types
  *
@@ -56,6 +81,15 @@ export interface ServerUserData extends BaseUserStats {
 
   /** Timestamp when user was last active */
   lastActive: number;
+
+  /** Optional admin gate */
+  isAdmin?: boolean;
+
+  /** Marks this user as a bot user entry */
+  isBot?: boolean;
+
+  /** Bot state-machine configuration/state */
+  botProfile?: Partial<BotProfileData>;
 }
 
 /**

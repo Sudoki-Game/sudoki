@@ -1,0 +1,181 @@
+.container {
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0;
+}
+
+.noticeSuccess,
+.noticeError {
+  margin: 0;
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  border: 2px solid;
+}
+
+.noticeSuccess {
+  background: color-mix(in srgb, var(--green) 18%, white);
+  border-color: var(--green);
+}
+
+.noticeError {
+  background: color-mix(in srgb, var(--red) 18%, white);
+  border-color: var(--red);
+}
+
+.overallStats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(110px, 1fr));
+  gap: 0.6rem;
+}
+
+.statCard {
+  border: 2px solid var(--hot-pink);
+  border-radius: 10px;
+  background: white;
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.statLabel {
+  margin: 0;
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.statValue {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.monthForm {
+  display: flex;
+  align-items: end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.controlsSection {
+  display: grid;
+  gap: 1rem;
+}
+
+.toggleForm {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.list {
+  display: grid;
+  gap: 1rem;
+}
+
+.card {
+  border: 1px solid var(--color-lightgray);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.botName {
+  margin: 0;
+}
+
+.botMeta {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 0.25rem 1rem;
+}
+
+.statsGrid p {
+  margin: 0;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.deleteForm {
+  display: flex;
+  align-items: end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.inlineFields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.checkboxLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .overallStats {
+    grid-template-columns: repeat(3, minmax(110px, 1fr));
+  }
+
+  .inlineFields {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .overallStats {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
+  .inlineFields {
+    grid-template-columns: 1fr;
+  }
+}

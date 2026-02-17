@@ -48,3 +48,5 @@ env:
     secret: hmac-secret
   - variable: NEXT_PUBLIC_SITE_URL
     secret: site-url
+  - variable: BOT_RUNNER_TOKEN
+    secret: bot-runner-token

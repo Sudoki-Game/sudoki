@@ -40,6 +40,31 @@ The game focuses on a **single daily puzzle** that all players tackle togetherâ€
 - **Real-Time Leaderboards** - Compare your performance with players worldwide
 - **User Statistics** - Track your progress, streaks, and performance over time
 
+## Experimental Bots
+
+This branch includes an **experimental** server-side bot simulation system.
+It's purpose is to fill in for the lack of human players and make the game feel alive but may be removed whenever.
+
+### How it works
+
+- Bots are stored as regular user documents with `isBot: true` and a `botProfile` payload.
+- The daily runner executes on the server and only runs when bot system config is enabled.
+- Each run uses a date lock to avoid duplicate execution for the same day.
+- Bots decide whether to play based on monthly budget pressure, weekday weighting, and state-machine transitions.
+- Bot scores target a low-to-mid human percentile (`difficultyPct`) against recent **medium** grid human scores.
+- Bot matches are written as normal matches under bot users, so they appear on leaderboards naturally.
+
+### Admin controls
+
+- Admin-only page: `/bots`
+- Supports bot system toggle, add/update/delete bot profiles, and schedule previews.
+
+### Scheduling trigger
+
+- Internal endpoint: `/api/internal/bots/run`
+- Protected by `x-bot-runner-token` and `BOT_RUNNER_TOKEN`
+- Recommended to trigger via Cloud Scheduler (or equivalent) once per day.
+
 ## Tech Stack
 
 - **Frontend**: Next.js 16.1.5, React 19.2.0, TypeScript 5
