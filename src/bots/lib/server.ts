@@ -76,15 +76,8 @@ function createInitialMonthlyState(
   };
 }
 
-function resolveMatchTimestamp(date: Date, random: () => number): number {
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth();
-  const day = date.getUTCDate();
-  const hour = 8 + Math.floor(random() * 12);
-  const minute = Math.floor(random() * 60);
-  const second = Math.floor(random() * 60);
-
-  return Date.UTC(year, month, day, hour, minute, second);
+function resolveMatchTimestamp(date: Date): number {
+  return date.getTime();
 }
 
 function buildWonMatch(
@@ -246,7 +239,7 @@ export async function runDailyBots(
           ? STREAK_BONUS_AMOUNT
           : 0;
 
-      const timestamp = resolveMatchTimestamp(now, random);
+      const timestamp = resolveMatchTimestamp(now);
       const cappedScore = Math.min(
         score,
         DIFFICULTY_EMPTY_CELLS[BOT_DIFFICULTY] * SCORE_PER_EMPTY_CELL,

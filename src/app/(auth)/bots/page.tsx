@@ -1,7 +1,9 @@
 import {
+  clearTodaysBotJobAction,
   createBotAction,
   deleteBotAction,
   getBotsAdminData,
+  runTodaysBotJobAction,
   setBotSystemEnabledAction,
   updateBotProfileAction,
 } from '@/app/actions/bots';
@@ -114,6 +116,24 @@ export default async function OwnerBotsPage({ searchParams }: PageProps) {
             Save system toggle
           </Button>
         </form>
+
+        <div className={styles.runActions}>
+          <div className={styles.runStatus}>Today&apos;s job: {data.todayRunStatus}</div>
+
+          <form action={runTodaysBotJobAction}>
+            <input type='hidden' name='monthKey' value={data.monthKey} />
+            <Button type='submit' variant='ok' disabled={data.todayRunStatus !== 'not-run'}>
+              Run today&apos;s bot job
+            </Button>
+          </form>
+
+          <form action={clearTodaysBotJobAction}>
+            <input type='hidden' name='monthKey' value={data.monthKey} />
+            <Button type='submit' variant='danger' disabled={data.todayRunStatus === 'not-run'}>
+              Remove today&apos;s job
+            </Button>
+          </form>
+        </div>
 
         <AddBotForm action={createBotAction} />
       </section>

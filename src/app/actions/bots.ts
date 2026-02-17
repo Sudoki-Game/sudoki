@@ -3,16 +3,20 @@
 import { previewBotMonthSchedule } from '@/bots/lib/planning';
 import { assertBotOwner } from '@/bots/lib/owner';
 import {
+  clearBotRunForDate,
   deleteBotOperationalData,
   deleteBotProfile,
   getAllBotProfiles,
   getBotMonthlyState,
+  getBotRunStatus,
   getBotSystemConfig,
   setBotSystemEnabled,
   upsertBotProfile,
   updateBotProfile,
 } from '@/bots/lib/repository';
 import type { BotProfile } from '@/bots/types';
+import { getDateKey } from '@/bots/lib/budget';
+import { runDailyBots } from '@/bots/lib/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { isDisplayNameTaken } from '@/user/lib/server';
@@ -34,6 +38,8 @@ export interface BotAdminEntry {
 export interface BotAdminData {
   monthKey: string;
   systemEnabled: boolean;
+  todayDateKey: string;
+  todayRunStatus: 'not-run' | 'running' | 'completed';
   entries: BotAdminEntry[];
 }
 
@@ -77,9 +83,11 @@ export async function getBotsAdminData(
   await assertBotOwner();
 
   const safeMonthKey = sanitizeMonthKey(monthKey);
-  const [profiles, systemConfig] = await Promise.all([
+  const todayDateKey = getDateKey(new Date());
+  const [profiles, systemConfig, todayRunStatus] = await Promise.all([
     getAllBotProfiles(),
     getBotSystemConfig(),
+    getBotRunStatus(todayDateKey),
   ]);
 
   const entries = await Promise.all(
@@ -103,8 +111,60 @@ export async function getBotsAdminData(
   return {
     monthKey: safeMonthKey,
     systemEnabled: systemConfig.enabled,
+    todayDateKey,
+    todayRunStatus,
     entries,
   };
+}
+
+/**
+ * Runs today's bot job if it has not been processed yet
+ */
+export async function runTodaysBotJobAction(formData: FormData): Promise<void> {
+  await assertBotOwner();
+
+  const monthInput = String(formData.get('monthKey') ?? '').trim();
+  const monthKey = sanitizeMonthKey(monthInput || undefined);
+  const todayDateKey = getDateKey(new Date());
+  const status = await getBotRunStatus(todayDateKey);
+
+  if (status !== 'not-run') {
+    redirect(buildBotsRedirect(monthKey, 'error', `Today's job is already ${status}`));
+  }
+
+  const result = await runDailyBots();
+  if (!result.ran || !result.lockAcquired) {
+    redirect(buildBotsRedirect(monthKey, 'error', "Today's job could not be started"));
+  }
+
+  redirect(
+    buildBotsRedirect(
+      monthKey,
+      'success',
+      `Today's job ran successfully (${result.summary.played} played)`,
+    ),
+  );
+}
+
+/**
+ * Removes today's run marker and daily bot records so it can be rerun
+ */
+export async function clearTodaysBotJobAction(formData: FormData): Promise<void> {
+  await assertBotOwner();
+
+  const monthInput = String(formData.get('monthKey') ?? '').trim();
+  const monthKey = sanitizeMonthKey(monthInput || undefined);
+  const todayDateKey = getDateKey(new Date());
+
+  await clearBotRunForDate(todayDateKey);
+
+  redirect(
+    buildBotsRedirect(
+      monthKey,
+      'success',
+      "Today's job marker was cleared. You can run it again.",
+    ),
+  );
 }
 
 /**

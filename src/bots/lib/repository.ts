@@ -16,6 +16,8 @@ export const BOT_RUNS_COLLECTION = 'botRuns';
 export const BOT_CONFIG_COLLECTION = 'botConfig';
 export const BOT_CONFIG_DOC_ID = 'system';
 
+export type BotRunStatus = 'not-run' | 'running' | 'completed';
+
 interface BotUserDoc {
   uid: string;
   displayName: string;
@@ -291,6 +293,50 @@ export async function finalizeRunLock(
     },
     { merge: true },
   );
+}
+
+/**
+ * Returns the run status for a specific date key
+ */
+export async function getBotRunStatus(dateKey: string): Promise<BotRunStatus> {
+  const snapshot = await serverDb.collection(BOT_RUNS_COLLECTION).doc(dateKey).get();
+
+  if (!snapshot.exists) {
+    return 'not-run';
+  }
+
+  const data = snapshot.data() as { status?: string };
+  if (data.status === 'completed') {
+    return 'completed';
+  }
+
+  return 'running';
+}
+
+/**
+ * Clears run state for a date key so the day can be rerun
+ *
+ * This removes the run lock/status document and all bot daily records for the day.
+ */
+export async function clearBotRunForDate(dateKey: string): Promise<void> {
+  const [runSnapshot, dailySnapshot] = await Promise.all([
+    serverDb.collection(BOT_RUNS_COLLECTION).doc(dateKey).get(),
+    serverDb.collection(BOT_DAILY_COLLECTION).where('dateKey', '==', dateKey).get(),
+  ]);
+
+  const batch = serverDb.batch();
+
+  if (runSnapshot.exists) {
+    batch.delete(runSnapshot.ref);
+  }
+
+  for (const doc of dailySnapshot.docs) {
+    batch.delete(doc.ref);
+  }
+
+  if (runSnapshot.exists || dailySnapshot.docs.length > 0) {
+    await batch.commit();
+  }
 }
 
 /**
