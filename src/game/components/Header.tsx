@@ -26,7 +26,7 @@ const Header = () => {
         alt='Sudoki! Logo'
         priority
         fetchPriority='high'
-        sizes='(max-width: 768px) 196px, 275px'
+        sizes='(max-width: 768px) 160px, 275px'
         height={84}
         width={275}
       />
