@@ -119,6 +119,8 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
             className={styles.stateImage}
             src={'/game/you-win-text.png'}
             alt={'You Win!'}
+            priority
+            fetchPriority='high'
             loading={'eager'}
             height={84}
             width={328}
@@ -128,6 +130,8 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
             className={styles.stateImage}
             src={'/game/game-over-text.png'}
             alt={'Game Over!'}
+            priority
+            fetchPriority='high'
             loading={'eager'}
             height={70}
             width={352}

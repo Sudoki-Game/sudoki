@@ -43,6 +43,9 @@
   color: var(--red);
 
   &.statNumerical {
+    min-width: 1.5ch;
+    display: inline-block;
+    text-align: center;
     font-family: 'Bear Days';
     margin-top: 0;
     font-size: 2rem;

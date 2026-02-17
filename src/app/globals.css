@@ -1,15 +1,13 @@
-@import '@fontsource/grandstander';
-@import '@fontsource/grandstander/700.css'; /* bold */
-@import '@fontsource/grandstander/900.css'; /* black */
-
 @font-face {
   font-family: 'Yang Bagus';
   src: url(/font/YangBagus.woff);
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Bear Days';
   src: url(/font/BearDays.woff);
+  font-display: swap;
 }
 
 :root {
@@ -68,7 +66,7 @@ body {
   gap: 1rem;
 
   color: var(--text);
-  font-family: 'Grandstander', sans-serif !important;
+  font-family: sans-serif;
   font-weight: bold;
   font-optical-sizing: auto;
 

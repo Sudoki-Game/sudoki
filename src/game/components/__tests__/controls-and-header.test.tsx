@@ -10,7 +10,7 @@ import { playSound } from '@/game/lib/sound';
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
+  default: ({ priority, fetchPriority, ...props }: React.ImgHTMLAttributes<HTMLImageElement> & { priority?: boolean; fetchPriority?: string }) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img {...props} alt={props.alt || ''} />
   ),
@@ -120,7 +120,7 @@ describe('SudokuControls', () => {
     jest.clearAllMocks();
   });
 
-  it('returns null when game is not ready', () => {
+  it('renders skeleton controls when game is not ready', () => {
     (useSudokuGame as jest.Mock).mockReturnValue({
       game: { status: 'playing', selected: { row: 1, col: 1 } },
       isReady: false,
@@ -131,7 +131,8 @@ describe('SudokuControls', () => {
 
     const { container } = render(<SudokuControls />);
 
-    expect(container.firstChild).toBeNull();
+    expect(container.firstChild).not.toBeNull();
+    expect(container.querySelectorAll('.skeletonCell')).toHaveLength(10);
   });
 
   it('renders controls and updates selected cell on number click', () => {

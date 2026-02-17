@@ -21,8 +21,20 @@ const SudokuControls = () => {
     }
   };
 
-  // Will scale into view when ready
-  if (!isReady) return null;
+  if (!isReady) {
+    return (
+      <div className={styles.controls} aria-hidden='true'>
+        <div className={styles.numlist}>
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div
+              key={`control-skeleton-${i}`}
+              className={styles.skeletonCell}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.controls}>
