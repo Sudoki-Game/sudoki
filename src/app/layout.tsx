@@ -99,15 +99,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <head>
+      <body className={grandstander.className}>
         <Script
           id='structured-data'
           type='application/ld+json'
           strategy='beforeInteractive'
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-      </head>
-      <body className={grandstander.className}>
         <AuthProvider>
           <DialogProvider>{children}</DialogProvider>
         </AuthProvider>
