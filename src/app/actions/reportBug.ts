@@ -1,28 +1,65 @@
 'use server';
 
 import nodemailer from 'nodemailer';
+import { z } from 'zod';
+import {
+  getFormDataString,
+  getZodIssueMessage,
+  logActionError,
+} from '@/app/actions/lib/validation';
 
 export type BugReportState = {
   success: boolean;
   message: string;
 };
 
+const requiredFieldSchema = z
+  .string()
+  .trim()
+  .min(1, 'Category and description are required.');
+
+const optionalStringSchema = z.string().trim().optional();
+
 export async function reportBug(
   _prevState: BugReportState,
   formData: FormData,
 ): Promise<BugReportState> {
   try {
-    const email = formData.get('email') as string | null;
-    const category = formData.get('category') as string;
-    const description = formData.get('description') as string;
-    const steps = formData.get('steps') as string | null;
+    const emailRaw = getFormDataString(formData, 'email');
+    const categoryRaw = getFormDataString(formData, 'category');
+    const descriptionRaw = getFormDataString(formData, 'description');
+    const stepsRaw = getFormDataString(formData, 'steps');
 
-    if (!category || !description) {
+    const categoryParsed = requiredFieldSchema.safeParse(categoryRaw ?? '');
+    const descriptionParsed = requiredFieldSchema.safeParse(
+      descriptionRaw ?? '',
+    );
+
+    if (!categoryParsed.success || !descriptionParsed.success) {
+      const source = categoryParsed.success ? descriptionParsed : categoryParsed;
       return {
         success: false,
-        message: 'Category and description are required.',
+        message: getZodIssueMessage(
+          source,
+          'Category and description are required.',
+        ),
       };
     }
+
+    const emailParsed = optionalStringSchema.safeParse(emailRaw ?? undefined);
+    const stepsParsed = optionalStringSchema.safeParse(stepsRaw ?? undefined);
+
+    if (!emailParsed.success || !stepsParsed.success) {
+      return {
+        success: false,
+        message: 'Invalid form submission.',
+      };
+    }
+
+    const category = categoryParsed.data;
+    const description = descriptionParsed.data;
+    const email = emailParsed.data;
+    const steps = stepsParsed.data;
 
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -58,7 +95,7 @@ ${steps || 'Not provided'}
       message: 'Bug report sent successfully. Thank you!',
     };
   } catch (error) {
-    console.error(error);
+    logActionError('ReportBugAction:reportBug', error);
     return {
       success: false,
       message: 'Failed to send bug report. Please try again later.',
