@@ -528,12 +528,16 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   ) => {
     if (isPaused || state.status !== 'playing') return;
 
+    if (state.dragValue === null) {
+      return;
+    }
+
     let deltaScore = 0;
     let newLives = state.lives;
 
     const newBoard = state.board.map((r) => [...r]);
     let newConflicts = new Map(state.conflicts);
-    const value = state.dragValue!;
+    const value = state.dragValue;
 
     // If we have no source to check, check the value at the target
     if (sourceRow == null || sourceCol == null) {
@@ -644,13 +648,25 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
 
     // Handle missing target
     if (!over) {
-      if (sourceIsCell) handleOutOfBounds(sourceRow!, sourceCol!);
+      if (typeof sourceRow === 'number' && typeof sourceCol === 'number') {
+        handleOutOfBounds(sourceRow, sourceCol);
+      }
 
       dispatch({ type: 'SET_DRAG_VALUE', value: null });
       return;
     }
 
-    const { row: targetRow, col: targetCol } = over.data.current!.cell;
+    const targetCell = over.data.current?.cell;
+    if (
+      !targetCell ||
+      typeof targetCell.row !== 'number' ||
+      typeof targetCell.col !== 'number'
+    ) {
+      dispatch({ type: 'SET_DRAG_VALUE', value: null });
+      return;
+    }
+
+    const { row: targetRow, col: targetCol } = targetCell;
     if (isInvalidDrop(sourceRow, sourceCol, targetRow, targetCol)) return;
 
     // We've dropped onto a valid cell

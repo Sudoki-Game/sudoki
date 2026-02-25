@@ -115,10 +115,10 @@ export async function getDailyPuzzle(
   const cacheKey = `${dateString}-${difficulty}`;
 
   // 1. Check in-memory cache (fastest)
-  if (puzzleCache.has(cacheKey)) {
+  const memoryCached = puzzleCache.get(cacheKey);
+  if (memoryCached) {
     console.log('[getDailyPuzzle] Memory cache hit');
-    const cached = puzzleCache.get(cacheKey)!;
-    return { ...cached, dateString, difficulty };
+    return { ...memoryCached, dateString, difficulty };
   }
 
   // 2. Check Firestore cache

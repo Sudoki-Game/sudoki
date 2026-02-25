@@ -33,10 +33,11 @@ const FinishSignInPage = () => {
         // alert('Successfully signed in!');
         // Redirect to a protected page or update UI
         router.replace('/');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.error('Error signing in with magic link:', error.message);
-        alert('Failed to sign in: ' + error.message);
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error ? error.message : 'Unknown error';
+        console.error('Error signing in with magic link:', message);
+        alert(`Failed to sign in: ${message}`);
       }
     }
   }
