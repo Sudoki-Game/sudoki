@@ -14,7 +14,7 @@ jest.mock('@/firebase/server', () => ({
 }));
 jest.mock('../client');
 jest.mock('@/user/lib/client');
-jest.mock('@/app/actions/match');
+jest.mock('@/match/lib/actionGateway');
 
 // Import after mocks are set up
 import { toServerMatch } from '../sync';

@@ -20,8 +20,8 @@ import {
   hasMatchForDate,
   hasPlayedToday,
   saveMatch as saveMatchToServer,
-} from '@/app/actions/match';
-import { getUserStats } from '@/app/actions/user';
+} from '@/match/lib/actionGateway';
+import { getUserStats } from '@/user/lib/actionGateway';
 import { calculateStreakBonusForMatch } from './validation';
 
 /**

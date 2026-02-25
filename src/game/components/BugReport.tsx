@@ -1,7 +1,7 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
-import { reportBug } from '@/app/actions/reportBug';
+import { reportBug } from '@/game/lib/actionGateway';
 import { useActionState } from 'react';
 import Button from '../../ui/components/Button';
 import Select, { SelectOption } from '../../ui/components/Select';

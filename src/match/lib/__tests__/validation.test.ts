@@ -24,7 +24,7 @@ import {
   getStreakBonusForNewMatch,
 } from '../validation';
 import { getUserData } from '@/user/lib/client';
-import { getUserStats } from '@/app/actions/user';
+import { getUserStats } from '@/user/lib/actionGateway';
 import { wouldContinueStreak } from '@/user/lib/stats';
 
 // Mock Firebase before imports
@@ -37,7 +37,7 @@ jest.mock('@/user/lib/client', () => ({
   getUserData: jest.fn(),
 }));
 
-jest.mock('@/app/actions/user', () => ({
+jest.mock('@/user/lib/actionGateway', () => ({
   getUserStats: jest.fn(),
 }));
 

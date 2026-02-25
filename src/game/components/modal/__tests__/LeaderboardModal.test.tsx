@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import LeaderboardModal from '../LeaderboardModal';
 import { useModalRouter } from '@/game/context/ModalRouterContext';
 import { auth } from '@/firebase/client';
-import { getTopPlayers, getNearbyPlayers } from '@/app/actions/user';
+import { getTopPlayers, getNearbyPlayers } from '@/user/lib/actionGateway';
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -22,7 +22,7 @@ jest.mock('@/firebase/client', () => ({
   },
 }));
 
-jest.mock('@/app/actions/user', () => ({
+jest.mock('@/user/lib/actionGateway', () => ({
   getTopPlayers: jest.fn(),
   getNearbyPlayers: jest.fn(),
 }));

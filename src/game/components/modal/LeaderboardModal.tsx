@@ -12,7 +12,7 @@ import {
   type LeaderboardPlayer,
   type TopPlayersResult,
   type NearbyPlayersResult,
-} from '@/app/actions/user';
+} from '@/user/lib/actionGateway';
 
 const LeaderboardModal = () => {
   const { goBack } = useModalRouter();

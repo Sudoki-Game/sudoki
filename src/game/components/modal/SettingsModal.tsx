@@ -6,7 +6,7 @@ import Button from '@/ui/components/Button';
 import Modal from './Modal';
 import { useAuth } from '@/auth/context/AuthContext';
 import { useDialog } from '@/ui/context/DialogContext';
-import { deleteAccount } from '@/app/actions/auth';
+import { deleteAccount } from '@/auth/lib/actionGateway';
 
 const SettingsModal = () => {
   const { isLoggedIn } = useAuth();

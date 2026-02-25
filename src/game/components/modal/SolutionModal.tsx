@@ -10,7 +10,7 @@ import type { GameState, Board, ClientMatch } from '@/game/types';
 import { auth } from '@/firebase/client';
 import { onAuthStateChanged } from 'firebase/auth';
 import { getTodaysMatch as getTodaysMatchLocal } from '@/match/lib/client';
-import { getTodaysMatch as getTodaysMatchServer } from '@/app/actions/match';
+import { getTodaysMatch as getTodaysMatchServer } from '@/match/lib/actionGateway';
 
 /**
  * Create a display-only game state from match data

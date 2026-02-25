@@ -22,7 +22,7 @@ import {
   createEmptyBoard,
   computeHighlights,
 } from '../util';
-import { getDailyPuzzle } from '@/app/actions/puzzle';
+import { getDailyPuzzle } from '@/game/lib/actionGateway';
 import {
   MAX_LIVES,
   SCORE_CORRECT_CELL,
@@ -42,7 +42,7 @@ import { onAuthStateChanged, type User } from 'firebase/auth';
 import {
   saveMatch as saveMatchToServer,
   getTodaysMatch as getTodaysMatchServer,
-} from '@/app/actions/match';
+} from '@/match/lib/actionGateway';
 import { uploadCachedMatches, uploadTodaysLocalMatch } from '@/match/lib/sync';
 
 type SudokuGameProviderProps = {

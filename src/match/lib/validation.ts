@@ -14,7 +14,7 @@ import {
 import type { BaseMatch } from '@/match/types';
 import type { Board } from '@/game/types';
 import { getUserData } from '@/user/lib/client';
-import { getUserStats } from '@/app/actions/user';
+import { getUserStats } from '@/user/lib/actionGateway';
 import { wouldContinueStreak } from '@/user/lib/stats';
 
 /**
