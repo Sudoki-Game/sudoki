@@ -49,13 +49,18 @@ The application requires Firebase configuration to build successfully. For local
 corepack enable  # Required once per environment
 yarn install     # Takes ~30s, downloads ~579 MB
 
-# Lint (runs ESLint + TypeScript compiler check)
-yarn lint        # Takes ~5-10s, must pass before commit
+# Lint / Typecheck
+yarn lint        # ESLint checks
+yarn typecheck   # TypeScript checks
 
 # Run tests (includes 200+ tests across 9 test suites)
 yarn test        # Takes ~3s, all tests should pass
+yarn test:ci     # CI mode, deterministic
 yarn test:watch  # Run tests in watch mode
 yarn test:coverage  # Generate coverage report
+
+# Combined quality checks
+yarn validate
 
 # Build for production
 yarn build       # Takes ~30s, requires .env.local file
@@ -70,9 +75,9 @@ yarn start       # Run production build
 1. **Always enable Corepack first:** `corepack enable`
 2. **Always install dependencies after cloning:** `yarn install`
 3. **Always create `.env.local` before building:** `cp .env.example .env.local`
-4. **Use ESLint + TypeScript checks for style consistency**
-5. **Run lint before building** to catch TypeScript errors early
-6. **Run tests after code changes** to ensure nothing broke
+4. **Run lint and typecheck before build:** `yarn lint && yarn typecheck`
+5. **Run tests after code changes:** `yarn test:ci`
+6. **Run full validation before push:** `yarn validate`
 
 ### Common Issues and Workarounds
 
@@ -201,10 +206,10 @@ Each module typically has:
 Before submitting changes, ensure:
 
 1. ✅ Code style is validated via lint: `yarn lint`
-2. ✅ Linting passes: `yarn lint`
-3. ✅ All tests pass: `yarn test`
+2. ✅ TypeScript checks pass: `yarn typecheck`
+3. ✅ All tests pass: `yarn test:ci`
 4. ✅ Build succeeds: `yarn build` (requires `.env.local`)
-5. ✅ TypeScript has no errors: `yarn lint` includes `tsc --noEmit`
+5. ✅ Full validation passes: `yarn validate`
 6. ✅ New files follow the existing module structure
 7. ✅ Import paths use `@/` prefix where appropriate
 8. ✅ Server-side code is in appropriate locations (app/actions/, lib/server.ts)
@@ -212,7 +217,12 @@ Before submitting changes, ensure:
 
 ## CI/CD
 
-Currently, there are no GitHub Actions workflows defined in the repository. All validation must be run locally before committing.
+GitHub Actions quality workflow is defined in `.github/workflows/quality-gates.yml`.
+
+- Blocking gates: lint, typecheck, tests
+- Coverage job: currently phased and non-blocking, with artifact upload
+
+Always run local checks before pushing to reduce CI iteration time.
 
 ## Additional Notes
 
@@ -232,10 +242,73 @@ cp .env.example .env.local
 
 # Pre-commit validation
 yarn lint
-yarn test
+yarn typecheck
+yarn test:ci
+yarn validate
 
 # Build verification
 yarn build
 ```
+
+## AI Governance Rules (Mandatory)
+
+These rules are mandatory for AI-generated code in this repository.
+
+### Framework and Architecture
+
+- Use Next.js App Router conventions.
+- Prefer Server Components by default.
+- Add `use client` only when necessary.
+- Prefer server actions for internal mutations.
+- Respect clean server/client boundaries; do not import server-only modules into client code.
+
+### React Component Rules
+
+- Arrow function components only.
+- One exported component per file.
+- Keep components pure, declarative, and composable.
+- Minimize `useEffect`; avoid effect-driven control flow when declarative alternatives exist.
+
+### Hook Rules
+
+- One responsibility per hook.
+- Keep hook composition flat and predictable.
+- Side effects must remain inside hooks.
+
+### TypeScript Rules
+
+- Keep strict typing.
+- Avoid `any` and unsafe assertions.
+- Prefer discriminated unions and exhaustive handling.
+- Use `satisfies` and `as const` for stronger compile-time guarantees.
+
+### Documentation Rules (TSDoc Required)
+
+All exported components, hooks, utilities, server actions, and public types must include TSDoc with:
+
+- summary
+- `@param`
+- `@returns`
+- `@throws` (when applicable)
+- side effects/runtime constraints (when applicable)
+
+### Error Handling & Validation
+
+- Validate boundary inputs (form data, storage/network payloads).
+- Prefer schema validation (`zod` or `valibot`) for complex payloads.
+- No silent failures.
+- Log with actionable context using `console.warn` / `console.error`.
+
+### Testing & Coverage
+
+- Add tests for hooks, utilities, server actions, and business logic changes.
+- Follow Jest conventions from `jest.config.ts` and colocated `__tests__` patterns.
+- Preserve or improve coverage; never lower thresholds without explicit approval.
+
+### Performance and Safety
+
+- Favor server-first data fetching.
+- Use route-level caching/revalidation intentionally.
+- Keep refactors incremental and behavior-preserving unless scope requires functional changes.
 
 **Trust these instructions.** Only search for additional information if you encounter errors not covered here or if you need to understand specific implementation details beyond build/test procedures.
