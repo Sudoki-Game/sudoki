@@ -1,6 +1,8 @@
 ![Sudoku Banner](/banner.png)
 
-# Sudoki
+[![License: GNU GENERAL PUBLIC LICENSE V3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+
+# Sudoki Game Source Code
 
 A web-based Sudoku game built around a **single daily puzzle** that everyone plays. Built with Next.js 16, React 19, and TypeScript, it features a risk/reward scoring system where players earn points for valid placements while lives limit mistakes. Daily streak bonuses reward persistence, encouraging players to return while staying competitive.
 
@@ -234,3 +236,7 @@ Planned features for future iterations:
 - **Optional Notifications** - Reminders to increase daily engagement
 - **Social Features** - Friend challenges or cooperative puzzle modes
 - **Enhanced Statistics** - Deeper analytics and performance tracking
+
+## License
+
+This project is licensed under the [GPLv3 License](LICENSE).
