@@ -1,3 +1,5 @@
+![Sudoku Banner](/banner.png)
+
 # Sudoki
 
 A web-based Sudoku game built around a **single daily puzzle** that everyone plays. Built with Next.js 16, React 19, and TypeScript, it features a risk/reward scoring system where players earn points for valid placements while lives limit mistakes. Daily streak bonuses reward persistence, encouraging players to return while staying competitive.
