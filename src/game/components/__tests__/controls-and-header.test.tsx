@@ -10,7 +10,7 @@ import { playSound } from '@/game/lib/sound';
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ priority, fetchPriority, ...props }: React.ImgHTMLAttributes<HTMLImageElement> & { priority?: boolean; fetchPriority?: string }) => (
+  default: ({ ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img {...props} alt={props.alt || ''} />
   ),

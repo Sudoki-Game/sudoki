@@ -637,9 +637,6 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     if (!active) return;
 
     const { row: sourceRow, col: sourceCol } = active.data.current?.cell ?? {};
-    const sourceIsCell =
-      sourceRow != null &&
-      sourceCol != null;
 
     // Handle missing target
     if (!over) {
