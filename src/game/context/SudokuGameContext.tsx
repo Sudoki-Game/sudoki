@@ -400,7 +400,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         setPlayedToday(false);
         setTodaysMatch(null);
         setLastMatch(null);
-        setGameOverReady(false);        
+        setGameOverReady(false);
       }
 
       // Mark context as ready only if this run is still current.
