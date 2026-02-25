@@ -71,6 +71,7 @@ describe('Sudoku', () => {
   const handleDrop = jest.fn();
   const clearGameOverReady = jest.fn();
   const openModal = jest.fn();
+  const closeModal = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -81,6 +82,7 @@ describe('Sudoku', () => {
     });
     (useModalRouter as jest.Mock).mockReturnValue({
       openModal,
+      closeModal,
       activeModal: null,
     });
     localStorage.clear();
@@ -177,5 +179,33 @@ describe('Sudoku', () => {
     expect(root).toHaveAttribute('inert');
     expect(root).toHaveStyle({ opacity: '40%' });
     expect(screen.getByTestId('sudoku-grid')).toBeInTheDocument();
+  });
+
+  it('closes stale gameover modal when user has not played today', async () => {
+    localStorage.setItem('sudoki_tutorial_seen', 'true');
+    (useModalRouter as jest.Mock).mockReturnValue({
+      openModal,
+      closeModal,
+      activeModal: 'gameover',
+    });
+    (useSudokuGame as jest.Mock).mockReturnValue({
+      game: createGameState(),
+      isPaused: true,
+      isReady: true,
+      togglePause,
+      handleClick,
+      handleDragStart,
+      handleDrop,
+      hasPlayedToday: false,
+      todaysMatch: null,
+      gameOverReady: false,
+      clearGameOverReady,
+    });
+
+    render(<Sudoku />);
+
+    await waitFor(() => {
+      expect(closeModal).toHaveBeenCalledTimes(1);
+    });
   });
 });

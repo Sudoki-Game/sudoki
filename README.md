@@ -102,12 +102,6 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
 # HMAC Secret for data signing
 NEXT_PUBLIC_HMAC_SECRET=your_hmac_secret
-
-# Bug reporting (optional)
-EMAIL_HOST=your_email_host
-EMAIL_USER=your_email_user
-EMAIL_PASS=your_email_password
-BUG_REPORT_TO=your_bug_report_email
 ```
 
 ### 4. Run the Development Server

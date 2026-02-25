@@ -3,21 +3,12 @@ jest.mock('@/app/actions/puzzle', () => ({
   getDailyPuzzle: jest.fn(),
 }));
 
-jest.mock('@/app/actions/reportBug', () => ({
-  reportBug: jest.fn(),
-}));
-
-import { getDailyPuzzle, reportBug } from '../actionGateway';
+import { getDailyPuzzle } from '../actionGateway';
 import * as puzzleActions from '@/app/actions/puzzle';
-import * as reportBugActions from '@/app/actions/reportBug';
 import type { DailyPuzzleResponse } from '@/app/actions/puzzle';
-import type { BugReportState } from '@/app/actions/reportBug';
 import type { Difficulty } from '@/game/types';
 
 const mockedPuzzleActions = puzzleActions as jest.Mocked<typeof puzzleActions>;
-const mockedReportBugActions = reportBugActions as jest.Mocked<
-  typeof reportBugActions
->;
 
 describe('Game Action Gateway', () => {
   beforeEach(() => {
@@ -65,58 +56,6 @@ describe('Game Action Gateway', () => {
 
       await expect(getDailyPuzzle('hard')).rejects.toThrow(
         'Puzzle generation failed',
-      );
-    });
-  });
-
-  describe('reportBug', () => {
-    it('should delegate to reportBug action and return result', async () => {
-      const prevState: BugReportState = { success: false, message: '' };
-      const formData = new FormData();
-      formData.set('category', 'bug');
-      formData.set('description', 'Test bug report');
-
-      const mockResult: BugReportState = {
-        success: true,
-        message: 'Bug report submitted',
-      };
-
-      mockedReportBugActions.reportBug.mockResolvedValue(mockResult);
-
-      const result = await reportBug(prevState, formData);
-
-      expect(reportBugActions.reportBug).toHaveBeenCalledWith(
-        prevState,
-        formData,
-      );
-      expect(result).toBe(mockResult);
-    });
-
-    it('should pass through validation errors from action', async () => {
-      const prevState: BugReportState = { success: false, message: '' };
-      const formData = new FormData();
-
-      const mockResult: BugReportState = {
-        success: false,
-        message: 'Category is required',
-      };
-
-      mockedReportBugActions.reportBug.mockResolvedValue(mockResult);
-
-      const result = await reportBug(prevState, formData);
-
-      expect(result).toEqual(mockResult);
-    });
-
-    it('should pass through action errors', async () => {
-      const mockError = new Error('Network error');
-      const prevState: BugReportState = { success: false, message: '' };
-      const formData = new FormData();
-
-      mockedReportBugActions.reportBug.mockRejectedValue(mockError);
-
-      await expect(reportBug(prevState, formData)).rejects.toThrow(
-        'Network error',
       );
     });
   });

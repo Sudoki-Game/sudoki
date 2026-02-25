@@ -255,6 +255,76 @@ describe('SudokuGameContext', () => {
     });
   });
 
+  it('ignores stale logged-in init result after a newer logout auth callback', async () => {
+    let capturedContext: SudokuGameProviderState | null = null;
+
+    type DeferredServerMatch = {
+      id: string;
+      isWon: boolean;
+      score: number;
+      streakBonus: number;
+      autoSolvesCount: number;
+      autoSolves: string;
+      livesRemaining: number;
+      board: string;
+      originalBoard: string;
+      solution: string;
+      timestamp: number;
+    };
+
+    let resolveServerMatch: (value: DeferredServerMatch | null) => void =
+      () => undefined;
+    const delayedServerMatch = new Promise<DeferredServerMatch | null>((resolve) => {
+      resolveServerMatch = resolve;
+    });
+
+    (getTodaysMatchServer as jest.Mock).mockReturnValue(delayedServerMatch);
+    (hasPlayedTodayLocal as jest.Mock).mockResolvedValue(false);
+    (getTodaysMatchLocal as jest.Mock).mockResolvedValue(null);
+
+    (onAuthStateChanged as jest.Mock).mockImplementation(
+      (_auth: unknown, callback: (user: { uid: string } | null) => void) => {
+        callback({ uid: 'u-stale' });
+        callback(null);
+        return jest.fn();
+      },
+    );
+
+    render(
+      <SudokuGameProvider>
+        <SudokuConsumer onChange={(ctx) => (capturedContext = ctx)} />
+      </SudokuGameProvider>,
+    );
+
+    await waitFor(() => {
+      expect(capturedContext?.isReady).toBe(true);
+      expect(capturedContext?.game.status).toBe('playing');
+      expect(capturedContext?.hasPlayedToday).toBe(false);
+      expect(capturedContext?.todaysMatch).toBeNull();
+    });
+
+    resolveServerMatch({
+      id: 'server-stale',
+      isWon: true,
+      score: 99,
+      streakBonus: 0,
+      autoSolvesCount: 0,
+      autoSolves: '[]',
+      livesRemaining: 3,
+      board: '[]',
+      originalBoard: '[]',
+      solution: '[]',
+      timestamp: Date.now(),
+    });
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mustGetContext(capturedContext).hasPlayedToday).toBe(false);
+    expect(mustGetContext(capturedContext).todaysMatch).toBeNull();
+  });
+
   it('selects a cell and resets selection when pausing with override', async () => {
     let capturedContext: SudokuGameProviderState | null = null;
     render(

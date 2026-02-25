@@ -7,11 +7,11 @@ jest.mock('@/game/context/ModalRouterContext', () => ({
 }));
 
 describe('HowToPlayModal', () => {
-  const closeModal = jest.fn();
+  const goBack = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useModalRouter as jest.Mock).mockReturnValue({ closeModal });
+    (useModalRouter as jest.Mock).mockReturnValue({ goBack });
     localStorage.clear();
   });
 
@@ -24,6 +24,6 @@ describe('HowToPlayModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Got It!' }));
 
     expect(localStorage.getItem('sudoki_tutorial_seen')).toBe('true');
-    expect(closeModal).toHaveBeenCalledTimes(1);
+    expect(goBack).toHaveBeenCalledTimes(1);
   });
 });

@@ -177,8 +177,7 @@ function reducer(state: GameState, action: GameAction): GameState {
       };
     case 'SELECT_CELL': {
       const highlights: Set<string> =
-        action.row != null &&
-        action.col != null
+        action.row != null && action.col != null
           ? computeHighlights(action.row, action.col, state.board)
           : new Set();
 
@@ -267,10 +266,29 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
    * Follows different paths for logged-in vs anonymous users (see Game Load diagram)
    * Auto-starts a new game if the user hasn't played today
    *
-   * Uses onAuthStateChanged to wait for Firebase Auth to initialize before checking
+   * Uses onAuthStateChanged to wait for Firebase Auth to initialize before checking.
+   *
+   * Important race guard:
+   * - Auth state can change while async work from a previous state is still in-flight
+   *   (example: logged-in checks are running and user logs out).
+   * - We increment a run id for each auth callback and only allow the latest run
+   *   to commit state updates.
+   * - Older runs exit early after each await, preventing stale data from
+   *   re-disabling or overwriting the current game session.
    */
   useEffect(() => {
-    const initializeGameState = async (user: User | null) => {
+    let isSubscribed = true;
+    let latestInitRunId = 0;
+
+    // True only for the most recent auth initialization run while mounted.
+    const isCurrentRun = (runId: number) =>
+      isSubscribed && runId === latestInitRunId;
+
+    // Initializes game state for a specific auth snapshot.
+    // Every async boundary re-checks run freshness before mutating state.
+    const initializeGameState = async (user: User | null, runId: number) => {
+      if (!isCurrentRun(runId)) return;
+
       let hasPlayed = false;
 
       if (user) {
@@ -279,6 +297,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         // Sync cached matches to server after login
         try {
           const syncResult = await uploadCachedMatches(user.uid);
+          if (!isCurrentRun(runId)) return;
           if (syncResult.uploaded > 0) {
             console.log(
               `[SudokuGame] Synced ${syncResult.uploaded} cached matches to server.`,
@@ -296,6 +315,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         // Sync today's local match to server
         try {
           const syncResult = await uploadTodaysLocalMatch(user.uid);
+          if (!isCurrentRun(runId)) return;
           if (syncResult.uploaded > 0) {
             console.log(`[SudokuGame] Synced today's match to server.`);
           }
@@ -309,6 +329,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         // Check server for today's match
         console.log("[SudokuGame] Checking server for today's match...");
         const serverTodaysMatch = await getTodaysMatchServer(user.uid);
+        if (!isCurrentRun(runId)) return;
         console.log(
           '[SudokuGame] Server result:',
           serverTodaysMatch?.id ?? 'no match',
@@ -346,10 +367,12 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         // Anonymous user flow: check localStorage only
         console.log('[SudokuGame] Anonymous user, checking localStorage...');
         const played = await hasPlayedTodayLocal();
+        if (!isCurrentRun(runId)) return;
         console.log('[SudokuGame] hasPlayedTodayLocal result:', played);
         if (played) {
           hasPlayed = true;
           const match = await getTodaysMatchLocal();
+          if (!isCurrentRun(runId)) return;
           console.log(
             '[SudokuGame] Found today match:',
             match?.id,
@@ -364,10 +387,12 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
 
       // Auto-start new game if user hasn't played today
       if (!hasPlayed) {
+        if (!isCurrentRun(runId)) return;
         console.log(
           '[SudokuGame] User has not played today, starting new game...',
         );
         await newGame();
+        if (!isCurrentRun(runId)) return;
         setElapsedTime(0);
         setIsPaused(false);
 
@@ -378,16 +403,21 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         setGameOverReady(false);
       }
 
-      // Mark context as ready after initialization completes
+      // Mark context as ready only if this run is still current.
+      if (!isCurrentRun(runId)) return;
       setIsReady(true);
     };
 
     // Wait for Firebase Auth to initialize before checking game state
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      initializeGameState(user);
+      latestInitRunId += 1;
+      void initializeGameState(user, latestInitRunId);
     });
 
-    return () => unsubscribe();
+    return () => {
+      isSubscribed = false;
+      unsubscribe();
+    };
   }, []);
 
   /**
@@ -427,9 +457,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
 
     if (!cell) return;
 
-    const isBoardCell =
-      cell.row != null &&
-      cell.col != null;
+    const isBoardCell = cell.row != null && cell.col != null;
 
     dispatch({ type: 'SET_DRAG_VALUE', value: cell.value });
 

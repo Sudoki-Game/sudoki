@@ -78,16 +78,14 @@ describe('SettingsModal', () => {
     expect(screen.queryByRole('button', { name: 'Sign Out' })).toBeNull();
   });
 
-  it('opens bug report and how-to-play modals and handles go back', () => {
+  it('opens how-to-play modals and handles go back', () => {
     (useAuth as jest.Mock).mockReturnValue({ isLoggedIn: false });
 
     render(<SettingsModal />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Report a Bug' }));
     fireEvent.click(screen.getByRole('button', { name: 'How to Play' }));
     fireEvent.click(screen.getByRole('button', { name: 'Go Back' }));
 
-    expect(openModal).toHaveBeenCalledWith('bug-report');
     expect(openModal).toHaveBeenCalledWith('how-to-play');
     expect(goBack).toHaveBeenCalledTimes(1);
   });

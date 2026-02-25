@@ -118,16 +118,6 @@ const SettingsModal = () => {
         <Button
           fill
           size='lg'
-          variant='warning'
-          type='button'
-          onClick={() => openModal('bug-report')}
-        >
-          Report a Bug
-        </Button>
-
-        <Button
-          fill
-          size='lg'
           type='button'
           onClick={() => openModal('how-to-play')}
         >

@@ -22,11 +22,6 @@ jest.mock('../SolutionModal', () => ({
   default: () => <div data-testid='modal-solution'>Solution</div>,
 }));
 
-jest.mock('../ReportBugModal', () => ({
-  __esModule: true,
-  default: () => <div data-testid='modal-bug-report'>BugReport</div>,
-}));
-
 jest.mock('../LeaderboardModal', () => ({
   __esModule: true,
   default: () => <div data-testid='modal-leaderboard'>Leaderboard</div>,

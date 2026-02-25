@@ -31,11 +31,11 @@ const Sudoku = () => {
     clearGameOverReady,
   } = useSudokuGame();
   const { dndSensors, boardRef, containerRef } = useSudokuControls();
-  const { openModal } = useModalRouter();
+  const { openModal, closeModal, activeModal } = useModalRouter();
 
+  // The board is interactive only during an active, unpaused game.
+  // Anything that opens a modal will pause gameplay via togglePause below.
   const isDisabled = isPaused || game.status !== 'playing';
-
-  const { activeModal } = useModalRouter();
 
   // Show how-to-play modal for first-time users
   useEffect(() => {
@@ -45,10 +45,21 @@ const Sudoku = () => {
     }
   }, [isReady, hasPlayedToday, openModal]);
 
-  // Disable game on menu active
+  // Any active modal pauses the board. This includes settings/gameover/tutorial.
+  // Pause is centralized here so gameplay components only need to read isPaused.
   useEffect(() => {
     togglePause(!!activeModal);
   }, [activeModal, togglePause]);
+
+  // Auth transitions can leave a stale gameover modal in router state
+  // (e.g., user had a completed match while logged in, then logs out).
+  // If we are ready and the current user has NOT played today, force-close it
+  // so togglePause(false) can re-enable interaction for the fresh game.
+  useEffect(() => {
+    if (isReady && !hasPlayedToday && activeModal === 'gameover') {
+      closeModal();
+    }
+  }, [isReady, hasPlayedToday, activeModal, closeModal]);
 
   // Win/Lost modals - only show after save is complete (gameOverReady)
   useEffect(() => {
@@ -58,16 +69,10 @@ const Sudoku = () => {
     }
   }, [gameOverReady, openModal, clearGameOverReady]);
 
-  // Show game over modal if user has already played today (on page load)
+  // On initial load, show today's result when the user already played.
+  // Guarding on idle avoids interrupting a currently active game.
   useEffect(() => {
-    console.log('[Sudoku] Checking hasPlayedToday:', {
-      hasPlayedToday,
-      todaysMatch: !!todaysMatch,
-      status: game.status,
-      isReady,
-    });
     if (isReady && hasPlayedToday && todaysMatch && game.status === 'idle') {
-      console.log('[Sudoku] Opening gameover modal for previous match');
       openModal('gameover');
     }
   }, [isReady, hasPlayedToday, todaysMatch, game.status, openModal]);
