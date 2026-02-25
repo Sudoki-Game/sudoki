@@ -120,7 +120,11 @@ export async function getNearbyPlayers(
       return { above: [], current: null, below: [], totalPlayers: 0 };
     }
 
-    const userData = userDoc.data()!;
+    const userData = userDoc.data();
+    if (!userData) {
+      return { above: [], current: null, below: [], totalPlayers: 0 };
+    }
+
     const userScore = userData.combinedScore;
 
     // Get players with higher scores (above the user)

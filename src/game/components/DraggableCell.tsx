@@ -1,8 +1,3 @@
-/**
- * Sudoku Game — Copyright (c) 2025 Dylan Almond
- * @license GNU General Public License v3.0
- */
-
 import { useDraggable } from '@dnd-kit/core';
 import styles from './DraggableCell.module.css';
 import SudokuCell, { type SudokuCellProps } from './SudokuCell';

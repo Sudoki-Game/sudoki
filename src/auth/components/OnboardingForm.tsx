@@ -3,28 +3,20 @@
 import { useActionState, useEffect } from 'react';
 import { uploadAllLocalMatches } from '@/match/lib/sync';
 import { getAuth } from 'firebase/auth';
-import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import { completeOnboarding, type OnboardingResult } from '@/app/actions/auth';
-import Button from '@/ui/components/Button';
+import {
+  completeOnboarding,
+  type OnboardingResult,
+} from '@/auth/lib/actionGateway';
 import Form from '@/ui/components/Form';
 import Input from '@/ui/components/Input';
 import styles from './OnboardingForm.module.css';
+import OnboardingSubmitButton from './OnboardingSubmitButton';
 
 const initialState: OnboardingResult = {
   success: false,
   error: undefined,
 };
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type='submit' disabled={pending} variant='ok' fill size='lg'>
-      {pending ? 'Setting up...' : 'Start Playing!'}
-    </Button>
-  );
-}
 
 const OnboardingForm = () => {
   const router = useRouter();
@@ -79,7 +71,7 @@ const OnboardingForm = () => {
 
         {state.error && <p className={styles.error}>{state.error}</p>}
 
-        <SubmitButton />
+        <OnboardingSubmitButton />
       </Form>
 
       <p className={styles.infoText}>

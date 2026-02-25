@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSudokuGame } from '@/game/context/SudokuGameContext';
 import { auth } from '@/firebase/client';
 import { getUserData as getUserDataLocal } from '@/user/lib/client';
-import { getUserStats as getUserStatsServer } from '@/app/actions/user';
+import { getUserStats as getUserStatsServer } from '@/user/lib/actionGateway';
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -41,7 +41,7 @@ jest.mock('@/match/lib/client', () => ({
   getTodaysMatch: jest.fn(),
 }));
 
-jest.mock('@/app/actions/match', () => ({
+jest.mock('@/match/lib/actionGateway', () => ({
   getTodaysMatch: jest.fn(),
 }));
 
@@ -49,7 +49,7 @@ jest.mock('@/user/lib/client', () => ({
   getUserData: jest.fn(),
 }));
 
-jest.mock('@/app/actions/user', () => ({
+jest.mock('@/user/lib/actionGateway', () => ({
   getUserStats: jest.fn(),
 }));
 

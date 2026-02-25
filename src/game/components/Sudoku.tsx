@@ -1,7 +1,3 @@
-/**
- * Sudoku Game — Copyright (c) 2025 Dylan Almond
- * @license GNU General Public License v3.0
- */
 'use client';
 
 import { DndContext, DragOverlay } from '@dnd-kit/core';

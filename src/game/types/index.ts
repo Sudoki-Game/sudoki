@@ -1,8 +1,3 @@
-/**
- * Sudoku Game — Copyright (c) 2025 Dylan Almond
- * @license GNU General Public License v3.0
- */
-
 // Re-export match types for convenience
 export type { BaseMatch, ClientMatch, ServerMatch } from '@/match/types';
 export {

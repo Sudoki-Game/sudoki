@@ -77,14 +77,14 @@ describe('auth/lib/firebase', () => {
     expect(localStorage.getItem('emailForSignIn')).toBe('dev@sudoki.uk');
   });
 
-  it('throws string message when sending magic link fails', async () => {
+  it('throws error message when sending magic link fails', async () => {
     (sendSignInLinkToEmail as jest.Mock).mockRejectedValue(
       new Error('mail service unavailable'),
     );
 
     const { sendMagicLink } = await loadFirebaseLib();
 
-    await expect(sendMagicLink('broken@sudoki.uk')).rejects.toBe(
+    await expect(sendMagicLink('broken@sudoki.uk')).rejects.toThrow(
       'Failed to send magic link: mail service unavailable',
     );
   });

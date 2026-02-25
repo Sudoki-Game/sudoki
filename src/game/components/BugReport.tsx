@@ -1,29 +1,18 @@
 'use client';
 
-import { useFormStatus } from 'react-dom';
-import { reportBug } from '@/app/actions/reportBug';
+import { reportBug } from '@/game/lib/actionGateway';
 import { useActionState } from 'react';
-import Button from '../../ui/components/Button';
 import Select, { SelectOption } from '../../ui/components/Select';
 import Form, { FormField } from '../../ui/components/Form';
 import Label from '../../ui/components/Label';
 import Textarea from '../../ui/components/Textarea';
 import Input from '../../ui/components/Input';
+import BugReportSubmitButton from './BugReportSubmitButton';
 
 const initialState = {
   success: false,
   message: '',
 };
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type='submit' disabled={pending} variant='warning' fill size='lg'>
-      {pending ? 'Sending…' : 'Report Bug'}
-    </Button>
-  );
-}
 
 const BugReport = () => {
   const [state, formAction] = useActionState(reportBug, initialState);
@@ -67,7 +56,7 @@ const BugReport = () => {
         <Textarea name='steps' id='steps' rows={6} />
       </FormField>
 
-      <SubmitButton />
+      <BugReportSubmitButton />
 
       {state.message && <p>{state.message}</p>}
     </Form>

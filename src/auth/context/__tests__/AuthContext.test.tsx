@@ -1,17 +1,17 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { AuthProvider, useAuth } from '../AuthContext';
-import { createSession, removeSession } from '@/app/actions/auth';
-import { getUserStats } from '@/app/actions/user';
+import { createSession, removeSession } from '@/auth/lib/actionGateway';
+import { getUserStats } from '@/user/lib/actionGateway';
 import { onAuthStateChanged } from '@/auth/lib/firebase';
 import { auth } from '@/firebase/client';
 
-jest.mock('@/app/actions/auth', () => ({
+jest.mock('@/auth/lib/actionGateway', () => ({
   createSession: jest.fn(),
   removeSession: jest.fn(),
 }));
 
-jest.mock('@/app/actions/user', () => ({
+jest.mock('@/user/lib/actionGateway', () => ({
   getUserStats: jest.fn(),
 }));
 

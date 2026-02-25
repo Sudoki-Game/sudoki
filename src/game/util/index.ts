@@ -1,8 +1,3 @@
-/**
- * Sudoku Game — Copyright (c) 2025 Dylan Almond
- * @license GNU General Public License v3.0
- */
-
 import { type Board, type Difficulty } from '../types';
 
 /**

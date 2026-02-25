@@ -5,7 +5,7 @@ import {
   useSudokuGame,
   type SudokuGameProviderState,
 } from '../SudokuGameContext';
-import { getDailyPuzzle } from '@/app/actions/puzzle';
+import { getDailyPuzzle } from '@/game/lib/actionGateway';
 import { playSound } from '@/game/lib/sound';
 import {
   saveMatch as saveLocalMatch,
@@ -19,10 +19,10 @@ import { onAuthStateChanged } from 'firebase/auth';
 import {
   saveMatch as saveMatchToServer,
   getTodaysMatch as getTodaysMatchServer,
-} from '@/app/actions/match';
+} from '@/match/lib/actionGateway';
 import { uploadCachedMatches, uploadTodaysLocalMatch } from '@/match/lib/sync';
 
-jest.mock('@/app/actions/puzzle', () => ({
+jest.mock('@/game/lib/actionGateway', () => ({
   getDailyPuzzle: jest.fn(),
 }));
 
@@ -52,7 +52,7 @@ jest.mock('firebase/auth', () => ({
   onAuthStateChanged: jest.fn(),
 }));
 
-jest.mock('@/app/actions/match', () => ({
+jest.mock('@/match/lib/actionGateway', () => ({
   saveMatch: jest.fn(),
   getTodaysMatch: jest.fn(),
 }));
