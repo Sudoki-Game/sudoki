@@ -5,11 +5,11 @@ import Modal from './Modal';
 import styles from './HowToPlayModal.module.css';
 
 const HowToPlayModal = () => {
-  const { closeModal } = useModalRouter();
+  const { goBack } = useModalRouter();
 
   const handleDismiss = () => {
     localStorage.setItem('sudoki_tutorial_seen', 'true');
-    closeModal();
+    goBack();
   };
 
   return (
