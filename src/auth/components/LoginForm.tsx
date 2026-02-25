@@ -1,7 +1,6 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { useFormStatus } from 'react-dom';
 import { type SessionResult } from '@/auth/types';
 import {
   mapFirebaseError,
@@ -13,22 +12,13 @@ import Button from '@/ui/components/Button';
 import Form from '@/ui/components/Form';
 import Input from '@/ui/components/Input';
 import Link from 'next/link';
+import LoginSubmitButton from './LoginSubmitButton';
 
 const initialState: SessionResult = {
   success: false,
   uid: undefined,
   error: undefined,
 };
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type='submit' disabled={pending} variant='ok' fill size='lg'>
-      {pending ? 'Loading...' : 'Continue'}
-    </Button>
-  );
-}
 
 const LoginForm = () => {
   const [googleError, setGoogleError] = useState<string | null>();
@@ -95,7 +85,7 @@ const LoginForm = () => {
             Magic Link has been sent!
           </Button>
         ) : (
-          <SubmitButton />
+          <LoginSubmitButton />
         )}
       </Form>
 

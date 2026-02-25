@@ -1,6 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 import { type SessionResult } from '@/auth/types';
 import { serverAuth } from '@/firebase/server';
 import {
@@ -11,6 +12,17 @@ import {
   checkOnboardingComplete,
   deleteUser,
 } from '@/user/lib/server';
+import {
+  getErrorMessage,
+  getFormDataString,
+  getZodIssueMessage,
+  logActionError,
+} from '@/app/actions/lib/validation';
+
+const displayNameSchema = z
+  .string()
+  .min(2, 'Display name must be at least 2 characters')
+  .max(30, 'Display name cannot exceed 30 characters');
 
 export async function createSession(idToken: string): Promise<SessionResult> {
   try {
@@ -65,9 +77,8 @@ export async function completeOnboarding(
   formData: FormData,
 ): Promise<OnboardingResult> {
   try {
-    const displayName = formData.get('displayName');
-
-    if (typeof displayName !== 'string') {
+    const displayName = getFormDataString(formData, 'displayName');
+    if (displayName === null) {
       return { success: false, error: 'Invalid form submission' };
     }
 
@@ -77,22 +88,21 @@ export async function completeOnboarding(
       return { success: false, error: 'Display name cannot be empty' };
     }
 
-    if (trimmedName.length < 2) {
+    const parsedDisplayName = displayNameSchema.safeParse(trimmedName);
+    if (!parsedDisplayName.success) {
       return {
         success: false,
-        error: 'Display name must be at least 2 characters',
+        error: getZodIssueMessage(
+          parsedDisplayName,
+          'Invalid display name format',
+        ),
       };
     }
 
-    if (trimmedName.length > 30) {
-      return {
-        success: false,
-        error: 'Display name cannot exceed 30 characters',
-      };
-    }
+    const validDisplayName = parsedDisplayName.data;
 
     // Check if display name is already taken
-    const isTaken = await isDisplayNameTaken(trimmedName);
+    const isTaken = await isDisplayNameTaken(validDisplayName);
     if (isTaken) {
       return { success: false, error: 'This display name is already taken' };
     }
@@ -103,14 +113,14 @@ export async function completeOnboarding(
     }
 
     const decodedToken = await serverAuth.verifyIdToken(session);
-    await updateDisplayName(decodedToken.uid, trimmedName);
+    await updateDisplayName(decodedToken.uid, validDisplayName);
 
     return { success: true };
   } catch (error) {
+    logActionError('AuthAction:completeOnboarding', error);
     return {
       success: false,
-      error:
-        error instanceof Error ? error.message : 'Failed to save display name',
+      error: getErrorMessage(error, 'Failed to save display name'),
     };
   }
 }

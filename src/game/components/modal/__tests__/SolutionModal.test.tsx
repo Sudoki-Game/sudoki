@@ -3,7 +3,7 @@ import SolutionModal from '../SolutionModal';
 import { useModalRouter } from '@/game/context/ModalRouterContext';
 import { onAuthStateChanged } from 'firebase/auth';
 import { getTodaysMatch as getTodaysMatchLocal } from '@/match/lib/client';
-import { getTodaysMatch as getTodaysMatchServer } from '@/app/actions/match';
+import { getTodaysMatch as getTodaysMatchServer } from '@/match/lib/actionGateway';
 
 jest.mock('dynascale', () => ({
   Dynascale: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -35,7 +35,7 @@ jest.mock('@/match/lib/client', () => ({
   getTodaysMatch: jest.fn(),
 }));
 
-jest.mock('@/app/actions/match', () => ({
+jest.mock('@/match/lib/actionGateway', () => ({
   getTodaysMatch: jest.fn(),
 }));
 

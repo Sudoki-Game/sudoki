@@ -16,8 +16,8 @@ import {
   hasMatchForDate,
   hasPlayedToday,
   saveMatch,
-} from '@/app/actions/match';
-import { getUserStats } from '@/app/actions/user';
+} from '@/match/lib/actionGateway';
+import { getUserStats } from '@/user/lib/actionGateway';
 
 jest.mock('../client', () => ({
   getCachedMatches: jest.fn(),
@@ -31,13 +31,13 @@ jest.mock('@/user/lib/client', () => ({
   clearUserData: jest.fn(),
 }));
 
-jest.mock('@/app/actions/match', () => ({
+jest.mock('@/match/lib/actionGateway', () => ({
   hasMatchForDate: jest.fn(),
   hasPlayedToday: jest.fn(),
   saveMatch: jest.fn(),
 }));
 
-jest.mock('@/app/actions/user', () => ({
+jest.mock('@/user/lib/actionGateway', () => ({
   getUserStats: jest.fn(),
 }));
 

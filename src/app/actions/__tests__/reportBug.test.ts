@@ -144,6 +144,9 @@ describe('reportBug', () => {
       success: false,
       message: 'Failed to send bug report. Please try again later.',
     });
-    expect(consoleErrorSpy).toHaveBeenCalledWith(transportError);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      '[ReportBugAction:reportBug]',
+      transportError,
+    );
   });
 });

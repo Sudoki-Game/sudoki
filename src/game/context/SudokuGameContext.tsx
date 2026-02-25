@@ -1,8 +1,3 @@
-/**
- * Sudoku Game — Copyright (c) 2025 Dylan Almond
- * @license GNU General Public License v3.0
- */
-
 'use client';
 
 import {
@@ -22,7 +17,7 @@ import {
   createEmptyBoard,
   computeHighlights,
 } from '../util';
-import { getDailyPuzzle } from '@/app/actions/puzzle';
+import { getDailyPuzzle } from '@/game/lib/actionGateway';
 import {
   MAX_LIVES,
   SCORE_CORRECT_CELL,
@@ -42,7 +37,7 @@ import { onAuthStateChanged, type User } from 'firebase/auth';
 import {
   saveMatch as saveMatchToServer,
   getTodaysMatch as getTodaysMatchServer,
-} from '@/app/actions/match';
+} from '@/match/lib/actionGateway';
 import { uploadCachedMatches, uploadTodaysLocalMatch } from '@/match/lib/sync';
 
 type SudokuGameProviderProps = {
@@ -528,12 +523,16 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   ) => {
     if (isPaused || state.status !== 'playing') return;
 
+    if (state.dragValue === null) {
+      return;
+    }
+
     let deltaScore = 0;
     let newLives = state.lives;
 
     const newBoard = state.board.map((r) => [...r]);
     let newConflicts = new Map(state.conflicts);
-    const value = state.dragValue!;
+    const value = state.dragValue;
 
     // If we have no source to check, check the value at the target
     if (sourceRow == null || sourceCol == null) {
@@ -638,19 +637,28 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
     if (!active) return;
 
     const { row: sourceRow, col: sourceCol } = active.data.current?.cell ?? {};
-    const sourceIsCell =
-      sourceRow != null &&
-      sourceCol != null;
 
     // Handle missing target
     if (!over) {
-      if (sourceIsCell) handleOutOfBounds(sourceRow!, sourceCol!);
+      if (typeof sourceRow === 'number' && typeof sourceCol === 'number') {
+        handleOutOfBounds(sourceRow, sourceCol);
+      }
 
       dispatch({ type: 'SET_DRAG_VALUE', value: null });
       return;
     }
 
-    const { row: targetRow, col: targetCol } = over.data.current!.cell;
+    const targetCell = over.data.current?.cell;
+    if (
+      !targetCell ||
+      typeof targetCell.row !== 'number' ||
+      typeof targetCell.col !== 'number'
+    ) {
+      dispatch({ type: 'SET_DRAG_VALUE', value: null });
+      return;
+    }
+
+    const { row: targetRow, col: targetCol } = targetCell;
     if (isInvalidDrop(sourceRow, sourceCol, targetRow, targetCol)) return;
 
     // We've dropped onto a valid cell

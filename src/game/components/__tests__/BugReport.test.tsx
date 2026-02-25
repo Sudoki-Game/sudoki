@@ -13,7 +13,7 @@ jest.mock('react', () => ({
   useActionState: jest.fn(),
 }));
 
-jest.mock('@/app/actions/reportBug', () => ({
+jest.mock('@/game/lib/actionGateway', () => ({
   reportBug: jest.fn(),
 }));
 

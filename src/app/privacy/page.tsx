@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PrivacyPage() {
+const PrivacyPage = () => {
   return (
     <div className={styles.container}>
       <h1>Privacy Policy</h1>
@@ -347,4 +347,6 @@ export default function PrivacyPage() {
       </section>
     </div>
   );
-}
+};
+
+export default PrivacyPage;

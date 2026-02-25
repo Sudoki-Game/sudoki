@@ -23,7 +23,7 @@ jest.mock('firebase/auth', () => ({
   getAuth: jest.fn(),
 }));
 
-jest.mock('@/app/actions/auth', () => ({
+jest.mock('@/auth/lib/actionGateway', () => ({
   completeOnboarding: jest.fn(),
 }));
 

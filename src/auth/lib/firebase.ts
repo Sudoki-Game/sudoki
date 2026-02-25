@@ -31,9 +31,9 @@ export async function sendMagicLink(email: string) {
     await sendSignInLinkToEmail(auth, email, actionCodeSettings);
     // Save the email locally to prevent the user from typing it again
     localStorage.setItem('emailForSignIn', email);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    throw 'Failed to send magic link: ' + error.message;
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to send magic link: ${message}`);
   }
 }
 

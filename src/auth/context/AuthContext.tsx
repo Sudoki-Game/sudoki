@@ -7,8 +7,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { createSession, removeSession } from '@/app/actions/auth';
-import { getUserStats } from '@/app/actions/user';
+import { createSession, removeSession } from '@/auth/lib/actionGateway';
+import { getUserStats } from '@/user/lib/actionGateway';
 import type { BaseUserStats } from '@/user/types';
 import { onAuthStateChanged } from '@/auth/lib/firebase';
 import { auth } from '@/firebase/client';

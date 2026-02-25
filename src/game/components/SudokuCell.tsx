@@ -1,8 +1,3 @@
-/**
- * Sudoku Game — Copyright (c) 2025 Dylan Almond
- * @license GNU General Public License v3.0
- */
-
 import clsx from 'clsx';
 import { cva } from 'class-variance-authority';
 import styles from './SudokuCell.module.css';

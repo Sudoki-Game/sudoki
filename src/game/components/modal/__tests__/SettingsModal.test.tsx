@@ -5,7 +5,7 @@ import { useModalRouter } from '@/game/context/ModalRouterContext';
 import { useRouter } from 'next/navigation';
 import { useDialog } from '@/ui/context/DialogContext';
 import { auth } from '@/firebase/client';
-import { deleteAccount } from '@/app/actions/auth';
+import { deleteAccount } from '@/auth/lib/actionGateway';
 
 jest.mock('@/auth/context/AuthContext', () => ({
   useAuth: jest.fn(),
@@ -29,7 +29,7 @@ jest.mock('@/firebase/client', () => ({
   },
 }));
 
-jest.mock('@/app/actions/auth', () => ({
+jest.mock('@/auth/lib/actionGateway', () => ({
   deleteAccount: jest.fn(),
 }));
 
