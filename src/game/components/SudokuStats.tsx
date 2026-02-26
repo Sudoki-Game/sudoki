@@ -22,6 +22,7 @@ const SudokuStats = ({ score, lives }: SudokuStatsProps) => {
           i < lives ? (
             <Image
               key={`heart-${i}`}
+              className={styles.heart}
               src={'/game/heart.svg'}
               alt={'Heart'}
               height={28}
@@ -30,6 +31,7 @@ const SudokuStats = ({ score, lives }: SudokuStatsProps) => {
           ) : (
             <Image
               key={`heart-${i}`}
+              className={styles.heart}
               src={'/game/heart-empty.svg'}
               alt={'Empty Heart'}
               height={28}

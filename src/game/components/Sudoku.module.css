@@ -1,10 +1,6 @@
 .root {
-  display: grid;
-  grid-template-rows: 100% 1fr;
-  grid-template-columns: 100%;
-  width: 100%;
-  height: 100%;
-
+  display: flex;
+  flex: 1;
   transition: opacity 0.3s ease;
   overflow: hidden;
 }
@@ -13,16 +9,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-evenly;
   overflow: hidden;
-  padding: 0 1.25rem;
+  padding: 1.25rem;
   gap: 2rem;
   box-sizing: border-box;
-  width: 100%;
-  height: 100%;
+  flex: 1;
 
   @media (orientation: portrait) and (max-width: 640px) {
     justify-content: space-evenly;
-    padding: 0 1rem;
-    /* gap: 1rem; */
+    padding: 1rem;
+    gap: 1rem;
   }
 }

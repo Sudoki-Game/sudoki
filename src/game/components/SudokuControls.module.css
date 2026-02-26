@@ -34,5 +34,5 @@
   background: var(--grey-gradient);
   border: 0.15rem solid var(--text);
   box-shadow: inset 0 -0.35rem 0 var(--shadow);
-  opacity: 0.45;
+  animation: var(--animation-pulse);
 }

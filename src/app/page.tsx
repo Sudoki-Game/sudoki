@@ -1,4 +1,3 @@
-import Copyright from '@/ui/components/Copyright';
 import Header from '@/game/components/Header';
 import { ModalRouterProvider } from '@/game/context/ModalRouterContext';
 import Sudoku from '@/game/components/Sudoku';
@@ -56,14 +55,13 @@ export default async function Home() {
   return (
     <ModalRouterProvider>
       <Header />
-      <main>
-        <SudokuGameProvider>
+
+      <SudokuGameProvider>
+        <main>
           <Sudoku />
           <ModalRouter />
-        </SudokuGameProvider>
-      </main>
-
-      <Copyright />
+        </main>
+      </SudokuGameProvider>
     </ModalRouterProvider>
   );
 }

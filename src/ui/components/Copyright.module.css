@@ -1,7 +1,11 @@
 .copyright {
-  margin: auto;
-  margin-bottom: 2.5rem;
   text-decoration: none;
   color: var(--shadow);
   font-size: 0.875rem;
+  transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  @media (orientation: portrait) and (max-height: 768px) {
+    height: 0;
+    opacity: 0;
+  }
 }

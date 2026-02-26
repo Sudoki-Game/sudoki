@@ -43,6 +43,15 @@
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1440px;
   --breakpoint-3xl: 1600px;
+
+  /* Animations */
+  --animation-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
 }
 
 * {
@@ -61,9 +70,8 @@ html {
 body {
   display: flex;
   flex-direction: column;
-  max-width: 728px;
+  align-items: center;
   width: 100%;
-  gap: 1rem;
 
   color: var(--text);
   font-family: sans-serif;
@@ -82,10 +90,14 @@ body {
 }
 
 main {
+  display: flex;
+  flex-direction: column;
   position: relative;
-  /* flex: 1; */
+  width: 100%;
   height: 100%;
+  max-width: var(--breakpoint-md);
   overflow: hidden;
+  margin: 1rem;
 }
 
 a {
