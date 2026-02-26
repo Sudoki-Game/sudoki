@@ -37,7 +37,7 @@
 .leaderboard tr {
   height: 2.5rem;
   transition: opacity 1s cubic-bezier(0.165, 0.84, 0.44, 1);
-  opacity: 100%;
+  opacity: 1;
 
   @starting-style {
     opacity: 0;
