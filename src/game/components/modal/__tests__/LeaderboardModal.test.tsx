@@ -63,10 +63,13 @@ describe('LeaderboardModal', () => {
       totalPlayers: 10,
     });
 
-    render(<LeaderboardModal />);
+    const { container } = render(<LeaderboardModal />);
+
+    // Skeleton rows should be present initially
+    expect(container.querySelectorAll('.skeleton').length).toBeGreaterThan(0);
 
     await waitFor(() => {
-      expect(screen.queryByText('Loading...')).toBeNull();
+      expect(screen.getByText('Alice')).toBeInTheDocument();
     });
 
     expect(screen.getByText('Leaderboard')).toBeInTheDocument();

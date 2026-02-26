@@ -104,7 +104,39 @@ const LeaderboardModal = () => {
 
         <div className={styles.wrapper}>
           {isLoading ? (
-            <p>Loading...</p>
+            <table className={styles.leaderboard}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th className={styles.statHeader}>Points</th>
+                  <th className={styles.statHeader}>MP</th>
+                  <th className={styles.statHeader}>Streak</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Top 3 players - show stars */}
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <tr key={i} className={styles.skeleton}>
+                    <td colSpan={5}></td>
+                  </tr>
+                ))}
+
+                {/* Separator */}
+                <tr className={styles.separator}>
+                  <td colSpan={5}>
+                    <hr />
+                  </td>
+                </tr>
+
+                {/* Nearby players - show numbers */}
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className={styles.skeleton}>
+                    <td colSpan={5}></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           ) : (
             <table className={styles.leaderboard}>
               <thead>

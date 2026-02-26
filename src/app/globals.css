@@ -43,6 +43,15 @@
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1440px;
   --breakpoint-3xl: 1600px;
+
+  /* Animations */
+  --animation-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
 }
 
 * {

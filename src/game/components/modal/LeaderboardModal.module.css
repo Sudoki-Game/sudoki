@@ -36,6 +36,12 @@
 
 .leaderboard tr {
   height: 2.5rem;
+  transition: opacity 1s cubic-bezier(0.165, 0.84, 0.44, 1);
+  opacity: 100%;
+
+  @starting-style {
+    opacity: 0;
+  }
 }
 
 .leaderboard td {
@@ -85,6 +91,13 @@
 /* Current user highlight */
 .currentUser {
   background-color: var(--hot-pink);
+}
+
+.skeleton {
+  animation: var(--animation-pulse);
+  width: 100%;
+  columns: 4;
+  background-color: var(--silver);
 }
 
 .currentUser td {
