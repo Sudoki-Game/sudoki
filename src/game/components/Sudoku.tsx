@@ -11,6 +11,7 @@ import { useModalRouter } from '@/game/context/ModalRouterContext';
 import SudokuStats from './SudokuStats';
 import styles from './Sudoku.module.css';
 import SudokuCellStyles from './SudokuCell.module.css';
+import Copyright from '@/ui/components/Copyright';
 
 /**
  * Main Sudoku UI component
@@ -113,6 +114,8 @@ const Sudoku = () => {
           </Dynascale>
 
           <SudokuControls />
+
+          <Copyright />
         </div>
       </DndContext>
     </div>

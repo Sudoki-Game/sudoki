@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import Copyright from '@/ui/components/Copyright';
 import headerStyles from '@/game/components/Header.module.css';
 import type { Metadata } from 'next';
 
@@ -37,8 +36,6 @@ const FinishSignInLayout = async ({
       </header>
 
       <main>{children}</main>
-
-      <Copyright />
     </>
   );
 };

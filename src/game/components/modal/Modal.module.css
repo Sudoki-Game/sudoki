@@ -1,11 +1,14 @@
 .modal {
+  /* Configurable for modal component */
+  --max-width: 520px;
+
   position: absolute;
   background-color: white;
   border: 2px solid var(--hot-pink);
   border-radius: 0.75rem;
   box-sizing: border-box;
   width: 100%;
-  max-width: min(520px, calc(100% - 2rem));
+  max-width: min(var(--max-width), calc(100% - 2rem));
   max-height: 100%;
   overflow-y: auto;
   padding: 1.5rem;

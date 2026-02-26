@@ -10,6 +10,14 @@
   gap: 1.5rem;
 
   text-align: center;
+
+  /* Absolute Copyright component */
+  >:last-child {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .header {

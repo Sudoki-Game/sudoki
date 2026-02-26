@@ -1,5 +1,6 @@
 import LoginForm from '@/auth/components/LoginForm';
 import styles from './page.module.css';
+import Copyright from '@/ui/components/Copyright';
 
 const LoginPage = async () => {
   return (
@@ -14,7 +15,10 @@ const LoginPage = async () => {
           other players worldwide.
         </p>
       </header>
+
       <LoginForm />
+
+      <Copyright />
     </section>
   );
 };

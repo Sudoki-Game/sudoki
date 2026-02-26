@@ -95,9 +95,9 @@ const LoginForm = () => {
         Continue with Google
       </Button>
 
-      <Button type='button' disabled fill size='lg' onClick={handleGoogle}>
+      {/* <Button type='button' disabled fill size='lg' onClick={handleGoogle}>
         Continue with GitHub
-      </Button>
+      </Button> */}
 
       <p className={styles.privacyPolicyText}>
         By creating an account, you agree to our{' '}
