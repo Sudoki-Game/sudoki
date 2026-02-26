@@ -96,7 +96,6 @@
 .skeleton {
   animation: var(--animation-pulse);
   width: 100%;
-  columns: 4;
   background-color: var(--silver);
 }
 
