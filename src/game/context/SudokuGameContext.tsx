@@ -39,6 +39,7 @@ import {
   getTodaysMatch as getTodaysMatchServer,
 } from '@/match/lib/actionGateway';
 import { uploadCachedMatches, uploadTodaysLocalMatch } from '@/match/lib/sync';
+import { useDialog } from '@/ui/context/DialogContext';
 
 type SudokuGameProviderProps = {
   children: React.ReactNode;
@@ -242,6 +243,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   const [gameOverReady, setGameOverReady] = useState(false);
   const [lastMatch, setLastMatch] = useState<ClientMatch | null>(null);
   const [isDuplicatePlay, setIsDuplicatePlay] = useState(false);
+  const { showDialog, hideDialog } = useDialog();
 
   /**
    * Grid of all fixed cells
@@ -907,7 +909,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
           updateLocalState();
         } else if (serverSaveResult.error === 'Match already exists for today') {
           // Another device already uploaded today's match.
-          // Fetch the server's match and show it instead of the local one.
+          // Fetch the server's match and show dialog, then game over modal.
           console.warn('[SudokuGame] Match already exists, fetching server match');
           try {
             const serverMatch = await getTodaysMatchServer(auth.currentUser.uid);
@@ -930,7 +932,19 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
               setTodaysMatch(clientMatch);
               setLastMatch(clientMatch);
               setIsDuplicatePlay(true);
-              setGameOverReady(true);
+              
+              // Show dialog before opening game over modal
+              showDialog({
+                title: 'Already Played',
+                description: 'This puzzle was already completed on another device. Showing the result from your first completion.',
+                confirmText: 'View Result',
+                cancelText: '',
+                variant: 'ok',
+                onConfirm: () => {
+                  setGameOverReady(true);
+                  hideDialog();
+                },
+              });
             } else {
               // Fallback: show local match if server fetch fails
               updateLocalState();

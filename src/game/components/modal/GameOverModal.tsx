@@ -24,7 +24,7 @@ interface GameOverModalProps {
 const GameOverModal = ({ onClose }: GameOverModalProps) => {
   const { openModal } = useModalRouter();
   const router = useRouter();
-  const { todaysMatch: contextMatch, isDuplicatePlay } = useSudokuGame();
+  const { todaysMatch: contextMatch } = useSudokuGame();
   const [userStats, setUserStats] = useState<BaseUserStats | null>(null);
   const [fetchedMatch, setFetchedMatch] = useState<ClientMatch | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -113,15 +113,6 @@ const GameOverModal = ({ onClose }: GameOverModalProps) => {
         <h2 className={modalStyles.title}>
           Day {Math.max(1, userStats?.dailyStreak ?? 1)}
         </h2>
-
-        {isDuplicatePlay && (
-          <div className={styles.duplicateNotice}>
-            <p>
-              This puzzle was already completed on another device. Showing the
-              result from your first completion.
-            </p>
-          </div>
-        )}
 
         {isWin ? (
           <Image

@@ -62,6 +62,13 @@ jest.mock('@/match/lib/sync', () => ({
   uploadTodaysLocalMatch: jest.fn(),
 }));
 
+jest.mock('@/ui/context/DialogContext', () => ({
+  useDialog: jest.fn(() => ({
+    showDialog: jest.fn(),
+    hideDialog: jest.fn(),
+  })),
+}));
+
 function makeBoard(fill: number | null = null) {
   return Array.from({ length: 9 }, () => Array(9).fill(fill));
 }
