@@ -134,6 +134,11 @@ export type SudokuGameProviderState = {
    * Clear the gameOverReady flag (called when modal opens)
    */
   clearGameOverReady: () => void;
+
+  /**
+   * Flag indicating the game was already played on another device
+   */
+  isDuplicatePlay: boolean;
 };
 
 const initialState: GameState = {
@@ -236,6 +241,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   const [todaysMatch, setTodaysMatch] = useState<ClientMatch | null>(null);
   const [gameOverReady, setGameOverReady] = useState(false);
   const [lastMatch, setLastMatch] = useState<ClientMatch | null>(null);
+  const [isDuplicatePlay, setIsDuplicatePlay] = useState(false);
 
   /**
    * Grid of all fixed cells
@@ -251,6 +257,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   const newGame = async () => {
     setElapsedTime(0);
     setIsReady(false);
+    setIsDuplicatePlay(false);
 
     const { puzzle, solution, difficulty } = await getDailyPuzzle('medium');
     dispatch({
@@ -897,11 +904,45 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
 
         if (serverSaveResult.success) {
           // Server save succeeded - update local state (no localStorage save needed)
+          setIsDuplicatePlay(false);
           updateLocalState();
         } else if (serverSaveResult.error === 'Match already exists for today') {
-          // Another device likely already uploaded today's match.
-          // Do not cache locally (it would retry forever), but keep local completion UX.
-          updateLocalState();
+          // Another device already uploaded today's match.
+          // Fetch the server's match and show it instead of the local one.
+          console.warn('[SudokuGame] Match already exists, fetching server match');
+          try {
+            const serverMatch = await getTodaysMatchServer(auth.currentUser.uid);
+            if (serverMatch) {
+              const clientMatch: ClientMatch = {
+                id: serverMatch.id,
+                isWon: serverMatch.isWon,
+                difficulty: serverMatch.difficulty,
+                score: serverMatch.score,
+                streakBonus: serverMatch.streakBonus,
+                autoSolvesCount: serverMatch.autoSolvesCount,
+                autoSolves: serverMatch.autoSolves,
+                livesRemaining: serverMatch.livesRemaining,
+                board: serverMatch.board,
+                originalBoard: serverMatch.originalBoard,
+                solution: serverMatch.solution,
+                timestamp: serverMatch.timestamp,
+              };
+              setPlayedToday(true);
+              setTodaysMatch(clientMatch);
+              setLastMatch(clientMatch);
+              setIsDuplicatePlay(true);
+              setGameOverReady(true);
+            } else {
+              // Fallback: show local match if server fetch fails
+              updateLocalState();
+              setIsDuplicatePlay(true);
+            }
+          } catch (err) {
+            console.warn('[SudokuGame] Failed to fetch server match:', err);
+            // Fallback: show local match
+            updateLocalState();
+            setIsDuplicatePlay(true);
+          }
         } else {
           console.warn(
             '[SudokuGame] Server save failed, caching locally:',
@@ -964,6 +1005,7 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         togglePause,
         gameOverReady,
         clearGameOverReady,
+        isDuplicatePlay,
       }}
     >
       {children}
