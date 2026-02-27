@@ -50,7 +50,8 @@ const Sudoku = () => {
   // Pause is centralized here so gameplay components only need to read isPaused.
   useEffect(() => {
     togglePause(!!activeModal);
-  }, [activeModal, togglePause]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeModal]);
 
   // Auth transitions can leave a stale gameover modal in router state
   // (e.g., user had a completed match while logged in, then logs out).
