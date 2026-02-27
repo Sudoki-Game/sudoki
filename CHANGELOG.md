@@ -1,3 +1,10 @@
+## [1.0.1-dev.1](https://github.com/Sudoki-Game/sudoki/compare/v1.0.0...v1.0.1-dev.1) (2026-02-27)
+
+
+### Bug Fixes
+
+* get correct release version from semantic release ([de93197](https://github.com/Sudoki-Game/sudoki/commit/de93197fdc94026f2903acdce449e1c184d07b2f))
+
 # 1.0.0 (2026-02-27)
 
 
