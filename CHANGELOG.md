@@ -1,3 +1,11 @@
+## [1.0.1-dev.2](https://github.com/Sudoki-Game/sudoki/compare/v1.0.1-dev.1...v1.0.1-dev.2) (2026-02-27)
+
+
+### Bug Fixes
+
+* get project version v2 ([c034e69](https://github.com/Sudoki-Game/sudoki/commit/c034e69a7add104f6227c4a1b6d19b8b04604fd2))
+* remove CHANGELOG.md on prerelease branches to avoid merge conflict ([e37805a](https://github.com/Sudoki-Game/sudoki/commit/e37805a33b5c47d7b6f24e84f80e4476f065a752))
+
 ## [1.0.1-dev.1](https://github.com/Sudoki-Game/sudoki/compare/v1.0.0...v1.0.1-dev.1) (2026-02-27)
 
 
