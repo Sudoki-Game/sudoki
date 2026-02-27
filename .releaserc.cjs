@@ -14,6 +14,13 @@ module.exports = {
     '@semantic-release/release-notes-generator',
     '@semantic-release/changelog',
     [
+      '@semantic-release/npm',
+      {
+        // updates package.json automatically
+        pkgRoot: '.',
+      },
+    ],
+    [
       '@semantic-release/git',
       {
         assets: ['package.json', 'CHANGELOG.md'],
