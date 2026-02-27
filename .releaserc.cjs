@@ -6,13 +6,19 @@ module.exports = {
     'main',
     {
       name: 'dev',
-      prerelease: 'dev',
+      prerelease: true,
     },
   ],
   plugins: [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
-    '@semantic-release/changelog',
+    [
+      '@semantic-release/npm',
+      {
+        // updates package.json automatically
+        pkgRoot: '.',
+      },
+    ],
     [
       '@semantic-release/git',
       {
