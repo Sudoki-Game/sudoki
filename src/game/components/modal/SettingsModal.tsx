@@ -1,6 +1,7 @@
 import { useModalRouter } from '@/game/context/ModalRouterContext';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase/client';
+import styles from './SettingsModal.module.css';
 import modalStyles from './Modal.module.css';
 import Button from '@/ui/components/Button';
 import Modal from './Modal';
@@ -79,7 +80,6 @@ const SettingsModal = () => {
     <Modal>
       <div className={modalStyles.content}>
         <h2 className={modalStyles.title}>Settings</h2>
-
         {showAuthButton &&
           (isLoggedIn ? (
             <>
@@ -114,7 +114,6 @@ const SettingsModal = () => {
               Sign In
             </Button>
           ))}
-
         <Button
           fill
           size='lg'
@@ -123,10 +122,13 @@ const SettingsModal = () => {
         >
           How to Play
         </Button>
-
         <Button fill size='lg' type='button' onClick={goBack}>
           Go Back
         </Button>
+
+        <span className={styles.versionTag}>
+          Version {process.env.NEXT_PUBLIC_VERSION}
+        </span>
       </div>
     </Modal>
   );
