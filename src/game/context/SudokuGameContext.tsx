@@ -890,9 +890,31 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
           ...match,
           userPlayed: auth.currentUser.uid,
         };
-        await saveMatchToServer(auth.currentUser.uid, serverMatch);
-        // Server save succeeded - update local state (no localStorage save needed)
-        updateLocalState();
+        const serverSaveResult = await saveMatchToServer(
+          auth.currentUser.uid,
+          serverMatch,
+        );
+
+        if (serverSaveResult.success) {
+          // Server save succeeded - update local state (no localStorage save needed)
+          updateLocalState();
+        } else if (serverSaveResult.error === 'Match already exists for today') {
+          // Another device likely already uploaded today's match.
+          // Do not cache locally (it would retry forever), but keep local completion UX.
+          updateLocalState();
+        } else {
+          console.warn(
+            '[SudokuGame] Server save failed, caching locally:',
+            serverSaveResult.error,
+          );
+          // Server save failed - cache to localStorage for later sync
+          const result = await saveMatch(match, { isCached: true });
+          if (result.success) {
+            // Update local user stats
+            await updateUserStatsLocal(match);
+            updateLocalState();
+          }
+        }
       } catch (error) {
         console.warn(
           '[SudokuGame] Server save failed, caching locally:',

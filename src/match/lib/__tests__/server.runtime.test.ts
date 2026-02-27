@@ -1,6 +1,7 @@
 import type { ServerMatch } from '@/match/types';
 import {
   MATCHES_COLLECTION,
+  DAILY_MATCH_LOCKS_COLLECTION,
   saveMatch,
   getMatch,
   getTodaysMatch,
@@ -18,6 +19,7 @@ jest.mock('@/firebase/server', () => ({
   serverDb: {
     collection: jest.fn(),
     batch: jest.fn(),
+    runTransaction: jest.fn(),
   },
 }));
 
@@ -88,6 +90,13 @@ describe('match/lib/server runtime', () => {
     delete: jest.Mock;
     commit: jest.Mock;
   };
+  let transactionRef: {
+    get: jest.Mock;
+    set: jest.Mock;
+  };
+  let dailyLockDocRef: {
+    id: string;
+  };
   let consoleErrorSpy: jest.SpyInstance;
   let consoleWarnSpy: jest.SpyInstance;
 
@@ -122,7 +131,21 @@ describe('match/lib/server runtime', () => {
       commit: jest.fn(),
     };
 
+    transactionRef = {
+      get: jest.fn(),
+      set: jest.fn(),
+    };
+
+    dailyLockDocRef = { id: 'daily-lock' };
+
     (serverDb.batch as jest.Mock).mockReturnValue(batchRef);
+    (serverDb.runTransaction as jest.Mock).mockImplementation(async (callback) =>
+      callback(transactionRef),
+    );
+    transactionRef.get.mockResolvedValue({
+      exists: false,
+      data: () => undefined,
+    });
 
     (serverDb.collection as jest.Mock).mockImplementation((name: string) => {
       if (name === MATCHES_COLLECTION) {
@@ -131,6 +154,12 @@ describe('match/lib/server runtime', () => {
           doc: jest.fn((id?: string) =>
             id && id.startsWith('delete-') ? deleteDocRef : matchDocRef,
           ),
+        };
+      }
+
+      if (name === DAILY_MATCH_LOCKS_COLLECTION) {
+        return {
+          doc: jest.fn(() => dailyLockDocRef),
         };
       }
 
@@ -181,16 +210,14 @@ describe('match/lib/server runtime', () => {
         errors: [],
         warnings: [{ field: 'difficulty', message: 'suspicious' }],
       });
-      whereQuery.get.mockResolvedValue(createSnapshot([]));
       userDocRef.get.mockResolvedValue({ exists: false, data: () => ({}) });
       userDocRef.update.mockResolvedValue(undefined);
-      matchDocRef.set.mockResolvedValue(undefined);
 
       const match = createMatch({ userPlayed: 'user-1' });
       const result = await saveMatch('user-1', match);
 
       expect(result).toEqual({ success: true });
-      expect(matchDocRef.set).toHaveBeenCalledWith(match);
+      expect(transactionRef.set).toHaveBeenCalledWith(matchDocRef, match);
     });
 
     it('returns mismatch error when user IDs differ', async () => {
@@ -199,21 +226,15 @@ describe('match/lib/server runtime', () => {
       expect(result).toEqual({ success: false, error: 'User ID mismatch' });
     });
 
-    it('rejects older match if same day match already exists', async () => {
-      const newerTimestamp = Date.now();
-      const olderTimestamp = newerTimestamp - 1000;
-      whereQuery.get.mockResolvedValue(
-        createSnapshot([
-          {
-            id: 'existing',
-            data: () => createMatch({ timestamp: newerTimestamp }),
-          },
-        ]),
-      );
+    it('rejects second match if day lock already exists', async () => {
+      transactionRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({ matchId: 'existing-match-id' }),
+      });
 
       const result = await saveMatch(
         'user-1',
-        createMatch({ timestamp: olderTimestamp, userPlayed: 'user-1' }),
+        createMatch({ timestamp: Date.now(), userPlayed: 'user-1' }),
       );
 
       expect(result).toEqual({
@@ -222,10 +243,21 @@ describe('match/lib/server runtime', () => {
       });
     });
 
+    it('treats same-match retry as idempotent success', async () => {
+      const match = createMatch({ id: 'retry-match-id', userPlayed: 'user-1' });
+      transactionRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({ matchId: 'retry-match-id' }),
+      });
+
+      const result = await saveMatch('user-1', match);
+
+      expect(result).toEqual({ success: true });
+      expect(userDocRef.update).not.toHaveBeenCalled();
+    });
+
     it('swallows stats update failure and still saves match', async () => {
-      whereQuery.get.mockResolvedValue(createSnapshot([]));
       userDocRef.get.mockRejectedValue(new Error('user read failed'));
-      matchDocRef.set.mockResolvedValue(undefined);
 
       const result = await saveMatch('user-1', createMatch({ userPlayed: 'user-1' }));
 
@@ -233,11 +265,11 @@ describe('match/lib/server runtime', () => {
     });
 
     it('returns save failure on unexpected exception', async () => {
-      whereQuery.get.mockRejectedValue(new Error('query failed'));
+      (serverDb.runTransaction as jest.Mock).mockRejectedValue(new Error('tx failed'));
 
       const result = await saveMatch('user-1', createMatch({ userPlayed: 'user-1' }));
 
-      expect(result).toEqual({ success: false, error: 'query failed' });
+      expect(result).toEqual({ success: false, error: 'tx failed' });
     });
   });
 
@@ -264,8 +296,13 @@ describe('match/lib/server runtime', () => {
 
   describe('getTodaysMatch and helpers', () => {
     it('returns today\'s match from query result', async () => {
-      const today = createMatch({ id: 'today' });
-      const old = createMatch({ id: 'old', timestamp: Date.now() - 5 * 86400000 });
+      const todayDate = new Date();
+      todayDate.setHours(12, 0, 0, 0);
+      const oldDate = new Date(todayDate);
+      oldDate.setDate(oldDate.getDate() - 5);
+
+      const today = createMatch({ id: 'today', timestamp: todayDate.getTime() });
+      const old = createMatch({ id: 'old', timestamp: oldDate.getTime() });
       whereQuery.get.mockResolvedValue(
         createSnapshot([
           { id: old.id, data: () => old },

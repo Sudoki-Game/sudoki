@@ -13,6 +13,25 @@ import { validateMatch } from './validation';
 
 /** Firestore collection name for matches */
 export const MATCHES_COLLECTION = 'matches';
+/** Firestore collection name for per-user daily match locks */
+export const DAILY_MATCH_LOCKS_COLLECTION = 'daily_match_locks';
+
+const MATCH_ALREADY_EXISTS_FOR_DAY = 'MATCH_ALREADY_EXISTS_FOR_DAY';
+
+interface DailyMatchLock {
+  userId: string;
+  dayKey: string;
+  matchId: string;
+  timestamp: number;
+}
+
+const getDayKeyFromTimestamp = (timestamp: number): string => {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 /**
  * Save a match to Firestore
@@ -52,28 +71,44 @@ export async function saveMatch(
       return { success: false, error: 'User ID mismatch' };
     }
 
-    // Check if user already has a match for today using conditional write
-    const userMatchesRef = serverDb
-      .collection(MATCHES_COLLECTION)
-      .where('userPlayed', '==', userId);
+    const dayKey = getDayKeyFromTimestamp(match.timestamp);
+    const dailyLockId = `${userId}_${dayKey}`;
+    const matchRef = serverDb.collection(MATCHES_COLLECTION).doc(match.id);
+    const dailyLockRef = serverDb
+      .collection(DAILY_MATCH_LOCKS_COLLECTION)
+      .doc(dailyLockId);
 
-    const existingMatches = await userMatchesRef.get();
-    const todaysMatch = existingMatches.docs.find((doc) => {
-      const data = doc.data() as ServerMatch;
-      return isMatchFromToday(data.timestamp);
+    let shouldUpdateStats = false;
+
+    await serverDb.runTransaction(async (transaction) => {
+      const existingLock = await transaction.get(dailyLockRef);
+
+      if (existingLock.exists) {
+        const existingData = existingLock.data() as DailyMatchLock | undefined;
+
+        // Idempotent retry of the same match write (e.g. client retry after timeout).
+        if (existingData?.matchId === match.id) {
+          return;
+        }
+
+        throw new Error(MATCH_ALREADY_EXISTS_FOR_DAY);
+      }
+
+      transaction.set(matchRef, match);
+      transaction.set(dailyLockRef, {
+        userId,
+        dayKey,
+        matchId: match.id,
+        timestamp: match.timestamp,
+      } satisfies DailyMatchLock);
+
+      shouldUpdateStats = true;
     });
 
-    if (todaysMatch) {
-      // Check timestamp to prevent race condition
-      const existingTimestamp = (todaysMatch.data() as ServerMatch).timestamp;
-      if (match.timestamp <= existingTimestamp) {
-        return { success: false, error: 'Match already exists for today' };
-      }
+    // Duplicate retries of the same match are accepted as no-ops.
+    if (!shouldUpdateStats) {
+      return { success: true };
     }
-
-    // Save the match
-    const matchRef = serverDb.collection(MATCHES_COLLECTION).doc(match.id);
-    await matchRef.set(match);
 
     // Update user stats after successful save
     try {
@@ -85,6 +120,13 @@ export async function saveMatch(
 
     return { success: true };
   } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === MATCH_ALREADY_EXISTS_FOR_DAY
+    ) {
+      return { success: false, error: 'Match already exists for today' };
+    }
+
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
     console.error('[MatchServer] Error saving match:', errorMessage);
