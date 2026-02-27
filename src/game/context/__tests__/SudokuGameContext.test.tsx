@@ -702,7 +702,7 @@ describe('SudokuGameContext', () => {
     });
   });
 
-  it('does not toggle pause when game is not playing and supports toggle without override', async () => {
+  it('allows pause control from modal system regardless of game status', async () => {
     let capturedContext: SudokuGameProviderState | null = null;
     render(
       <SudokuGameProvider>
@@ -714,6 +714,7 @@ describe('SudokuGameContext', () => {
       expect(capturedContext?.isReady).toBe(true);
     });
 
+    // Set game to idle
     act(() => {
       mustGetContext(capturedContext).dispatch({ type: 'SET_STATUS', status: 'idle' });
     });
@@ -721,11 +722,19 @@ describe('SudokuGameContext', () => {
       expect(mustGetContext(capturedContext).game.status).toBe('idle');
     });
 
+    // Modal system should be able to pause even when game is idle
     act(() => {
       capturedContext?.togglePause(true);
     });
+    expect(mustGetContext(capturedContext).isPaused).toBe(true);
+
+    // Unpause should also work
+    act(() => {
+      capturedContext?.togglePause(false);
+    });
     expect(mustGetContext(capturedContext).isPaused).toBe(false);
 
+    // Set game to playing
     act(() => {
       mustGetContext(capturedContext).dispatch({ type: 'SET_STATUS', status: 'playing' });
     });
@@ -734,6 +743,7 @@ describe('SudokuGameContext', () => {
       expect(mustGetContext(capturedContext).game.status).toBe('playing');
     });
 
+    // Toggle without override should work
     act(() => {
       capturedContext?.togglePause();
     });

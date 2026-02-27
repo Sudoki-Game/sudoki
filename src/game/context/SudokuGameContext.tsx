@@ -401,7 +401,6 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
         await newGame();
         if (!isCurrentRun(runId)) return;
         setElapsedTime(0);
-        setIsPaused(false);
 
         // Reset existing match data if user has just logged out
         setPlayedToday(false);
@@ -428,16 +427,16 @@ export function SudokuGameProvider({ children }: SudokuGameProviderProps) {
   }, []);
 
   /**
-   * Toggle pause state - only works during active gameplay
+   * Toggle pause state
+   * Modal system has priority - can always set pause regardless of game state
    */
   const togglePause = (override?: boolean) => {
-    if (state.status !== 'playing') return;
-
-    const shouldPause = override ?? !isReady;
+    const shouldPause = override ?? !isPaused;
 
     setIsPaused((prev) => override ?? !prev);
 
-    if (shouldPause) {
+    // Only reset selection when pausing during active gameplay
+    if (shouldPause && state.status === 'playing') {
       dispatch({ type: 'RESET_SELECTION' });
     }
   };
