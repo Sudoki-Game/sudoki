@@ -6,6 +6,8 @@
 
 A web-based Sudoku game built around a **single daily puzzle** that everyone plays. Built with Next.js 16, React 19, and TypeScript, it features a risk/reward scoring system where players earn points for valid placements while lives limit mistakes. Daily streak bonuses reward persistence, encouraging players to return while staying competitive.
 
+Sudoki is also my **first serious attempt at agentic development**, built on top of my original hand-coded Sudoku project, [`sudoku`](https://github.com/DylanAlmond/sudoku). It has been a genuinely valuable way to learn how to manage a medium-sized Next.js and Firebase application, especially since Firebase was still relatively new territory for me. Along the way, it helped me build confidence with authentication, data modelling, and deployment workflows while reinforcing quality through TDD, GitHub Copilot Agent support, and AI-assisted code review from both sides of the review process.
+
 ## How It Works
 
 The game focuses on a **single daily puzzle** that all players tackle togetherâ€”creating consistent difficulty and fair competition.
@@ -52,6 +54,19 @@ The game focuses on a **single daily puzzle** that all players tackle togetherâ€
 - **Styling**: CSS Modules
 - **Package Manager**: Yarn 4.12.0 (via Corepack)
 - **Deployment**: Firebase App Hosting
+
+## Project Background
+
+Sudoki is an evolution of my earlier hand-coded project, [`sudoku`](https://github.com/DylanAlmond/sudoku). I used this version to explore a more agent-assisted workflow while taking on the added complexity of a larger Next.js + Firebase codebase.
+
+What made this project especially valuable was the combination of:
+
+- learning Firebase by building production-style features instead of isolated experiments
+- managing a medium-sized codebase with clearer structure, validation, and tighter iteration loops
+- using TDD and Copilot Agent as quality-control tools rather than shortcuts
+- building stronger code review habits, whether that meant reviewing AI-generated changes or having AI review mine
+
+The result is a project that reflects both the game itself and the process of learning how to build, review, validate, and evolve software more effectively.
 
 ## Design Philosophy
 
