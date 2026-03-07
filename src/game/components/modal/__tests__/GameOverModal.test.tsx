@@ -97,6 +97,9 @@ describe('GameOverModal', () => {
       expect(screen.getByAltText('Game Over!')).toBeInTheDocument();
     });
 
+    expect(screen.getByText('Personal Best')).toBeInTheDocument();
+    expect(screen.getByText('500')).toBeInTheDocument();
+
     fireEvent.click(screen.getByRole('button', { name: 'Create an Account' }));
     expect(push).toHaveBeenCalledWith('/login');
   });

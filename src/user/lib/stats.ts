@@ -56,6 +56,16 @@ function isYesterday(timestamp: number): boolean {
 }
 
 /**
+ * Calculate the effective score for a match, including any applied bonuses.
+ *
+ * @param match - Match to evaluate
+ * @returns Score used for cumulative and personal-best comparisons
+ */
+export function calculateEffectiveMatchScore(match: BaseMatch): number {
+  return match.score + (match.streakBonus ?? 0);
+}
+
+/**
  * Calculate streak information from match history
  *
  * @param matches - Array of matches sorted by timestamp ascending
@@ -153,13 +163,13 @@ export function calculateStatsFromMatches(matches: BaseMatch[]): BaseUserStats {
     };
   }
 
-  // Calculate combined score (score + streak bonus for each match)
-  const combinedScore = matches.reduce((sum, match) => {
-    return sum + match.score + (match.streakBonus || 0);
-  }, 0);
+  const matchScores = matches.map(calculateEffectiveMatchScore);
 
-  // Calculate personal best score
-  const personalBestScore = Math.max(...matches.map((m) => m.score));
+  // Calculate combined score (score + streak bonus for each match)
+  const combinedScore = matchScores.reduce((sum, score) => sum + score, 0);
+
+  // Calculate personal best score using the same effective score used in-game.
+  const personalBestScore = Math.max(...matchScores);
 
   // Find the most recent match
   const sortedByTime = [...matches].sort((a, b) => b.timestamp - a.timestamp);

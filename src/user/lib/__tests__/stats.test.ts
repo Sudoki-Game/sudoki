@@ -94,6 +94,17 @@ describe('calculateStatsFromMatches', () => {
     expect(stats.personalBestScore).toBe(500);
   });
 
+  it('should calculate personal best score using score plus streak bonus', () => {
+    const matches = [
+      createMatchForDate(daysAgo(2), { score: 450, streakBonus: 0 }),
+      createMatchForDate(daysAgo(1), { score: 350, streakBonus: 200 }),
+      createMatchForDate(daysAgo(0), { score: 500, streakBonus: 0 }),
+    ];
+
+    const stats = calculateStatsFromMatches(matches);
+    expect(stats.personalBestScore).toBe(550);
+  });
+
   it('should set lastMatchTimestamp to most recent match', () => {
     const recentDate = daysAgo(0);
     const matches = [

@@ -228,7 +228,7 @@ describe('updateUserStatsFromMatch', () => {
     expect(updated.matchesPlayed).toBe(1);
     expect(updated.dailyStreak).toBe(1);
     expect(updated.bestStreak).toBe(1);
-    expect(updated.personalBestScore).toBe(500);
+    expect(updated.personalBestScore).toBe(550);
     expect(updated.lastMatchTimestamp).toBe(match.timestamp);
   });
 
@@ -277,6 +277,25 @@ describe('updateUserStatsFromMatch', () => {
     expect(updated.dailyStreak).toBe(4);
     expect(updated.bestStreak).toBe(4);
     expect(updated.personalBestScore).toBe(350);
+  });
+
+  it('should use the bonus-inclusive score when comparing personal bests', async () => {
+    const yesterday = new Date('2026-02-14T12:00:00.000Z').getTime();
+    const today = new Date('2026-02-15T13:00:00.000Z').getTime();
+
+    await saveUserData(
+      createTestUserData({
+        personalBestScore: 500,
+        lastMatchTimestamp: yesterday,
+      }),
+    );
+
+    await updateUserStatsFromMatch(
+      createTestMatch({ score: 350, streakBonus: 200, timestamp: today }),
+    );
+
+    const updated = await getUserData();
+    expect(updated.personalBestScore).toBe(550);
   });
 
   it('should reset streak when day gap is larger than one day', async () => {

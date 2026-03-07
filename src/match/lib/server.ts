@@ -8,6 +8,7 @@
 import { serverDb } from '@/firebase/server';
 import type { ServerMatch, SaveMatchResult } from '@/match/types';
 import { isMatchFromToday } from '@/match/types';
+import { calculateEffectiveMatchScore } from '@/user/lib/stats';
 import { FieldValue } from 'firebase-admin/firestore';
 import { validateMatch } from './validation';
 
@@ -289,7 +290,7 @@ export async function saveMatchBatch(
  * - lastMatchTimestamp: set to match timestamp
  * - dailyStreak: incremented if consecutive day, reset to 1 otherwise
  * - bestStreak: max of current bestStreak and new dailyStreak
- * - personalBestScore: max of current and new match score
+ * - personalBestScore: max of current and new effective match score
  */
 export async function updateUserStatsFromMatch(
   userId: string,
@@ -298,7 +299,10 @@ export async function updateUserStatsFromMatch(
 ): Promise<void> {
   try {
     const userRef = serverDb.collection('users').doc(userId);
-    const finalScore = match.score + streakBonus;
+    const finalScore = calculateEffectiveMatchScore({
+      ...match,
+      streakBonus,
+    });
 
     // Get current user data
     const userDoc = await userRef.get();
@@ -345,7 +349,7 @@ export async function updateUserStatsFromMatch(
       lastMatchTimestamp: match.timestamp,
       dailyStreak: newDailyStreak,
       bestStreak: newBestStreak,
-      personalBestScore: Math.max(currentPersonalBestScore, match.score),
+      personalBestScore: Math.max(currentPersonalBestScore, finalScore),
     });
   } catch (error) {
     console.error('[MatchServer] Error updating user stats:', error);

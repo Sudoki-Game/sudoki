@@ -68,6 +68,7 @@ describe('prepareTransferData', () => {
     expect(result.matches).toHaveLength(2);
     expect(result.recalculatedStats.matchesPlayed).toBe(2);
     expect(result.recalculatedStats.combinedScore).toBe(700); // 200 + 300 + 200 (streak bonus)
+    expect(result.recalculatedStats.personalBestScore).toBe(500);
   });
 
   it('should handle empty match history', () => {
@@ -144,6 +145,7 @@ describe('mergeWithServerData', () => {
 
     // 2 matches: 100 + 250 + 200 (streak bonus) = 550
     expect(result.recalculatedStats.matchesPlayed).toBe(2);
+    expect(result.recalculatedStats.personalBestScore).toBe(450);
   });
 
   it('should handle empty server data', () => {

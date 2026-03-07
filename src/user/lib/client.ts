@@ -12,6 +12,7 @@ import {
   type SignedPayload,
 } from '@/match/lib/encoding';
 import type { ClientMatch } from '@/match/types';
+import { calculateEffectiveMatchScore } from '@/user/lib/stats';
 
 /** localStorage key for user data */
 export const USER_DATA_KEY = 'sudoku_user_data';
@@ -85,7 +86,7 @@ export function clearUserData(): void {
  * - lastMatchTimestamp: set to match timestamp
  * - dailyStreak: incremented if consecutive day, reset to 1 otherwise
  * - bestStreak: max of current bestStreak and new dailyStreak
- * - personalBestScore: max of current and new match score
+ * - personalBestScore: max of current and new effective match score
  */
 export async function updateUserStatsFromMatch(
   match: ClientMatch,
@@ -94,7 +95,7 @@ export async function updateUserStatsFromMatch(
     // Get current user data
     const userData = await getUserData();
 
-    const finalScore = match.score + (match.streakBonus ?? 0);
+    const finalScore = calculateEffectiveMatchScore(match);
     const lastMatchTimestamp = userData.lastMatchTimestamp;
     const currentDailyStreak = userData.dailyStreak;
 
@@ -133,7 +134,7 @@ export async function updateUserStatsFromMatch(
       lastMatchTimestamp: match.timestamp,
       dailyStreak: newDailyStreak,
       bestStreak: Math.max(userData.bestStreak, newDailyStreak),
-      personalBestScore: Math.max(userData.personalBestScore, match.score),
+      personalBestScore: Math.max(userData.personalBestScore, finalScore),
     };
 
     return await saveUserData(updatedData);

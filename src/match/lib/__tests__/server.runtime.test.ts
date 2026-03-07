@@ -414,7 +414,7 @@ describe('match/lib/server runtime', () => {
         expect.objectContaining({
           dailyStreak: 1,
           bestStreak: 1,
-          personalBestScore: 300,
+          personalBestScore: 350,
           lastMatchTimestamp: match.timestamp,
         }),
       );
@@ -465,6 +465,33 @@ describe('match/lib/server runtime', () => {
           dailyStreak: 3,
           bestStreak: 3,
           personalBestScore: 150,
+        }),
+      );
+    });
+
+    it('uses the bonus-inclusive score when comparing personal bests', async () => {
+      const yesterday = Date.now() - 86400000;
+      const today = Date.now();
+      userDocRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({
+          dailyStreak: 2,
+          bestStreak: 2,
+          personalBestScore: 500,
+          lastMatchTimestamp: yesterday,
+        }),
+      });
+      userDocRef.update.mockResolvedValue(undefined);
+
+      await updateUserStatsFromMatch(
+        'user-1',
+        createMatch({ timestamp: today, score: 350, streakBonus: 200 }),
+        200,
+      );
+
+      expect(userDocRef.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          personalBestScore: 550,
         }),
       );
     });
